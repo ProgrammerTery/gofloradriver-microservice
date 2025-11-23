@@ -15,6 +15,9 @@
         <link rel="stylesheet" href="/css/trips.css">
     #elseif(pageType == "vehicle"):
         <link rel="stylesheet" href="/css/onboarding.css">
+    #elseif(pageType == "landing"):
+        <link rel="stylesheet" href="/css/onboarding.css">
+
     #endif
     
     <!-- Meta -->
@@ -23,8 +26,8 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    
-    #extend("head")
+
+    #import("head")
 </head>
 <body class="driver-portal #(pageType)">
     
@@ -126,7 +129,7 @@
         
         <!-- Page Content -->
         <div class="page-content #if(pageType == "auth" || pageType == "landing"):centered-content#endif">
-            #extend("content")
+            #import("content")
         </div>
     </main>
     
@@ -163,9 +166,8 @@
     #elseif(pageType == "trips"):
         <script src="/js/trips.js"></script>
     #endif
-    
-    #extend("scripts")
-    
+
+    #import("scripts")
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             initializeDriverPortal();
