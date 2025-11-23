@@ -1,5 +1,6 @@
 import Vapor
 import Leaf
+import DriversDTO
 
 struct DriversUIController: RouteCollection {
 
@@ -59,24 +60,22 @@ struct DriversUIController: RouteCollection {
     }
 
     @Sendable func handleSignup(_ req: Request) async throws -> Response {
-        let signupData = try req.content.decode(SignupFormData.self)
-
+        let signupData = try req.content.decode(DriverDTO.self)
         // Validate passwords match
         guard signupData.password == signupData.confirmPassword else {
             return req.redirect(to: "/products/gofloradriver/signup?error=Passwords do not match")
         }
+
+        let jsonData = try JSONEncoder().encode(signupData)
+        let buffer = req.application.allocator.buffer(data: jsonData)
 
         // Call the UnsecuredDriversController API for account creation
         do {
             let response = try await makeAPIRequest(
                 req: req,
                 method: .POST,
-                endpoint: APIConfig.endpoints["unsecuredDrivers"]! + "/signup",
-                body: [
-                    "email": signupData.email,
-                    "password": signupData.password
-                ]
-            )
+                endpoint: (APIConfig.endpoints["gofloradriver"] ?? "urlfailed") + "/signup",
+                body: buffer)
 
             if response.status == .created || response.status == .ok {
                 // Store email in session for next step
@@ -115,16 +114,9 @@ struct DriversUIController: RouteCollection {
     @Sendable func handleDriverRegistration(_ req: Request) async throws -> Response {
         let registrationData = try req.content.decode(DriverRegistrationFormData.self)
 
-        // Prepare data for DriversController API
-        let driverData: [String: Any] = [
-            "driverID": registrationData.driverID,
-            "driverName": registrationData.driverName,
-            "driverPhone": registrationData.driverPhone,
-            "driverEmail": registrationData.driverEmail,
-            "driverAddress": registrationData.driverAddress,
-            "driverLicense": registrationData.driverLicense,
-            "registrationDate": ISO8601DateFormatter().string(from: Date())
-        ]
+
+        let jsonData = try JSONEncoder().encode(registrationData)
+        let driverData = req.application.allocator.buffer(data: jsonData)
 
         do {
             let response = try await makeAPIRequest(
@@ -233,21 +225,15 @@ struct DriversUIController: RouteCollection {
 
     // MARK: - Helper Methods
 
-    private func makeAPIRequest(req: Request, method: HTTPMethod, endpoint: String, body: [String: Any]? = nil) async throws -> ClientResponse {
+    private func makeAPIRequest(req: Request, method: HTTPMethod, endpoint: String,  body: ByteBuffer? = nil) async throws -> ClientResponse {
         var headers = HTTPHeaders()
         headers.add(name: .contentType, value: "application/json")
-
-        var clientBody: ByteBuffer?
-        if let body = body {
-            let jsonData = try JSONSerialization.data(withJSONObject: body)
-            clientBody = req.application.allocator.buffer(data: jsonData)
-        }
 
         let clientRequest = ClientRequest(
             method: method,
             url: URI(string: endpoint),
             headers: headers,
-            body: clientBody
+            body: body
         )
 
         return try await req.client.send(clientRequest)

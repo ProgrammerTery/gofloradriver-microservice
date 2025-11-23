@@ -18,12 +18,6 @@ struct SignupPageContext: Content {
     let errorMessage: String?
 }
 
-struct SignupFormData: Content {
-    let email: String
-    let password: String
-    let confirmPassword: String
-}
-
 struct DriverRegistrationPageContext: Content {
     let title: String
     let pageType: String

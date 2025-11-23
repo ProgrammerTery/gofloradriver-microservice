@@ -15,6 +15,8 @@
             
             <form method="POST" action="/products/gofloradriver/signup" class="auth-form" id="signupForm">
                 <div class="form-group">
+                   <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required autofocus> 
                     <label for="email">Email Address</label>
                     <input type="email" 
                            id="email" 
