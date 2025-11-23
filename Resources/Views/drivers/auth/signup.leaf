@@ -1,0 +1,89 @@
+#extend("drivers/driversbase"):
+    #export("content"):
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1>Create Your Driver Account</h1>
+                <p>Join thousands of drivers earning with GoFlora</p>
+            </div>
+            
+            #if(errorMessage):
+            <div class="alert alert-error">
+                <span class="alert-icon">⚠️</span>
+                <span>#(errorMessage)</span>
+            </div>
+            #endif
+            
+            <form method="POST" action="/products/gofloradriver/signup" class="auth-form" id="signupForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" 
+                           id="email" 
+                           name="email" 
+                           required 
+                           placeholder="your@email.com"
+                           autocomplete="email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" 
+                           id="password" 
+                           name="password" 
+                           required 
+                           placeholder="Enter a strong password"
+                           autocomplete="new-password"
+                           minlength="8">
+                    <div class="password-requirements">
+                        <small>Password must be at least 8 characters long</small>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" 
+                           id="confirmPassword" 
+                           name="confirmPassword" 
+                           required 
+                           placeholder="Confirm your password"
+                           autocomplete="new-password">
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="terms" required>
+                        <span class="checkmark"></span>
+                        I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Privacy Policy</a>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-full">
+                    Create Account
+                </button>
+            </form>
+            
+            <div class="auth-footer">
+                <p>Already have a driver account? <a href="/products/gofloradriver/login">Sign in here</a></p>
+                <p><a href="/products/gofloradriver">← Back to home</a></p>
+            </div>
+        </div>
+        
+        <script>
+            document.getElementById('signupForm').addEventListener('submit', function(e) {
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (password !== confirmPassword) {
+                    e.preventDefault();
+                    alert('Passwords do not match. Please try again.');
+                    return false;
+                }
+                
+                if (password.length < 8) {
+                    e.preventDefault();
+                    alert('Password must be at least 8 characters long.');
+                    return false;
+                }
+            });
+        </script>
+    #endexport
+#endextend

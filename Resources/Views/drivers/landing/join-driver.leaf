@@ -1,0 +1,92 @@
+#extend("drivers/driversbase"):
+    #export("content"):
+        <div class="join-container">
+            <div class="join-header">
+                <h1>Become a GoFlora Driver</h1>
+                <p>Start your journey to financial independence with flexible driving opportunities</p>
+            </div>
+            
+            <div class="requirements-section">
+                <h2>Driver Requirements</h2>
+                <div class="requirements-grid">
+                    <div class="requirement">
+                        <span class="req-icon">✓</span>
+                        <div class="req-content">
+                            <h4>Valid Driver's License</h4>
+                            <p>Must have a valid driver's license for at least 2 years</p>
+                        </div>
+                    </div>
+                    <div class="requirement">
+                        <span class="req-icon">✓</span>
+                        <div class="req-content">
+                            <h4>Vehicle Requirements</h4>
+                            <p>Vehicle must be 2015 or newer, properly insured and registered</p>
+                        </div>
+                    </div>
+                    <div class="requirement">
+                        <span class="req-icon">✓</span>
+                        <div class="req-content">
+                            <h4>Background Check</h4>
+                            <p>Pass a comprehensive background check and driving record review</p>
+                        </div>
+                    </div>
+                    <div class="requirement">
+                        <span class="req-icon">✓</span>
+                        <div class="req-content">
+                            <h4>Age Requirement</h4>
+                            <p>Must be 21 years or older</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="process-section">
+                <h2>Simple 3-Step Process</h2>
+                <div class="process-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h4>Sign Up</h4>
+                        <p>Create your driver account with basic information</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h4>Vehicle Registration</h4>
+                        <p>Register your vehicle and choose your service type</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h4>Start Earning</h4>
+                        <p>Begin accepting trips and earning money immediately</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="earnings-section">
+                <h2>Earning Potential</h2>
+                <div class="earnings-info">
+                    <div class="earning-stat">
+                        <h3>$15-45</h3>
+                        <p>Per trip depending on distance and service type</p>
+                    </div>
+                    <div class="earning-stat">
+                        <h3>$20-35/hour</h3>
+                        <p>Average hourly earnings during peak times</p>
+                    </div>
+                    <div class="earning-stat">
+                        <h3>Weekly Bonuses</h3>
+                        <p>Extra earnings for completing weekly trip goals</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="join-actions">
+                <a href="/products/gofloradriver/signup" class="btn btn-primary btn-large">
+                    Start Your Application
+                </a>
+                <p class="join-note">
+                    Already have an account? <a href="/products/gofloradriver/login">Sign in here</a>
+                </p>
+            </div>
+        </div>
+    #endexport
+#endextend

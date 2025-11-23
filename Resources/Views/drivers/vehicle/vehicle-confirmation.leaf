@@ -1,0 +1,88 @@
+#extend("drivers/driversbase"):
+    #export("content"):
+        <div class="vehicle-container">
+            <div class="vehicle-header">
+                <h1>Vehicle Registration Complete!</h1>
+                <p>Congratulations #(driverName), your vehicle is now registered!</p>
+            </div>
+            
+            <div class="confirmation-content">
+                <div class="success-icon">
+                    <span>🚗</span>
+                </div>
+                
+                <div class="vehicle-summary">
+                    <h3>Your Registered Vehicle</h3>
+                    <div class="vehicle-details">
+                        <div class="vehicle-info">
+                            <div class="info-item">
+                                <span class="info-label">Vehicle:</span>
+                                <span class="info-value">#(vehicle.year) #(vehicle.make) #(vehicle.model)</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Color:</span>
+                                <span class="info-value">#(vehicle.color)</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">License Plate:</span>
+                                <span class="info-value">#(vehicle.licensePlate)</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Service Type:</span>
+                                <span class="info-value">#(serviceType.name) - $#(serviceType.baseRate)/trip</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="next-steps-section">
+                    <h3>🎉 You're Ready to Drive!</h3>
+                    <p>Your vehicle registration is complete. You can now:</p>
+                    
+                    <div class="features-grid">
+                        <div class="feature">
+                            <span class="feature-icon">👀</span>
+                            <h4>Browse Available Trips</h4>
+                            <p>Find trips in your area that match your schedule</p>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">💰</span>
+                            <h4>Submit Competitive Bids</h4>
+                            <p>Set your own rates and compete for the best trips</p>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">📱</span>
+                            <h4>Manage Your Schedule</h4>
+                            <p>Accept trips when it's convenient for you</p>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">⭐</span>
+                            <h4>Build Your Reputation</h4>
+                            <p>Earn high ratings and get more trip requests</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <a href="/products/gofloradriver/dashboard" class="btn btn-primary btn-large">
+                        Go to Dashboard
+                    </a>
+                    <a href="/products/gofloradriver/trips" class="btn btn-secondary">
+                        Browse Available Trips
+                    </a>
+                </div>
+                
+                <div class="getting-started-tips">
+                    <h4>💡 Tips for Success</h4>
+                    <ul class="tips-list">
+                        <li><strong>Competitive Bidding:</strong> Research typical rates in your area</li>
+                        <li><strong>Response Time:</strong> Quick responses increase your chances</li>
+                        <li><strong>Professional Service:</strong> Be punctual and courteous</li>
+                        <li><strong>Vehicle Condition:</strong> Keep your vehicle clean and comfortable</li>
+                        <li><strong>Communication:</strong> Stay in touch with passengers</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    #endexport
+#endextend

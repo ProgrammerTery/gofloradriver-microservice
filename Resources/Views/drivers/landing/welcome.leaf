@@ -1,0 +1,79 @@
+#extend("drivers/driversbase"):
+    #export("content"):
+        <div class="landing-hero">
+            <div class="hero-content">
+                <h1 class="hero-title">Join GoFlora as a Driver</h1>
+                <p class="hero-subtitle">
+                    Start earning money by providing reliable transportation services in your community.
+                    Flexible hours, competitive rates, and full support.
+                </p>
+                
+                <div class="hero-features">
+                    <div class="feature">
+                        <span class="feature-icon">💰</span>
+                        <h3>Competitive Earnings</h3>
+                        <p>Set your own rates and maximize your income</p>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">⏰</span>
+                        <h3>Flexible Schedule</h3>
+                        <p>Drive when you want, take time off when you need</p>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">🛡️</span>
+                        <h3>Full Support</h3>
+                        <p>24/7 driver support and insurance coverage</p>
+                    </div>
+                </div>
+                
+                <div class="hero-actions">
+                    <a href="/products/gofloradriver/join" class="btn btn-primary btn-large">
+                        Get Started Today
+                    </a>
+                    <a href="/products/gofloradriver/signup" class="btn btn-secondary">
+                        Already Have Account? Sign In
+                    </a>
+                </div>
+            </div>
+            
+            <div class="hero-image">
+                <img src="/images/driver-hero.jpg" alt="Happy GoFlora Driver" onerror="this.style.display='none'">
+            </div>
+        </div>
+        
+        <div class="landing-benefits">
+            <div class="benefits-container">
+                <h2>Why Choose GoFlora?</h2>
+                
+                <div class="benefits-grid">
+                    <div class="benefit">
+                        <h4>Instant Payments</h4>
+                        <p>Get paid immediately after each completed trip</p>
+                    </div>
+                    <div class="benefit">
+                        <h4>Choose Your Trips</h4>
+                        <p>Bid on trips that work for your schedule and location</p>
+                    </div>
+                    <div class="benefit">
+                        <h4>Professional Platform</h4>
+                        <p>Professional app with GPS tracking and customer support</p>
+                    </div>
+                    <div class="benefit">
+                        <h4>Growing Network</h4>
+                        <p>Join thousands of drivers in our expanding network</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="landing-cta">
+            <div class="cta-container">
+                <h2>Ready to Start Driving?</h2>
+                <p>Join our community of professional drivers today</p>
+                <a href="/products/gofloradriver/join" class="btn btn-primary btn-large">
+                    Start Your Application
+                </a>
+            </div>
+        </div>
+    #endexport
+#endextend

@@ -1,0 +1,176 @@
+#extend("drivers/driversbase"):
+    #export("content"):
+        <div class="vehicle-container">
+            <div class="vehicle-header">
+                <h1>Vehicle Registration</h1>
+                <p>Tell us about your vehicle, #(driverName)</p>
+                #if(selectedServiceType):
+                <div class="selected-service-badge">
+                    Selected: #(selectedServiceType.name) Service
+                </div>
+                #endif
+            </div>
+            
+            #if(errorMessage):
+            <div class="alert alert-error">
+                <span class="alert-icon">⚠️</span>
+                <span>#(errorMessage)</span>
+            </div>
+            #endif
+            
+            <form method="POST" action="/products/gofloradriver/vehicle/register" class="vehicle-form" id="vehicleForm">
+                <div class="form-section">
+                    <h3>Vehicle Information</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="make">Make</label>
+                            <input type="text" 
+                                   id="make" 
+                                   name="make" 
+                                   required 
+                                   placeholder="Toyota, Honda, Ford, etc."
+                                   list="makes">
+                            <datalist id="makes">
+                                <option value="Toyota">
+                                <option value="Honda">
+                                <option value="Ford">
+                                <option value="Chevrolet">
+                                <option value="Nissan">
+                                <option value="BMW">
+                                <option value="Mercedes-Benz">
+                                <option value="Audi">
+                                <option value="Volkswagen">
+                                <option value="Hyundai">
+                            </datalist>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="model">Model</label>
+                            <input type="text" 
+                                   id="model" 
+                                   name="model" 
+                                   required 
+                                   placeholder="Camry, Civic, F-150, etc.">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="year">Year</label>
+                            <input type="number" 
+                                   id="year" 
+                                   name="year" 
+                                   required 
+                                   min="2010" 
+                                   max="2025"
+                                   placeholder="2020">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="color">Color</label>
+                            <input type="text" 
+                                   id="color" 
+                                   name="color" 
+                                   required 
+                                   placeholder="White, Black, Silver, etc."
+                                   list="colors">
+                            <datalist id="colors">
+                                <option value="White">
+                                <option value="Black">
+                                <option value="Silver">
+                                <option value="Gray">
+                                <option value="Blue">
+                                <option value="Red">
+                                <option value="Green">
+                                <option value="Brown">
+                            </datalist>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="licensePlate">License Plate Number</label>
+                        <input type="text" 
+                               id="licensePlate" 
+                               name="licensePlate" 
+                               required 
+                               placeholder="ABC-1234"
+                               style="text-transform: uppercase;">
+                    </div>
+                </div>
+                
+                #if(selectedServiceType):
+                <input type="hidden" name="serviceTypeID" value="#(selectedServiceType.id)">
+                #endif
+                
+                <div class="vehicle-requirements">
+                    <h4>Vehicle Requirements</h4>
+                    <div class="requirements-checklist">
+                        <label class="checkbox-label">
+                            <input type="checkbox" required>
+                            <span class="checkmark"></span>
+                            Vehicle is 2015 or newer
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" required>
+                            <span class="checkmark"></span>
+                            Vehicle has valid registration
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" required>
+                            <span class="checkmark"></span>
+                            Vehicle has current insurance
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" required>
+                            <span class="checkmark"></span>
+                            Vehicle passes safety inspection
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-full">
+                    Register Vehicle
+                </button>
+            </form>
+            
+            <div class="vehicle-footer">
+                <p><a href="/products/gofloradriver/vehicle/service-type">← Back to service type</a></p>
+            </div>
+        </div>
+        
+        <script>
+            document.getElementById('vehicleForm').addEventListener('submit', function(e) {
+                const year = parseInt(document.getElementById('year').value);
+                const currentYear = new Date().getFullYear();
+                
+                if (year < 2015) {
+                    e.preventDefault();
+                    alert('Vehicle must be 2015 or newer to register for GoFlora driver service.');
+                    return false;
+                }
+                
+                if (year > currentYear + 1) {
+                    e.preventDefault();
+                    alert('Please enter a valid vehicle year.');
+                    return false;
+                }
+                
+                // Check if all requirements are checked
+                const requirements = document.querySelectorAll('.requirements-checklist input[type="checkbox"]');
+                const allChecked = Array.from(requirements).every(checkbox => checkbox.checked);
+                
+                if (!allChecked) {
+                    e.preventDefault();
+                    alert('Please confirm all vehicle requirements before proceeding.');
+                    return false;
+                }
+            });
+            
+            // Auto-uppercase license plate
+            document.getElementById('licensePlate').addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+        </script>
+    #endexport
+#endextend

@@ -1,0 +1,110 @@
+#extend("drivers/driversbase"):
+    #export("content"):
+        <div class="vehicle-container">
+            <div class="vehicle-header">
+                <h1>Select Your Service Type</h1>
+                <p>Choose the type of transportation service you'll provide</p>
+            </div>
+            
+            #if(errorMessage):
+            <div class="alert alert-error">
+                <span class="alert-icon">⚠️</span>
+                <span>#(errorMessage)</span>
+            </div>
+            #endif
+            
+            <form method="POST" action="/products/gofloradriver/vehicle/service-type" id="serviceTypeForm">
+                <div class="service-types-grid">
+                    #for(serviceType in serviceTypes):
+                    <div class="service-type-card">
+                        <input type="radio" 
+                               name="serviceTypeID" 
+                               value="#(serviceType.id)" 
+                               id="service-#(serviceType.id)" 
+                               required>
+                        <label for="service-#(serviceType.id)" class="service-type-label">
+                            <div class="service-type-header">
+                                <h3>#(serviceType.name)</h3>
+                                <div class="service-type-price">$#(serviceType.baseRate)/trip</div>
+                            </div>
+                            <p class="service-type-description">#(serviceType.description)</p>
+                            <div class="service-type-features">
+                                #if(serviceType.name == "Economy"):
+                                <ul>
+                                    <li>Standard vehicles (sedans, compacts)</li>
+                                    <li>Up to 4 passengers</li>
+                                    <li>Basic service level</li>
+                                    <li>Competitive pricing</li>
+                                </ul>
+                                #elseif(serviceType.name == "Premium"):
+                                <ul>
+                                    <li>Luxury vehicles (premium sedans)</li>
+                                    <li>Up to 4 passengers</li>
+                                    <li>Enhanced comfort</li>
+                                    <li>Higher earning potential</li>
+                                </ul>
+                                #elseif(serviceType.name == "SUV"):
+                                <ul>
+                                    <li>Large vehicles (SUVs, vans)</li>
+                                    <li>Up to 6-8 passengers</li>
+                                    <li>Extra cargo space</li>
+                                    <li>Group transportation</li>
+                                </ul>
+                                #else:
+                                <ul>
+                                    <li>Flexible service options</li>
+                                    <li>Competitive rates</li>
+                                    <li>Professional service</li>
+                                </ul>
+                                #endif
+                            </div>
+                        </label>
+                    </div>
+                    #endfor
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary btn-full">
+                        Continue to Vehicle Details
+                    </button>
+                </div>
+            </form>
+            
+            <div class="service-info">
+                <h4>💡 Tips for Choosing Your Service Type</h4>
+                <ul class="tips-list">
+                    <li><strong>Economy:</strong> Best for drivers with standard vehicles looking for consistent trips</li>
+                    <li><strong>Premium:</strong> Higher rates but requires newer, luxury vehicles</li>
+                    <li><strong>SUV:</strong> Great for larger vehicles and group transportation needs</li>
+                </ul>
+                <p class="note">You can change your service type later from your dashboard.</p>
+            </div>
+        </div>
+        
+        <script>
+            document.getElementById('serviceTypeForm').addEventListener('submit', function(e) {
+                const selectedService = document.querySelector('input[name="serviceTypeID"]:checked');
+                if (!selectedService) {
+                    e.preventDefault();
+                    alert('Please select a service type to continue.');
+                    return false;
+                }
+            });
+            
+            // Add visual feedback for selected cards
+            document.querySelectorAll('input[name="serviceTypeID"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    // Remove selection from all cards
+                    document.querySelectorAll('.service-type-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                    
+                    // Add selection to current card
+                    if (this.checked) {
+                        this.closest('.service-type-card').classList.add('selected');
+                    }
+                });
+            });
+        </script>
+    #endexport
+#endextend

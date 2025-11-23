@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>#(title) - GoFlora Driver</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/drivers-main.css">
+    #if(pageType == "auth"):
+        <link rel="stylesheet" href="/css/onboarding.css">
+    #elseif(pageType == "dashboard"):
+        <link rel="stylesheet" href="/css/dashboard.css">
+    #elseif(pageType == "trips"):
+        <link rel="stylesheet" href="/css/trips.css">
+    #elseif(pageType == "vehicle"):
+        <link rel="stylesheet" href="/css/onboarding.css">
+    #endif
+    
+    <!-- Meta -->
+    <meta name="description" content="GoFlora Driver Portal">
+    <meta name="robots" content="noindex">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    #extend("head")
+</head>
+<body class="driver-portal #(pageType)">
+    
+    <!-- Header -->
+    #if(pageType != "auth" && pageType != "landing" && pageType != "success"):
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-brand">
+                <a href="/products/gofloradriver/dashboard">
+                    <img src="/images/goflora-logo.svg" alt="GoFlora" class="logo" onerror="this.style.display='none'">
+                    <span class="brand-text">GoFlora Driver</span>
+                </a>
+            </div>
+            
+            <nav class="main-nav">
+                <a href="/products/gofloradriver/dashboard" class="nav-link #if(pageType == "dashboard"):active#endif">
+                    <span class="nav-icon">🏠</span>
+                    Dashboard
+                </a>
+                <a href="/products/gofloradriver/trips" class="nav-link #if(pageType == "trips"):active#endif">
+                    <span class="nav-icon">🚗</span>
+                    Trips
+                </a>
+                <a href="/products/gofloradriver/bids" class="nav-link">
+                    <span class="nav-icon">💰</span>
+                    My Bids
+                </a>
+                <a href="/products/gofloradriver/assigned" class="nav-link">
+                    <span class="nav-icon">📋</span>
+                    Assigned
+                </a>
+                <a href="/products/gofloradriver/history" class="nav-link">
+                    <span class="nav-icon">📊</span>
+                    History
+                </a>
+            </nav>
+            
+            <div class="header-actions">
+                <div class="driver-menu">
+                    <button class="driver-menu-toggle" onclick="toggleDriverMenu()">
+                        #if(driver):
+                            <span class="driver-name">#(driver.name)</span>
+                        #else:
+                            <span class="driver-name">Driver</span>
+                        #endif
+                        <span class="dropdown-arrow">▼</span>
+                    </button>
+                    <div class="driver-menu-dropdown" id="driverMenu">
+                        <a href="/products/gofloradriver/profile">Profile</a>
+                        <a href="/products/gofloradriver/vehicle">Vehicle</a>
+                        <hr>
+                        <a href="/products/gofloradriver/logout">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    #endif
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        #if(pageType == "dashboard" || pageType == "trips"):
+        <!-- Sidebar for dashboard and trip pages -->
+        <aside class="sidebar">
+            <div class="sidebar-content">
+                #if(stats):
+                <div class="driver-stats">
+                    <h3>Today's Stats</h3>
+                    <div class="stat-item">
+                        <span class="stat-label">Active Bids</span>
+                        <span class="stat-value">#(stats.activeBids)</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Assigned Trips</span>
+                        <span class="stat-value">#(stats.assignedTrips)</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Earnings</span>
+                        <span class="stat-value">#(stats.earnings)</span>
+                    </div>
+                </div>
+                #endif
+                
+                <div class="quick-actions">
+                    <h3>Quick Actions</h3>
+                    <a href="/products/gofloradriver/trips" class="quick-action-btn">
+                        Browse Trips
+                    </a>
+                    <a href="/products/gofloradriver/bids" class="quick-action-btn">
+                        My Bids
+                    </a>
+                    <a href="/products/gofloradriver/assigned" class="quick-action-btn">
+                        Active Jobs
+                    </a>
+                </div>
+            </div>
+        </aside>
+        #endif
+        
+        <!-- Page Content -->
+        <div class="page-content #if(pageType == "auth" || pageType == "landing"):centered-content#endif">
+            #extend("content")
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    #if(pageType != "auth" && pageType != "landing"):
+    <footer class="main-footer">
+        <div class="footer-content">
+            <p>&copy; 2025 GoFlora Transport Service. Driver Portal v1.0</p>
+            <div class="footer-links">
+                <a href="#" onclick="openSupport()">Support</a>
+                <a href="#">Terms</a>
+                <a href="#">Privacy</a>
+            </div>
+        </div>
+    </footer>
+    #endif
+    
+    <!-- Notifications -->
+    <div id="notifications" class="notifications-container"></div>
+    
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+    </div>
+    
+    <!-- Core JavaScript -->
+    <script src="/js/form-validation.js"></script>
+    
+    #if(pageType == "dashboard"):
+        <script src="/js/dashboard.js"></script>
+    #elseif(pageType == "trips"):
+        <script src="/js/trips.js"></script>
+    #endif
+    
+    #extend("scripts")
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDriverPortal();
+            showNotificationsFromURL();
+        });
+        
+        function toggleDriverMenu() {
+            const menu = document.getElementById('driverMenu');
+            menu.classList.toggle('show');
+        }
+        
+        function openSupport() {
+            alert('Support feature coming soon!');
+        }
+        
+        function initializeDriverPortal() {
+            console.log('Driver Portal initialized');
+        }
+        
+        function showNotificationsFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const success = urlParams.get('success');
+            const error = urlParams.get('error');
+            
+            if (success) {
+                showNotification(success, 'success');
+            }
+            if (error) {
+                showNotification(error, 'error');
+            }
+        }
+        
+        function showNotification(message, type) {
+            const container = document.getElementById('notifications');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()">&times;</button>
+            `;
+            container.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('driverMenu');
+            const toggle = document.querySelector('.driver-menu-toggle');
+            
+            if (menu && !toggle.contains(event.target)) {
+                menu.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,631 @@
+/* GoFlora Driver - Onboarding & Authentication Styles */
+
+/* Landing Pages */
+.landing-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    min-height: 80vh;
+    padding: 4rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.hero-content h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: #6b7280;
+    margin-bottom: 3rem;
+    line-height: 1.6;
+}
+
+.hero-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.feature {
+    text-align: center;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.feature h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: #1f2937;
+}
+
+.feature p {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.hero-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+/* Benefits Section */
+.landing-benefits {
+    background: #f9fafb;
+    padding: 4rem 2rem;
+}
+
+.benefits-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.benefits-container h2 {
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: #1f2937;
+}
+
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.benefit {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.benefit h4 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: #2563eb;
+}
+
+.benefit p {
+    color: #6b7280;
+}
+
+/* CTA Section */
+.landing-cta {
+    background: #2563eb;
+    padding: 4rem 2rem;
+    color: white;
+    text-align: center;
+}
+
+.cta-container h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.cta-container p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+/* Join Driver Page */
+.join-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.join-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.join-header h1 {
+    font-size: 2.5rem;
+    color: #1f2937;
+    margin-bottom: 1rem;
+}
+
+.join-header p {
+    font-size: 1.25rem;
+    color: #6b7280;
+}
+
+.requirements-section,
+.process-section,
+.earnings-section {
+    margin-bottom: 4rem;
+}
+
+.requirements-section h2,
+.process-section h2,
+.earnings-section h2 {
+    font-size: 2rem;
+    color: #1f2937;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.requirements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.requirement {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.req-icon {
+    color: #10b981;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.req-content h4 {
+    margin-bottom: 0.5rem;
+    color: #1f2937;
+}
+
+.req-content p {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+/* Process Steps */
+.process-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.step {
+    text-align: center;
+    padding: 2rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    background: #2563eb;
+    color: white;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.step h4 {
+    margin-bottom: 0.5rem;
+    color: #1f2937;
+}
+
+.step p {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+/* Earnings Info */
+.earnings-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+}
+
+.earning-stat {
+    text-align: center;
+    padding: 2rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.earning-stat h3 {
+    font-size: 2rem;
+    color: #059669;
+    margin-bottom: 0.5rem;
+}
+
+.earning-stat p {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.join-actions {
+    text-align: center;
+    margin-top: 4rem;
+}
+
+.join-note {
+    margin-top: 2rem;
+    color: #6b7280;
+}
+
+/* Auth Container */
+.auth-container {
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-header h1 {
+    font-size: 2rem;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.auth-header p {
+    color: #6b7280;
+    font-size: 1rem;
+}
+
+/* Form Styles */
+.auth-form {
+    margin-bottom: 2rem;
+}
+
+.form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.form-section h3 {
+    font-size: 1.25rem;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.password-requirements {
+    margin-top: 0.25rem;
+}
+
+.password-requirements small {
+    color: #6b7280;
+    font-size: 0.8rem;
+}
+
+/* Checkbox Styles */
+.checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.checkmark {
+    flex-shrink: 0;
+}
+
+/* Alert Styles */
+.alert {
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.alert-error {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.alert-icon {
+    font-size: 1.2rem;
+}
+
+/* Choice Container */
+.choice-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.choice-explanation {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.choice-explanation h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #1f2937;
+}
+
+.benefits-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 2rem;
+}
+
+.benefits-list li {
+    padding: 0.5rem 0;
+    color: #059669;
+}
+
+.benefits-list li::before {
+    content: "✓ ";
+    font-weight: bold;
+}
+
+.choice-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.choice-card {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 2rem;
+    text-align: center;
+    transition: border-color 0.3s ease;
+}
+
+.choice-card:hover {
+    border-color: #2563eb;
+}
+
+.choice-card h4 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: #1f2937;
+}
+
+.choice-card p {
+    color: #6b7280;
+    margin-bottom: 2rem;
+}
+
+/* Success Styles */
+.success-content {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.success-icon {
+    font-size: 4rem;
+    margin-bottom: 2rem;
+}
+
+.success-message h3 {
+    font-size: 1.5rem;
+    color: #059669;
+    margin-bottom: 1rem;
+}
+
+.success-message p {
+    color: #6b7280;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.next-steps {
+    margin: 3rem 0;
+}
+
+.next-steps h4 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    color: #1f2937;
+}
+
+.steps-list {
+    text-align: left;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.steps-list .step {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.steps-list .step:last-child {
+    border-bottom: none;
+}
+
+.step-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: #f3f4f6;
+    border-radius: 50%;
+    font-size: 0.8rem;
+}
+
+.steps-list .step.completed .step-icon {
+    background: #10b981;
+    color: white;
+}
+
+.success-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin: 3rem 0;
+    flex-wrap: wrap;
+}
+
+.welcome-info {
+    background: #f9fafb;
+    border-radius: 10px;
+    padding: 2rem;
+    margin-top: 3rem;
+}
+
+.welcome-info h4 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: #1f2937;
+}
+
+.tips-list {
+    list-style: none;
+    padding: 0;
+}
+
+.tips-list li {
+    padding: 0.5rem 0;
+    color: #374151;
+}
+
+.tips-list li::before {
+    content: "💡 ";
+    margin-right: 0.5rem;
+}
+
+/* Auth Footer */
+.auth-footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.auth-footer p {
+    margin: 0.5rem 0;
+}
+
+.auth-footer a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .landing-hero {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: center;
+    }
+    
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-actions {
+        justify-content: center;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .choice-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .success-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .auth-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+}

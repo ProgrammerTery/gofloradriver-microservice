@@ -1,0 +1,50 @@
+#extend("drivers/driversbase"):
+    #export("content"):
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1>Vehicle Registration</h1>
+                <p>Welcome #(driverName)! Would you like to register your vehicle now?</p>
+            </div>
+            
+            <div class="choice-container">
+                <div class="choice-explanation">
+                    <h3>Why Register Your Vehicle?</h3>
+                    <ul class="benefits-list">
+                        <li>Start accepting trip requests immediately</li>
+                        <li>Set your service type and pricing</li>
+                        <li>Access all driver features</li>
+                        <li>Begin earning money today</li>
+                    </ul>
+                </div>
+                
+                <div class="choice-options">
+                    <div class="choice-card">
+                        <h4>Register Vehicle Now</h4>
+                        <p>Complete your setup and start driving today</p>
+                        <form method="POST" action="/products/gofloradriver/vehicle-choice">
+                            <input type="hidden" name="registerVehicleNow" value="true">
+                            <button type="submit" class="btn btn-primary btn-full">
+                                Yes, Register My Vehicle
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="choice-card">
+                        <h4>Register Later</h4>
+                        <p>Complete vehicle registration when you're ready to start driving</p>
+                        <form method="POST" action="/products/gofloradriver/vehicle-choice">
+                            <input type="hidden" name="registerVehicleNow" value="false">
+                            <button type="submit" class="btn btn-secondary btn-full">
+                                I'll Register Later
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="auth-footer">
+                <p><small>You can always add your vehicle later from your driver dashboard</small></p>
+            </div>
+        </div>
+    #endexport
+#endextend

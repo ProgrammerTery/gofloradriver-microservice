@@ -1,0 +1,93 @@
+#extend("drivers/driversbase"):
+    #export("content"):
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1>Registration Successful!</h1>
+                <p>Welcome to GoFlora, #(driverName)!</p>
+            </div>
+            
+            <div class="success-content">
+                <div class="success-icon">
+                    <span>✅</span>
+                </div>
+                
+                <div class="success-message">
+                    #if(hasVehicle):
+                        <h3>Your driver account and vehicle have been successfully registered!</h3>
+                        <p>You're all set to start accepting trip requests and earning money with GoFlora.</p>
+                    #else:
+                        <h3>Your driver account has been successfully created!</h3>
+                        <p>To start accepting trips, you'll need to register your vehicle and choose a service type.</p>
+                    #endif
+                </div>
+                
+                <div class="next-steps">
+                    <h4>What's Next?</h4>
+                    <div class="steps-list">
+                        #if(hasVehicle):
+                            <div class="step completed">
+                                <span class="step-icon">✓</span>
+                                <span>Driver account created</span>
+                            </div>
+                            <div class="step completed">
+                                <span class="step-icon">✓</span>
+                                <span>Vehicle registered</span>
+                            </div>
+                            <div class="step">
+                                <span class="step-icon">→</span>
+                                <span>Start browsing available trips</span>
+                            </div>
+                        #else:
+                            <div class="step completed">
+                                <span class="step-icon">✓</span>
+                                <span>Driver account created</span>
+                            </div>
+                            <div class="step">
+                                <span class="step-icon">1</span>
+                                <span>Register your vehicle</span>
+                            </div>
+                            <div class="step">
+                                <span class="step-icon">2</span>
+                                <span>Choose service type</span>
+                            </div>
+                            <div class="step">
+                                <span class="step-icon">3</span>
+                                <span>Start earning</span>
+                            </div>
+                        #endif
+                    </div>
+                </div>
+                
+                <div class="success-actions">
+                    <a href="#(nextStepURL)" class="btn btn-primary btn-large">
+                        #if(hasVehicle):
+                            Go to Dashboard
+                        #else:
+                            Register Vehicle
+                        #endif
+                    </a>
+                    
+                    #if(hasVehicle):
+                        <a href="/products/gofloradriver/trips" class="btn btn-secondary">
+                            Browse Available Trips
+                        </a>
+                    #else:
+                        <a href="/products/gofloradriver/dashboard" class="btn btn-secondary">
+                            Explore Dashboard
+                        </a>
+                    #endif
+                </div>
+            </div>
+            
+            <div class="welcome-info">
+                <h4>Getting Started Tips</h4>
+                <ul class="tips-list">
+                    <li>Complete your profile for better trip opportunities</li>
+                    <li>Check available trips in your area</li>
+                    <li>Set competitive bid prices to win more trips</li>
+                    <li>Maintain high ratings for consistent bookings</li>
+                </ul>
+            </div>
+        </div>
+    #endexport
+#endextend
