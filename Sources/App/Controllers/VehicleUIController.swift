@@ -20,7 +20,7 @@ struct VehicleUIController: RouteCollection {
 
     @Sendable func renderServiceTypeSelection(_ req: Request) async throws -> Response {
         guard let driverID = req.session.data["driverID"],
-              let driverName = req.session.data["driverName"] else {
+              let driverName = req.session.data["name"] else {
             return req.redirect(to: "/products/gofloradriver/register")
         }
 
@@ -50,7 +50,7 @@ struct VehicleUIController: RouteCollection {
 
     @Sendable func renderVehicleRegistration(_ req: Request) async throws -> Response {
         guard let driverID = req.session.data["driverID"],
-              let driverName = req.session.data["driverName"],
+              let driverName = req.session.data["name"],
               let selectedServiceTypeID = req.session.data["selectedServiceTypeID"] else {
             return req.redirect(to: "/products/gofloradriver/vehicle/service-type")
         }

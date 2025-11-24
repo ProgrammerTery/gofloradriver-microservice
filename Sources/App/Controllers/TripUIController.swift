@@ -1,5 +1,6 @@
 import Vapor
 import Leaf
+import DriversDTO
 
 struct TripUIController: RouteCollection {
     
@@ -42,7 +43,7 @@ struct TripUIController: RouteCollection {
         
         let driver = try await fetchDriverProfile(req)
         let trip = try await fetchTripDetails(req, tripId: tripId)
-        let existingBid = try await fetchExistingBid(req, tripId: tripId, driverId: driver.id)
+        let existingBid = try await fetchExistingBid(req, tripId: tripId, driverId: driver.driverID)
         
         let context = TripDetailsPageContext(
             title: "Trip Details",
@@ -182,16 +183,11 @@ struct TripUIController: RouteCollection {
     
     // MARK: - Helper Methods
     
-    private func fetchDriverProfile(_ req: Request) async throws -> DriverProfileContext {
+    private func fetchDriverProfile(_ req: Request) async throws -> DriverProfileDTO {
         // Mock data - in real implementation, call API with session token
-        return DriverProfileContext(
-            id: req.session.data["driverID"] ?? "unknown",
-            name: req.session.data["driverName"] ?? "Unknown Driver",
-            email: req.session.data["driverEmail"] ?? "",
-            phone: "+1234567890",
-            license: "DL123456",
-            address: "123 Driver St"
-        )
+
+
+        return DriverProfileDTO(driverID:  req.session.data["driverID"] ?? "unknown", driverName: req.session.data["name"] ?? "Unknown Driver", driverPhone: "+263778463020", driverEmail: "waltack@example.com", driverAddress: "Victoria Falls City", registrationDate: Date(), driverLicense: "AQW5363783", vehicle_id: UUID())
     }
     
     private func fetchAvailableTrips(_ req: Request) async throws -> [TripSummaryContext] {
