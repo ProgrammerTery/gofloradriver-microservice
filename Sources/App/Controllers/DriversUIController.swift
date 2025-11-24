@@ -172,6 +172,7 @@ struct DriversUIController: RouteCollection {
                 return req.redirect(to: "/products/gofloradriver/login?error=\(error)&email=\(loginData.username)")
             }
         } catch {
+            print("Login error: \(error)")
             return req.redirect(to: "/products/gofloradriver/login?error=Network error. Please try again.&email=\(loginData.username)")
         }
     }
