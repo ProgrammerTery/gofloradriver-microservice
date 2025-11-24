@@ -24,7 +24,7 @@
                                    id="driverID" 
                                    name="driverID" 
                                    required 
-                                   placeholder="Choose a unique driver ID"
+                                   placeholder="Enter your National ID"
                                    pattern="[A-Za-z0-9_-]+"
                                    title="Only letters, numbers, underscores and hyphens allowed">
                         </div>

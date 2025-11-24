@@ -77,6 +77,15 @@ struct DriversUIController: RouteCollection {
                 endpoint: (APIConfig.endpoints["gofloradriver"] ?? "urlfailed") + "/signup",
                 body: buffer)
 
+            // lets extract useful info returned after a successful signup
+
+            let driverResponse = try response.content.decode(DriverDTOResponseModel.self)
+
+            //lets store the token in session
+            req.session.data["driverToken"] = driverResponse.token
+            req.session.data["email"] = driverResponse.email
+            req.session.data["name"] = driverResponse.name
+
             if response.status == .created || response.status == .ok {
                 // Store email in session for next step
                 req.session.data["signupEmail"] = signupData.email
@@ -87,50 +96,57 @@ struct DriversUIController: RouteCollection {
                 return req.redirect(to: "/products/gofloradriver/signup?error=\(error)")
             }
         } catch {
-            return req.redirect(to: "/products/gofloradriver/signup?error=Network error. Please try again.")
+            return req.redirect(to: "/products/gofloradriver/signup?error=Something went wrong. Please try again.")
         }
     }
 
     // MARK: - Driver Registration Flow
 
     @Sendable func renderDriverRegistration(_ req: Request) async throws -> View {
-        let email = req.session.data["signupEmail"] ?? ""
+        let email = req.session.data["email"] ?? ""
+        let name = req.session.data["name"] ?? ""
+
         let context = DriverRegistrationPageContext(
             title: "Driver Registration",
             pageType: "auth",
             errorMessage: req.query["error"],
-            prefillData: DriverRegistrationFormData(
+            prefillData: DriverProfileDTO(
                 driverID: "",
-                driverName: "",
+                driverName: name,
                 driverPhone: "",
                 driverEmail: email,
                 driverAddress: "",
-                driverLicense: ""
+                registrationDate: Date(),
+                driverLicense: "",
+                vehicle_id: nil
             )
         )
         return try await req.view.render("drivers/auth/driver-registration", context)
     }
 
     @Sendable func handleDriverRegistration(_ req: Request) async throws -> Response {
-        let registrationData = try req.content.decode(DriverRegistrationFormData.self)
+        let registrationData = try req.content.decode(DriverProfileDTO.self)
 
 
         let jsonData = try JSONEncoder().encode(registrationData)
         let driverData = req.application.allocator.buffer(data: jsonData)
+        // Call the DriverProfilesController API for registration
+        let driverToken = req.session.data["driverToken"]
 
         do {
             let response = try await makeAPIRequest(
                 req: req,
                 method: .POST,
-                endpoint: APIConfig.endpoints["unsecuredDrivers"]! + "/register",
-                body: driverData
+                endpoint: APIConfig.endpoints["driver-profiles"]! + "/register",
+                body: driverData,
+                driverToken: driverToken
             )
 
             if response.status == .created || response.status == .ok {
                 // Store driver data in session
                 req.session.data["driverID"] = registrationData.driverID
-                req.session.data["driverName"] = registrationData.driverName
-                req.session.data["driverEmail"] = registrationData.driverEmail
+                req.session.data["name"] = registrationData.driverName
+                req.session.data["email"] = registrationData.driverEmail
 
                 return req.redirect(to: "/products/gofloradriver/vehicle-choice")
             } else {
@@ -147,7 +163,7 @@ struct DriversUIController: RouteCollection {
 
     @Sendable func renderVehicleChoice(_ req: Request) async throws -> View {
         guard let driverID = req.session.data["driverID"],
-              let driverName = req.session.data["driverName"] else {
+              let driverName = req.session.data["name"] else {
             throw Abort(.badRequest, reason: "Driver session not found. Please register first.")
         }
 
@@ -173,7 +189,7 @@ struct DriversUIController: RouteCollection {
     // MARK: - Success Page
 
     @Sendable func renderRegistrationSuccess(_ req: Request) async throws -> View {
-        guard let driverName = req.session.data["driverName"] else {
+        guard let driverName = req.session.data["name"] else {
             throw Abort(.badRequest, reason: "Driver session not found. Please register first.")
         }
 
@@ -225,9 +241,12 @@ struct DriversUIController: RouteCollection {
 
     // MARK: - Helper Methods
 
-    private func makeAPIRequest(req: Request, method: HTTPMethod, endpoint: String,  body: ByteBuffer? = nil) async throws -> ClientResponse {
+    private func makeAPIRequest(req: Request, method: HTTPMethod, endpoint: String,  body: ByteBuffer? = nil, driverToken: String? = nil) async throws -> ClientResponse {
         var headers = HTTPHeaders()
         headers.add(name: .contentType, value: "application/json")
+        if let token = driverToken {
+            headers.add(name: .authorization, value: "Bearer \(token)")
+        }
 
         let clientRequest = ClientRequest(
             method: method,
@@ -239,16 +258,9 @@ struct DriversUIController: RouteCollection {
         return try await req.client.send(clientRequest)
     }
 
-    private func fetchDriverProfile(_ req: Request) async throws -> DriverProfileContext {
+    private func fetchDriverProfile(_ req: Request) async throws -> DriverProfileDTO {
         // Mock data - in real implementation, call API with session token
-        return DriverProfileContext(
-            id: req.session.data["driverID"] ?? "unknown",
-            name: req.session.data["driverName"] ?? "Unknown Driver",
-            email: req.session.data["driverEmail"] ?? "",
-            phone: "+1234567890",
-            license: "DL123456",
-            address: "123 Driver St"
-        )
+        return DriverProfileDTO(driverID:  req.session.data["driverID"] ?? "unknown", driverName: req.session.data["name"] ?? "Unknown Driver", driverPhone: "+263778463020", driverEmail: "waltack@example.com", driverAddress: "Victoria Falls City", registrationDate: Date(), driverLicense: "AQW5363783", vehicle_id: UUID())
     }
 
     private func fetchDriverStats(_ req: Request) async throws -> DriverStatsContext {
