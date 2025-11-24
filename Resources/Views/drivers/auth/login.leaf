@@ -4,7 +4,7 @@
         <div class="auth-container">
             <div class="auth-header">
                 <h1>Driver Login</h1>
-                <p>Welcome back! Please sign in to your driver account.</p>
+                <p>Welcome back! </br> Please sign in to your driver account.</p>
             </div>
             
             #if(errorMessage):
@@ -21,7 +21,7 @@
                            name="username" 
                            required 
                            placeholder="Enter your email address"
-                           value="#(prefillEmail ?? "")">
+                           value="#(prefillEmail)">
                 </div>
 
                 <div class="form-group">
@@ -37,7 +37,7 @@
                     <label class="checkbox-label">
                         <input type="checkbox" name="rememberMe" value="true">
                         <span class="checkmark"></span>
-                        Remember me for 30 days
+                        Remember me
                     </label>
                 </div>
                 
@@ -56,8 +56,8 @@
             </div>
             
             <div class="alternative-actions">
-                <a href="/products/gofloradriver/welcome" class="btn btn-secondary btn-full">
-                    ← Back to Welcome
+                <a href="/products/gofloradriver/landing" class="btn btn-secondary btn-full">
+                    ← Back
                 </a>
             </div>
         </div>

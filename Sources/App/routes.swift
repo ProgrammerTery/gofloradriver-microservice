@@ -6,6 +6,10 @@ func routes(_ app: Application) throws {
     try app.routes.register(collection: VehicleUIController())
     try app.routes.register(collection: TripUIController())
     
+    
+    // Register the new landing controller
+    try app.routes.register(collection: LandingController())
+    
     // Root redirect to welcome page
     app.get { req in
         req.redirect(to: "/products/gofloradriver")
