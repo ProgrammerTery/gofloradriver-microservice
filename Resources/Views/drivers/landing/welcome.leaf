@@ -7,7 +7,7 @@
                     Start earning money by providing reliable transportation services in your community.
                     Flexible hours, competitive rates, and full support.
                 </p>
-                
+
                 <div class="hero-features">
                     <div class="feature">
                         <span class="feature-icon">💰</span>
@@ -25,26 +25,26 @@
                         <p>24/7 driver support and insurance coverage</p>
                     </div>
                 </div>
-                
+
                 <div class="hero-actions">
                     <a href="/products/gofloradriver/join" class="btn btn-primary btn-large">
                         Get Started Today
                     </a>
-                    <a href="/products/gofloradriver/signup" class="btn btn-secondary">
+                    <a href="/products/gofloradriver/login" class="btn btn-secondary">
                         Already Have Account? Sign In
                     </a>
                 </div>
             </div>
-            
+
             <div class="hero-image">
                 <img src="/images/driver-hero.jpg" alt="Happy GoFlora Driver" onerror="this.style.display='none'">
             </div>
         </div>
-        
+
         <div class="landing-benefits">
             <div class="benefits-container">
                 <h2>Why Choose GoFlora?</h2>
-                
+
                 <div class="benefits-grid">
                     <div class="benefit">
                         <h4>Instant Payments</h4>
@@ -65,7 +65,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="landing-cta">
             <div class="cta-container">
                 <h2>Ready to Start Driving?</h2>

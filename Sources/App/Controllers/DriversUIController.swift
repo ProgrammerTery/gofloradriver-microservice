@@ -1,6 +1,7 @@
 import Vapor
 import Leaf
 import DriversDTO
+import SharedModels
 
 struct DriversUIController: RouteCollection {
 
@@ -13,6 +14,9 @@ struct DriversUIController: RouteCollection {
         driversUIRoute.get("join", use: renderJoinDriver)
         driversUIRoute.get("signup", use: renderSignup)
         driversUIRoute.post("signup", use: handleSignup)
+
+        driversUIRoute.get("login", use: renderLogin)
+        driversUIRoute.post("login", use: handleLogin)
 
         // Driver Registration Routes
         driversUIRoute.get("register", use: renderDriverRegistration)
@@ -33,6 +37,12 @@ struct DriversUIController: RouteCollection {
     // MARK: - Landing & Join Flow
 
     @Sendable func renderWelcome(_ req: Request) async throws -> View {
+        // Check if driver is already logged in
+        if let driverToken = req.session.data["driverToken"], !driverToken.isEmpty {
+            // User is already authenticated, redirect to dashboard
+            throw Abort.redirect(to: "/products/gofloradriver/dashboard")
+        }
+
         let context = WelcomePageContext(
             title: "Welcome to GoFlora Driver",
             pageType: "landing"
@@ -97,6 +107,73 @@ struct DriversUIController: RouteCollection {
             }
         } catch {
             return req.redirect(to: "/products/gofloradriver/signup?error=Something went wrong. Please try again.")
+        }
+    }
+
+    // MARK: - Login Flow
+
+    @Sendable func renderLogin(_ req: Request) async throws -> View {
+        // Check if driver is already logged in
+        if let driverToken = req.session.data["driverToken"], !driverToken.isEmpty {
+            // User is already authenticated, redirect to dashboard
+            throw Abort.redirect(to: "/products/gofloradriver/dashboard")
+        }
+
+        let context = LoginPageContext(
+            title: "Driver Login",
+            pageType: "auth",
+            errorMessage: req.query["error"],
+            prefillEmail: req.query["email"]
+        )
+        return try await req.view.render("drivers/auth/login", context)
+    }
+
+    @Sendable func handleLogin(_ req: Request) async throws -> Response {
+        let loginData = try req.content.decode(SignInRequest.self)
+
+        let jsonData = try JSONEncoder().encode(loginData)
+        let buffer = req.application.allocator.buffer(data: jsonData)
+
+        // Call the UnsecuredDriversController API for authentication
+        do {
+            let response = try await makeAPIRequest(
+                req: req,
+                method: .POST,
+                endpoint: (APIConfig.endpoints["gofloradriver"] ?? "urlfailed") + "/login",
+                body: buffer
+            )
+
+            if response.status == .ok {
+                // Extract driver info from response
+                let driverResponse = try response.content.decode(DriverDTOResponseModel.self)
+
+                // Store session data
+                req.session.data["driverToken"] = driverResponse.token
+                req.session.data["email"] = driverResponse.email
+                req.session.data["name"] = driverResponse.name
+               // req.session.data["driverID"] = driverResponse.driverID ?? ""
+
+                // Set remember me if requested (extends session duration)
+                if let rememberMe = try? req.content.get(String.self, at: "rememberMe"), rememberMe == "true" {
+                    req.session.data["rememberMe"] = "true"
+                }
+
+                // Check if user has completed registration
+                if  !driverResponse.email.isEmpty {
+                    // User has completed driver registration, go to dashboard
+                    return req.redirect(to: "/products/gofloradriver/dashboard")
+                } else {
+                    // User hasn't completed driver registration, redirect to registration
+                    return req.redirect(to: "/products/gofloradriver/register")
+                }
+            } else {
+                let errorData = try response.content.decode([String: String].self)
+                let error = errorData["message"] ?? "Invalid email or password"
+                return req.redirect(to: "/products/gofloradriver/login?error=\(error)&email=\(loginData.username)")
+            }
+        } catch {
+            print("Login error: \(error)")
+            return req.redirect(to: "/products/gofloradriver/login?error=Network error. Please try again.&email=\(loginData.username)")
         }
     }
 
@@ -288,13 +365,22 @@ struct DriversUIController: RouteCollection {
     }
 }
 
+// MARK: - Data Structures
+
+struct LoginPageContext: Content {
+    let title: String
+    let pageType: String
+    let errorMessage: String?
+    let prefillEmail: String?
+}
+
 // Simple auth middleware for session checking
 struct DriverAuthMiddleware: AsyncMiddleware {
     func respond(to request: Request, chainingTo next: AsyncResponder) async throws -> Response {
-        if request.session.data["driverID"] != nil {
+        if request.session.data["driverToken"] != nil {
             return try await next.respond(to: request)
         } else {
-            return request.redirect(to: "/products/gofloradriver/signup")
+            return request.redirect(to: "/products/gofloradriver/login")
         }
     }
 }

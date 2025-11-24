@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>#(title) - GoFlora Driver</title>
-    
+
     <!-- CSS -->
     <link rel="stylesheet" href="/css/drivers-main.css">
     #if(pageType == "auth"):
@@ -19,18 +19,26 @@
         <link rel="stylesheet" href="/css/onboarding.css">
 
     #endif
-    
+
     <!-- Meta -->
     <meta name="description" content="GoFlora Driver Portal">
     <meta name="robots" content="noindex">
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 
-    #import("head")
 </head>
+<body>
+    <div class="main-container">
+        #import("body")
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/js/form-validation.js"></script>
+</body>
+</html>
 <body class="driver-portal #(pageType)">
-    
+
     <!-- Header -->
     #if(pageType != "auth" && pageType != "landing" && pageType != "success"):
     <header class="main-header">
@@ -41,7 +49,7 @@
                     <span class="brand-text">GoFlora Driver</span>
                 </a>
             </div>
-            
+
             <nav class="main-nav">
                 <a href="/products/gofloradriver/dashboard" class="nav-link #if(pageType == "dashboard"):active#endif">
                     <span class="nav-icon">🏠</span>
@@ -64,7 +72,7 @@
                     History
                 </a>
             </nav>
-            
+
             <div class="header-actions">
                 <div class="driver-menu">
                     <button class="driver-menu-toggle" onclick="toggleDriverMenu()">
@@ -86,7 +94,7 @@
         </div>
     </header>
     #endif
-    
+
     <!-- Main Content -->
     <main class="main-content">
         #if(pageType == "dashboard" || pageType == "trips"):
@@ -110,7 +118,7 @@
                     </div>
                 </div>
                 #endif
-                
+
                 <div class="quick-actions">
                     <h3>Quick Actions</h3>
                     <a href="/products/gofloradriver/trips" class="quick-action-btn">
@@ -126,13 +134,13 @@
             </div>
         </aside>
         #endif
-        
+
         <!-- Page Content -->
         <div class="page-content #if(pageType == "auth" || pageType == "landing"):centered-content#endif">
             #import("content")
         </div>
     </main>
-    
+
     <!-- Footer -->
     #if(pageType != "auth" && pageType != "landing"):
     <footer class="main-footer">
@@ -146,10 +154,10 @@
         </div>
     </footer>
     #endif
-    
+
     <!-- Notifications -->
     <div id="notifications" class="notifications-container"></div>
-    
+
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay" style="display: none;">
         <div class="loading-spinner">
@@ -157,10 +165,10 @@
             <p>Loading...</p>
         </div>
     </div>
-    
+
     <!-- Core JavaScript -->
     <script src="/js/form-validation.js"></script>
-    
+
     #if(pageType == "dashboard"):
         <script src="/js/dashboard.js"></script>
     #elseif(pageType == "trips"):
@@ -173,25 +181,25 @@
             initializeDriverPortal();
             showNotificationsFromURL();
         });
-        
+
         function toggleDriverMenu() {
             const menu = document.getElementById('driverMenu');
             menu.classList.toggle('show');
         }
-        
+
         function openSupport() {
             alert('Support feature coming soon!');
         }
-        
+
         function initializeDriverPortal() {
             console.log('Driver Portal initialized');
         }
-        
+
         function showNotificationsFromURL() {
             const urlParams = new URLSearchParams(window.location.search);
             const success = urlParams.get('success');
             const error = urlParams.get('error');
-            
+
             if (success) {
                 showNotification(success, 'success');
             }
@@ -199,7 +207,7 @@
                 showNotification(error, 'error');
             }
         }
-        
+
         function showNotification(message, type) {
             const container = document.getElementById('notifications');
             const notification = document.createElement('div');
@@ -209,7 +217,7 @@
                 <button onclick="this.parentElement.remove()">&times;</button>
             `;
             container.appendChild(notification);
-            
+
             // Auto remove after 5 seconds
             setTimeout(() => {
                 if (notification.parentElement) {
@@ -217,12 +225,12 @@
                 }
             }, 5000);
         }
-        
+
         // Close dropdown when clicking outside
         document.addEventListener('click', function(event) {
             const menu = document.getElementById('driverMenu');
             const toggle = document.querySelector('.driver-menu-toggle');
-            
+
             if (menu && !toggle.contains(event.target)) {
                 menu.classList.remove('show');
             }
