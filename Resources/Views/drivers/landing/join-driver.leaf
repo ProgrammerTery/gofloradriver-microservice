@@ -1,5 +1,5 @@
 #extend("drivers/driversbase"):
-    #export("content"):
+    #export("contentDetail"):
         <div class="join-container">
             <div class="join-header">
                 <h1>Become a GoFlora Driver</h1>

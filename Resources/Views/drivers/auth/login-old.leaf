@@ -1,0 +1,248 @@
+#extend("drivers/driversbase"):
+    #export("title", "Driver Login")
+    #export("pageType", "auth")
+    
+    #export("content"):
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);">
+                        <i class="fas fa-leaf" style="font-size: 2rem; color: white;"></i>
+                    </div>
+                    <h1>Welcome Back!</h1>
+                    <p>Sign in to your driver account</p>
+                </div>
+                
+                #if(errorMessage):
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>#(errorMessage)</span>
+                    </div>
+                #endif
+                
+                <form method="POST" action="/products/gofloradriver/login">
+                    <div class="form-group">
+                        <label class="form-label" for="username">Email Address</label>
+                        <input type="email" 
+                               class="form-control"
+                               id="username" 
+                               name="username" 
+                               required 
+                               placeholder="your@email.com"
+                               value="#(prefillEmail)"
+                               autocomplete="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password</label>
+                        <input type="password" 
+                               class="form-control"
+                               id="password" 
+                               name="password" 
+                               required 
+                               placeholder="Enter your password"
+                               autocomplete="current-password">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Sign In
+                    </button>
+                </form>
+                
+                <div class="auth-footer">
+                    <p style="margin-bottom: 0.5rem;">Don't have an account? <a href="/products/gofloradriver/signup" style="color: var(--primary); font-weight: 600; text-decoration: none;">Sign up here</a></p>
+                    <p style="margin-bottom: 1rem;"><a href="/products/gofloradriver/forgot-password" style="color: var(--text-tertiary); font-size: 0.875rem; text-decoration: none;">Forgot your password?</a></p>
+                    <a href="/products/gofloradriver/landing" class="btn btn-outline btn-full">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            // Focus on email input on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                document.getElementById('username').focus();
+            });
+        </script>
+    #endexport
+#endextend
+            body {
+                /* Dark background for the whole page (you may need to place this in your driversbase template) */
+                background-color: #1a1a2e; /* Deep dark blue */
+                color: #e4e6eb; /* Light text */
+            }
+
+            .auth-container {
+                max-width: 400px;
+                margin: 4rem auto; /* Increased margin for better centering in dark theme */
+                padding: 2.5rem; /* Slightly more padding */
+                background: #202c45; /* Slightly lighter dark blue for the card */
+                border-radius: 12px; /* Smoother corners */
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05); /* Stronger, softer shadow */
+            }
+
+            .auth-header {
+                text-align: center;
+                margin-bottom: 2rem;
+            }
+
+            .auth-header h1 {
+                color: #e4e6eb; /* White/Light gray title */
+                font-size: 2rem; /* Slightly larger title */
+                font-weight: 700; /* Bolder */
+                margin-bottom: 0.5rem;
+            }
+
+            .auth-header p {
+                color: #94a3b8; /* Soft blue-gray subtitle */
+                font-size: 1rem;
+            }
+            
+            /* Error Message - Still needs to stand out */
+            .error-message {
+                background-color: #581d2a; /* Darker red background */
+                border: 1px solid #ff4e50; /* Vibrant red border */
+                border-radius: 6px;
+                padding: 0.75rem;
+                margin-bottom: 1.5rem; /* Increased margin */
+            }
+
+            .error-message p {
+                color: #ffbaba; /* Light red text */
+                margin: 0;
+                font-size: 0.9rem;
+            }
+
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 0.4rem;
+                font-weight: 500;
+                color: #e4e6eb; /* Light label text */
+                font-size: 0.9rem;
+            }
+
+            .form-group input[type="email"],
+            .form-group input[type="password"] {
+                width: 100%;
+                padding: 0.8rem;
+                border: 1px solid #334155; /* Dark border */
+                background-color: #27344a; /* Darker input background */
+                color: #e4e6eb; /* Input text color */
+                border-radius: 6px;
+                font-size: 1rem;
+                box-sizing: border-box;
+            }
+
+            .form-group input:focus {
+                outline: none;
+                border-color: #38bdf8; /* Vibrant blue focus color */
+                box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3); /* Soft glow effect */
+            }
+
+            .checkbox-label {
+                display: flex !important;
+                align-items: center;
+                cursor: pointer;
+                font-size: 0.9rem;
+                color: #94a3b8; /* Light gray checkbox label */
+            }
+            
+            /* Button styles - Changed to a striking blue-green gradient */
+            .btn {
+                padding: 0.9rem 1rem;
+                border-radius: 8px; /* Slightly more rounded buttons */
+                font-weight: 600;
+                text-align: center;
+                text-decoration: none;
+                cursor: pointer;
+                border: none;
+                font-size: 1.05rem;
+                transition: all 0.3s ease;
+            }
+
+            .btn-primary {
+                /* Primary CTA: Striking Blue-Green Gradient */
+                background: linear-gradient(90deg, #38bdf8 0%, #10b981 100%); /* Tailwind's Sky to Emerald */
+                color: #1a1a2e; /* Dark text for contrast */
+                box-shadow: 0 5px 20px rgba(56, 189, 248, 0.4);
+            }
+
+            .btn-primary:hover {
+                background: linear-gradient(90deg, #10b981 0%, #38bdf8 100%); /* Subtle gradient shift on hover */
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(56, 189, 248, 0.6);
+            }
+
+            .btn-secondary {
+                background-color: #334155; /* Dark gray secondary button */
+                color: #e4e6eb; /* Light text */
+                border: 1px solid #475569; /* Subtle border */
+            }
+
+            .btn-secondary:hover {
+                background-color: #475569;
+                transform: translateY(-1px);
+            }
+
+            .btn-full {
+                width: 100%;
+                display: block;
+            }
+
+            .auth-links {
+                text-align: center;
+                margin-top: 2rem;
+            }
+
+            .auth-links p {
+                margin: 0.75rem 0;
+                font-size: 0.9rem;
+                color: #94a3b8;
+            }
+
+            .auth-links a {
+                color: #38bdf8; /* Bright blue links */
+                text-decoration: none;
+                font-weight: 600;
+            }
+
+            .auth-links a:hover {
+                text-decoration: underline;
+            }
+
+            .divider {
+                text-align: center;
+                margin: 2rem 0;
+                position: relative;
+            }
+
+            .divider::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: #334155; /* Dark divider line */
+            }
+
+            .divider span {
+                background: #202c45; /* Match card background */
+                padding: 0 1rem;
+                color: #94a3b8;
+                font-size: 0.875rem;
+            }
+
+            .alternative-actions {
+                margin-top: 1rem;
+            }
+        </style>
+    #endexport
+#endextend

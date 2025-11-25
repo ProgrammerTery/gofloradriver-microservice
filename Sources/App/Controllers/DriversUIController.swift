@@ -151,7 +151,7 @@ struct DriversUIController: RouteCollection {
                 req.session.data["driverToken"] = driverResponse.token
                 req.session.data["email"] = driverResponse.email
                 req.session.data["name"] = driverResponse.name
-               // req.session.data["driverID"] = driverResponse.driverID ?? ""
+                // req.session.data["driverID"] = driverResponse.driverID ?? ""
 
                 // Set remember me if requested (extends session duration)
                 if let rememberMe = try? req.content.get(String.self, at: "rememberMe"), rememberMe == "true" {
@@ -384,3 +384,18 @@ struct DriverAuthMiddleware: AsyncMiddleware {
         }
     }
 }
+
+/*
+struct TripSummaryContext: Content {
+    let id: String
+    let pickup: String
+    let destination: String
+    let distance: String
+    let suggestedPrice: Double
+    let status: String
+    let bidAmount: Double?
+    let scheduledTime: String
+    let date: String?
+    let amount: String?
+}
+*/

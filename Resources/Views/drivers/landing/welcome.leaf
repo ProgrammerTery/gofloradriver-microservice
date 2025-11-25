@@ -1,5 +1,5 @@
 #extend("drivers/driversbase"):
-    #export("content"):
+    #export("contentDetail"):
         <div class="landing-hero">
             <div class="hero-content">
                 <h1 class="hero-title">Join GoFlora as a Driver</h1>
