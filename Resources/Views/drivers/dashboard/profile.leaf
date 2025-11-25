@@ -1,0 +1,262 @@
+#extend("drivers/driversbase"):
+
+    #export("sidebarContent"):
+        <div style="padding: 0 1.5rem;">
+            <!-- Profile Stats -->
+            <div style="margin-bottom: 2.5rem;">
+                <h3 style="font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af; margin-bottom: 1.25rem;">
+                    Account Stats
+                </h3>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; color: white; box-shadow: 0 2px 12px rgba(102, 126, 234, 0.2);">
+                        <div style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">Member Since</div>
+                        <div style="font-size: 1.25rem; font-weight: 800;">#date(driver.registrationDate, "MMM yyyy")</div>
+                    </div>
+                    
+                    <div style="padding: 1rem; background: white; border-radius: 12px; border: 1px solid #f3f4f6;">
+                        <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.375rem;">Completed Trips</div>
+                        <div style="font-size: 1.5rem; font-weight: 800; color: #1a1a1a;">#(stats.completedTrips)</div>
+                    </div>
+                    
+                    <div style="padding: 1rem; background: white; border-radius: 12px; border: 1px solid #f3f4f6;">
+                        <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.375rem;">Total Earnings</div>
+                        <div style="font-size: 1.5rem; font-weight: 800; color: #10b981;">#(stats.earnings)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div>
+                <h3 style="font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af; margin-bottom: 1.25rem;">
+                    Quick Actions
+                </h3>
+                <div style="display: flex; flex-direction: column; gap: 0.625rem;">
+                    <a href="/products/gofloradriver/profile/edit" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1rem; background: white; color: #1a1a1a; text-decoration: none; border: 1px solid #f3f4f6; border-radius: 12px; font-size: 0.9375rem; font-weight: 500; transition: all 0.2s;">
+                        <i class="fas fa-edit" style="font-size: 1rem; color: #667eea;"></i>
+                        <span>Edit Profile</span>
+                    </a>
+                    <a href="/products/gofloradriver/dashboard" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1rem; background: white; color: #1a1a1a; text-decoration: none; border: 1px solid #f3f4f6; border-radius: 12px; font-size: 0.9375rem; font-weight: 500; transition: all 0.2s;">
+                        <i class="fas fa-home" style="font-size: 1rem; color: #667eea;"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    #endexport
+
+    #export("content"):
+        <!-- Success/Error Messages -->
+        #if(successMessage):
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.25rem;"></i>
+                <span style="color: #166534; font-weight: 500;">#(successMessage)</span>
+            </div>
+        #endif
+        
+        #if(errorMessage):
+            <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-exclamation-circle" style="color: #ef4444; font-size: 1.25rem;"></i>
+                <span style="color: #991b1b; font-weight: 500;">#(errorMessage)</span>
+            </div>
+        #endif
+
+        <!-- Page Header -->
+        <div style="margin-bottom: 2rem;">
+            <h1 style="font-size: 2rem; font-weight: 800; color: #1a1a1a; margin-bottom: 0.5rem;">My Profile</h1>
+            <p style="color: #6b7280; font-size: 1rem;">Manage your personal information and account settings</p>
+        </div>
+
+        <!-- Profile Card -->
+        <div style="background: white; border-radius: 20px; padding: 2.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6; margin-bottom: 1.5rem;">
+            <!-- Profile Header with Avatar -->
+            <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 2.5rem; padding-bottom: 2rem; border-bottom: 2px solid #f3f4f6;">
+                <div style="width: 96px; height: 96px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem; font-weight: 800; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);">
+                    #uppercase(#slice(driver.driverName, 0, 1))
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 2rem; font-weight: 800; color: #1a1a1a; margin-bottom: 0.5rem;">#(driver.driverName)</h2>
+                    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(102, 126, 234, 0.1); color: #667eea; border-radius: 20px; font-size: 0.875rem; font-weight: 600;">
+                            <i class="fas fa-id-card"></i>
+                            <span>ID: #(driver.driverID)</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(16, 185, 129, 0.1); color: #10b981; border-radius: 20px; font-size: 0.875rem; font-weight: 600;">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Verified Driver</span>
+                        </div>
+                    </div>
+                </div>
+                <a href="/products/gofloradriver/profile/edit" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.875rem 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 0.9375rem; box-shadow: 0 2px 12px rgba(102, 126, 234, 0.25); transition: all 0.2s;">
+                    <i class="fas fa-edit"></i>
+                    <span>Edit Profile</span>
+                </a>
+            </div>
+
+            <!-- Contact Information -->
+            <div style="margin-bottom: 2.5rem;">
+                <h3 style="font-size: 1.25rem; font-weight: 800; color: #1a1a1a; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-address-book" style="color: #667eea;"></i>
+                    Contact Information
+                </h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                    <div style="padding: 1.5rem; background: #f9fafb; border-radius: 16px; border: 1px solid #f3f4f6;">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+                            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(102, 126, 234, 0.05) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-envelope" style="font-size: 1.25rem; color: #667eea;"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.75rem; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Email</div>
+                                <div style="font-size: 1rem; font-weight: 600; color: #1a1a1a;">#(driver.driverEmail)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding: 1.5rem; background: #f9fafb; border-radius: 16px; border: 1px solid #f3f4f6;">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+                            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-phone" style="font-size: 1.25rem; color: #10b981;"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.75rem; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Phone</div>
+                                <div style="font-size: 1rem; font-weight: 600; color: #1a1a1a;">#(driver.driverPhone)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding: 1.5rem; background: #f9fafb; border-radius: 16px; border: 1px solid #f3f4f6;">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+                            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-map-marker-alt" style="font-size: 1.25rem; color: #f59e0b;"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.75rem; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Address</div>
+                                <div style="font-size: 1rem; font-weight: 600; color: #1a1a1a;">#(driver.driverAddress)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Driver Information -->
+            <div>
+                <h3 style="font-size: 1.25rem; font-weight: 800; color: #1a1a1a; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-id-card-alt" style="color: #667eea;"></i>
+                    Driver Information
+                </h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                    <div style="padding: 1.5rem; background: #f9fafb; border-radius: 16px; border: 1px solid #f3f4f6;">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+                            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-id-badge" style="font-size: 1.25rem; color: #3b82f6;"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.75rem; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">License Number</div>
+                                <div style="font-size: 1rem; font-weight: 600; color: #1a1a1a;">#(driver.driverLicense)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding: 1.5rem; background: #f9fafb; border-radius: 16px; border: 1px solid #f3f4f6;">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+                            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-calendar-check" style="font-size: 1.25rem; color: #8b5cf6;"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.75rem; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Registration Date</div>
+                                <div style="font-size: 1rem; font-weight: 600; color: #1a1a1a;">#date(driver.registrationDate, "MMMM d, yyyy")</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    #if(driver.vehicle_id):
+                        <div style="padding: 1.5rem; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%); border-radius: 16px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+                                <div style="width: 48px; height: 48px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-car" style="font-size: 1.25rem; color: #10b981;"></i>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: #059669; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Vehicle Status</div>
+                                    <div style="font-size: 1rem; font-weight: 700; color: #10b981;">Vehicle Registered</div>
+                                </div>
+                            </div>
+                            <a href="/products/gofloradriver/vehicle/manage" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.625rem 1rem; background: white; color: #10b981; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 0.875rem; transition: all 0.2s;">
+                                <i class="fas fa-cog"></i>
+                                <span>Manage Vehicle</span>
+                            </a>
+                        </div>
+                    #else:
+                        <div style="padding: 1.5rem; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%); border-radius: 16px; border: 1px solid rgba(245, 158, 11, 0.2);">
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+                                <div style="width: 48px; height: 48px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-exclamation-triangle" style="font-size: 1.25rem; color: #f59e0b;"></i>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: #92400e; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Vehicle Status</div>
+                                    <div style="font-size: 1rem; font-weight: 700; color: #f59e0b;">No Vehicle Registered</div>
+                                </div>
+                            </div>
+                            <a href="/products/gofloradriver/vehicle/service-type" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.625rem 1rem; background: white; color: #f59e0b; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 0.875rem; transition: all 0.2s;">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Register Vehicle</span>
+                            </a>
+                        </div>
+                    #endif
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Stats Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+            <div style="background: white; border-radius: 16px; padding: 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 56px; height: 56px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-route" style="font-size: 1.75rem; color: #667eea;"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.375rem;">Completed Trips</div>
+                        <div style="font-size: 2rem; font-weight: 800; color: #1a1a1a;">#(stats.completedTrips)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: white; border-radius: 16px; padding: 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 56px; height: 56px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-dollar-sign" style="font-size: 1.75rem; color: #10b981;"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.375rem;">Total Earnings</div>
+                        <div style="font-size: 2rem; font-weight: 800; color: #10b981;">#(stats.earnings)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: white; border-radius: 16px; padding: 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 56px; height: 56px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-gavel" style="font-size: 1.75rem; color: #f59e0b;"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.375rem;">Active Bids</div>
+                        <div style="font-size: 2rem; font-weight: 800; color: #1a1a1a;">#(stats.activeBids)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: white; border-radius: 16px; padding: 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 56px; height: 56px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-clipboard-check" style="font-size: 1.75rem; color: #3b82f6;"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.375rem;">Assigned Trips</div>
+                        <div style="font-size: 2rem; font-weight: 800; color: #1a1a1a;">#(stats.assignedTrips)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    #endexport
+    
+#endextend

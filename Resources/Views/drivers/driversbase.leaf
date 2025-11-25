@@ -475,9 +475,16 @@
                 </nav>
                 
                 <div class="header-actions">
+                    <a href="/products/gofloradriver/profile" class="nav-link">
                     <div class="user-avatar">
                         <i class="fas fa-user"></i>
                     </div>
+                    <span>Profile</span>
+                    </a>
+                    <a href="/products/gofloradriver/logout" class="nav-link">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
                 </div>
             </div>
         </header>
