@@ -155,6 +155,7 @@ struct DriversUIController: RouteCollection {
                 req.session.data["driverToken"] = driverResponse.token
                 req.session.data["email"] = driverResponse.email
                 req.session.data["name"] = driverResponse.name
+                req.session.data["driverID"] =  "Implementing Soon" //Call API to get driver ID
                 // req.session.data["driverID"] = driverResponse.driverID ?? ""
 
                 // Set remember me if requested (extends session duration)
@@ -314,7 +315,8 @@ struct DriversUIController: RouteCollection {
             driver: driverProfile,
             stats: stats,
             successMessage: req.query["success"],
-            errorMessage: req.query["error"]
+            errorMessage: req.query["error"],
+            initial: String(driverProfile.driverName.prefix(1))
         )
         return try await req.view.render("drivers/dashboard/profile", context)
     }
@@ -438,6 +440,7 @@ struct ProfilePageContext: Content {
     let stats: DriverStatsContext
     let successMessage: String?
     let errorMessage: String?
+    let initial: String?
 }
 
 struct EditProfilePageContext: Content {

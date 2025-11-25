@@ -492,7 +492,7 @@
         
         <!-- Main Content -->
         <div class="content-wrapper">
-            #if(pageType == "dashboard" || pageType == "trips"):
+            #if(pageType == "dashboard" || pageType == "trips" || pageType == "profile"):
             <aside class="sidebar">
                 #import("sidebarContent")
             </aside>
