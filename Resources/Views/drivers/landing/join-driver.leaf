@@ -1,92 +1,561 @@
-#extend("drivers/driversbase"):
-    #export("contentDetail"):
-        <div class="join-container">
-            <div class="join-header">
-                <h1>Become a GoFlora Driver</h1>
-                <p>Start your journey to financial independence with flexible driving opportunities</p>
-            </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join GoFlora - Become a Driver</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            background: #f5f7fa;
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 80vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            color: white;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .hero p {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            margin-bottom: 2.5rem;
+            opacity: 0.95;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+        
+        .btn {
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .btn-secondary:hover {
+            background: white;
+            color: #667eea;
+        }
+        
+        /* Main Content */
+        .content-section {
+            background: white;
+            margin-top: -50px;
+            position: relative;
+            z-index: 3;
+            border-radius: 30px 30px 0 0;
+            padding: 4rem 2rem;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 3rem;
+            color: #1a1a1a;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #6b7280;
+            max-width: 700px;
+            margin: -2rem auto 4rem;
+        }
+        
+        /* Requirements Grid */
+        .requirements-grid {
+            max-width: 1200px;
+            margin: 0 auto 6rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        .requirement-card {
+            background: linear-gradient(135deg, #f8f9ff 0%, #e6edff 100%);
+            padding: 2rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .requirement-card:hover {
+            transform: translateY(-10px);
+            border-color: #667eea;
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.15);
+        }
+        
+        .req-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .requirement-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: #1a1a1a;
+        }
+        
+        .requirement-card p {
+            color: #6b7280;
+            line-height: 1.7;
+        }
+        
+        /* Process Steps */
+        .process-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 6rem 2rem;
+            color: white;
+        }
+        
+        .process-steps {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+        
+        .step {
+            text-align: center;
+            position: relative;
+        }
+        
+        .step-number {
+            width: 80px;
+            height: 80px;
+            background: white;
+            color: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .step h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .step p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            line-height: 1.7;
+        }
+        
+        /* Earnings Section */
+        .earnings-section {
+            padding: 6rem 2rem;
+            background: white;
+        }
+        
+        .earnings-grid {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        .earning-card {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            padding: 2.5rem 2rem;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .earning-card:hover {
+            transform: translateY(-10px);
+            border-color: #10b981;
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.15);
+        }
+        
+        .earning-card h3 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #10b981;
+            margin-bottom: 1rem;
+        }
+        
+        .earning-card p {
+            color: #059669;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        /* Benefits Section */
+        .benefits-section {
+            background: #f9fafb;
+            padding: 6rem 2rem;
+        }
+        
+        .benefits-list {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .benefit-item {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .benefit-item:hover {
+            border-left-color: #667eea;
+            transform: translateX(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+        
+        .benefit-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .benefit-text {
+            flex: 1;
+        }
+        
+        .benefit-text h4 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #1a1a1a;
+        }
+        
+        .benefit-text p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+        
+        /* Final CTA */
+        .final-cta {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 6rem 2rem;
+            text-align: center;
+            color: white;
+        }
+        
+        .cta-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .cta-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+        }
+        
+        .cta-subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 3rem;
+        }
+        
+        .login-link {
+            margin-top: 2rem;
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+        
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .login-link a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .requirements-grid,
+            .process-steps,
+            .earnings-grid {
+                grid-template-columns: 1fr;
+            }
             
-            <div class="requirements-section">
-                <h2>Driver Requirements</h2>
-                <div class="requirements-grid">
-                    <div class="requirement">
-                        <span class="req-icon">✓</span>
-                        <div class="req-content">
-                            <h4>Valid Driver's License</h4>
-                            <p>Must have a valid driver's license for at least 2 years</p>
-                        </div>
-                    </div>
-                    <div class="requirement">
-                        <span class="req-icon">✓</span>
-                        <div class="req-content">
-                            <h4>Vehicle Requirements</h4>
-                            <p>Vehicle must be 2015 or newer, properly insured and registered</p>
-                        </div>
-                    </div>
-                    <div class="requirement">
-                        <span class="req-icon">✓</span>
-                        <div class="req-content">
-                            <h4>Background Check</h4>
-                            <p>Pass a comprehensive background check and driving record review</p>
-                        </div>
-                    </div>
-                    <div class="requirement">
-                        <span class="req-icon">✓</span>
-                        <div class="req-content">
-                            <h4>Age Requirement</h4>
-                            <p>Must be 21 years or older</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="process-section">
-                <h2>Simple 3-Step Process</h2>
-                <div class="process-steps">
-                    <div class="step">
-                        <div class="step-number">1</div>
-                        <h4>Sign Up</h4>
-                        <p>Create your driver account with basic information</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">2</div>
-                        <h4>Vehicle Registration</h4>
-                        <p>Register your vehicle and choose your service type</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">3</div>
-                        <h4>Start Earning</h4>
-                        <p>Begin accepting trips and earning money immediately</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="earnings-section">
-                <h2>Earning Potential</h2>
-                <div class="earnings-info">
-                    <div class="earning-stat">
-                        <h3>$15-45</h3>
-                        <p>Per trip depending on distance and service type</p>
-                    </div>
-                    <div class="earning-stat">
-                        <h3>$20-35/hour</h3>
-                        <p>Average hourly earnings during peak times</p>
-                    </div>
-                    <div class="earning-stat">
-                        <h3>Weekly Bonuses</h3>
-                        <p>Extra earnings for completing weekly trip goals</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="join-actions">
-                <a href="/products/gofloradriver/signup" class="btn btn-primary btn-large">
+            .hero h1 { font-size: 2.5rem; }
+            .section-title { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-content">
+            <h1>GoFlora Driver</h1>
+            <p>Join thousands of drivers earning flexible income with premium transportation opportunities</p>
+            <div class="cta-buttons">
+                <a href="/products/gofloradriver/signup" class="btn btn-primary">
+                    <i class="fas fa-rocket"></i>
                     Start Your Application
                 </a>
-                <p class="join-note">
-                    Already have an account? <a href="/products/gofloradriver/login">Sign in here</a>
-                </p>
+                <a href="/products/gofloradriver/login" class="btn btn-secondary">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </a>
             </div>
         </div>
-    #endexport
-#endextend
+    </div>
+
+    <!-- Requirements Section -->
+    <div class="content-section">
+        <h2 class="section-title">Driver Requirements</h2>
+        <p class="section-subtitle">Make sure you meet these basic requirements before applying</p>
+        
+        <div class="requirements-grid">
+            <div class="requirement-card">
+                <div class="req-icon">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <h3>Valid Driver's License</h3>
+                <p>Must have a valid driver's license with a clean driving record</p>
+            </div>
+            
+            <div class="requirement-card">
+                <div class="req-icon">
+                    <i class="fas fa-car"></i>
+                </div>
+                <h3>Vehicle Requirements</h3>
+                <p>Vehicle must be 2015 or newer, properly insured, registered, and in good condition</p>
+            </div>
+            
+            <div class="requirement-card">
+                <div class="req-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Background Check</h3>
+                <p>Pass a comprehensive background check and driving record review for safety</p>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Process Steps -->
+    <div class="process-section">
+        <h2 class="section-title" style="color: white;">Simple 3-Step Process</h2>
+        <p class="section-subtitle" style="color: rgba(255,255,255,0.9);">Get started in minutes with our streamlined onboarding</p>
+        
+        <div class="process-steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Sign Up</h3>
+                <p>Create your driver account with basic information and upload required documents</p>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Vehicle Registration</h3>
+                <p>Register your vehicle, select service type, and complete verification process</p>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Start Earning</h3>
+                <p>Get approved and begin accepting trips to earn money on your own schedule</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Earnings Section -->
+    <div class="earnings-section">
+        <h2 class="section-title">Earning Potential</h2>
+        <p class="section-subtitle">Competitive rates and flexible opportunities for all drivers</p>
+        
+        <div class="earnings-grid">
+            <div class="earning-card">
+                <h3>$15-45</h3>
+                <p>Per trip depending on distance and service type</p>
+            </div>
+            
+            <div class="earning-card">
+                <h3>$20-35/hr</h3>
+                <p>Average hourly earnings during peak times</p>
+            </div>
+            
+            <div class="earning-card">
+                <h3>Weekly Bonuses</h3>
+                <p>Extra earnings for completing weekly trip goals</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benefits Section -->
+    <div class="benefits-section">
+        <h2 class="section-title">Why Drive with GoFlora?</h2>
+        <p class="section-subtitle">Join a platform that values and supports its drivers</p>
+        
+        <div class="benefits-list">
+            <div class="benefit-item">
+                <div class="benefit-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="benefit-text">
+                    <h4>Flexible Schedule</h4>
+                    <p>Work when you want, where you want. Complete control over your time</p>
+                </div>
+            </div>
+            
+            <div class="benefit-item">
+                <div class="benefit-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="benefit-text">
+                    <h4>Instant Payments</h4>
+                    <p>Get paid immediately after each trip. No waiting, no delays</p>
+                </div>
+            </div>
+    
+            
+            <div class="benefit-item">
+                <div class="benefit-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <div class="benefit-text">
+                    <h4>24/7 Support</h4>
+                    <p>Dedicated support team ready to help you anytime, anywhere</p>
+                </div>
+            </div>
+            
+            <div class="benefit-item">
+                <div class="benefit-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="benefit-text">
+                    <h4>Premium Customers</h4>
+                    <p>Serve verified business clients and premium passengers with guaranteed tips</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final CTA -->
+    <div class="final-cta">
+        <div class="cta-content">
+            <h2 class="cta-title">Ready to Start Driving?</h2>
+            <p class="cta-subtitle">Join our growing community of successful drivers today</p>
+            <a href="/products/gofloradriver/signup" class="btn btn-primary" style="font-size: 1.2rem; padding: 1.25rem 3rem;">
+                <i class="fas fa-rocket"></i>
+                Start Your Application Now
+            </a>
+            <div class="login-link">
+                Already have an account? <a href="/products/gofloradriver/login">Sign in here</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
