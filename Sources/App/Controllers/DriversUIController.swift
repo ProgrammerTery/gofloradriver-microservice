@@ -9,7 +9,7 @@ struct DriversUIController: RouteCollection {
         let driversUIRoute = routes.grouped("products", "gofloradriver")
 
         // Landing & Onboarding Routes (Public)
-      //  driversUIRoute.get(use: renderWelcome)
+        //  driversUIRoute.get(use: renderWelcome)
         driversUIRoute.get("welcome") { req in
             req.redirect(to: "/products/gofloradriver/landing")
         }
@@ -23,6 +23,7 @@ struct DriversUIController: RouteCollection {
         // Driver Registration Routes
         driversUIRoute.get("register", use: renderDriverRegistration)
         driversUIRoute.post("register", use: handleDriverRegistration)
+        driversUIRoute.post("register", "skip", use: handleSkipRegistration)
         driversUIRoute.get("vehicle-choice", use: renderVehicleChoice)
         driversUIRoute.post("vehicle-choice", use: handleVehicleChoice)
 
@@ -288,6 +289,24 @@ struct DriversUIController: RouteCollection {
         return try await req.view.render("drivers/auth/registration-success", context)
     }
 
+    // MARK: - Skip Registration
+
+    @Sendable func handleSkipRegistration(_ req: Request) async throws -> Response {
+        // Mark profile as incomplete in session
+        req.session.data["profileIncomplete"] = "true"
+        req.session.data["skipRegistration"] = "true"
+
+        // Store minimal driver info if not already present
+        if req.session.data["driverID"] == nil {
+            req.session.data["driverID"] = UUID().uuidString
+            req.session.data["name"] = "Driver \(Int.random(in: 1000...9999))"
+            req.session.data["email"] = req.session.data["email"] ?? "temp@example.com"
+        }
+
+        // Redirect to dashboard with incomplete profile flag
+        return req.redirect(to: "/products/gofloradriver/dashboard")
+    }
+
     // MARK: - Protected Routes
 
     @Sendable func renderDashboard(_ req: Request) async throws -> View {
@@ -295,12 +314,16 @@ struct DriversUIController: RouteCollection {
         let stats = try await fetchDriverStats(req)
         let recentTrips = try await fetchRecentTrips(req)
 
-        let context = DashboardPageContext(
+        // Check if profile is incomplete (from skip registration)
+        let profileIncomplete = req.session.data["profileIncomplete"] == "true"
+
+        let context = DriversDashboardPageContext(
             title: "Driver Dashboard",
             pageType: "dashboard",
             driver: driverProfile,
             stats: stats,
-            recentTrips: recentTrips
+            recentTrips: recentTrips,
+            profileIncomplete: profileIncomplete
         )
         return try await req.view.render("drivers/dashboard/dashboard", context)
     }
@@ -399,26 +422,72 @@ struct DriversUIController: RouteCollection {
         return DriverProfileDTO(driverID:  req.session.data["driverID"] ?? "unknown", driverName: req.session.data["name"] ?? "Unknown Driver", driverPhone: "+263778463020", driverEmail: "waltack@example.com", driverAddress: "Victoria Falls City", registrationDate: Date(), driverLicense: "AQW5363783", vehicle_id: UUID())
     }
 
-    private func fetchDriverStats(_ req: Request) async throws -> DriverStatsContext {
-        return DriverStatsContext(
-            activeBids: 3,
-            assignedTrips: 1,
-            completedTrips: 15,
-            earnings: "$1,250.00"
+    private func fetchDriverStats(_ req: Request) async throws -> DriversDriverStatsContext {
+        // In a real implementation, these would come from API calls
+        return DriversDriverStatsContext(
+            totalEarnings: "4250.00",
+            totalTrips: "125",
+            averageRating: "4.9",
+            thisWeekTrips: "8",
+            activeBids: "3",
+            assignedTrips: "2",
+            earningsToday: "145.50",
+            completedTrips: "123",
+            successRate: "98",
+            weeklyTrips: "8",
+            weeklyEarnings: "580.00",
+            weeklyHours: "24",
+            availableTrips: "12",
+
+            // Revenue Trajectory Properties
+            monthlyEarnings: "3450.00",
+            monthlyGrowth: "18",
+            monthlyGoal: "3000.00",
+            goalProgress: "115",
+            goalExceeded: "25",
+            avgTripEarnings: "32",
+            daysLeft: "6"
         )
     }
 
-    private func fetchRecentTrips(_ req: Request) async throws -> [TripSummaryContext] {
+    private func fetchRecentTrips(_ req: Request) async throws -> [DriversTripSummaryContext] {
+        // In a real implementation, this would come from API calls
         return [
-            TripSummaryContext(
-                id: "trip-1",
+            DriversTripSummaryContext(
+                id: "trip-001",
                 pickup: "Downtown Mall",
-                destination: "Airport",
-                distance: "15 miles",
+                destination: "Airport Terminal 1",
+                distance: "15.2 miles",
                 suggestedPrice: 45.00,
-                status: "pending",
-                bidAmount: nil,
-                scheduledTime: "2025-01-28 14:30"
+                status: "completed",
+                bidAmount: 42.00,
+                scheduledTime: "2025-01-28 14:30",
+                date: "Jan 28, 2025",
+                amount: "42.00"
+            ),
+            DriversTripSummaryContext(
+                id: "trip-002",
+                pickup: "Business District",
+                destination: "Hotel Plaza",
+                distance: "8.5 miles",
+                suggestedPrice: 25.00,
+                status: "completed",
+                bidAmount: 28.00,
+                scheduledTime: "2025-01-28 16:00",
+                date: "Jan 28, 2025",
+                amount: "28.00"
+            ),
+            DriversTripSummaryContext(
+                id: "trip-003",
+                pickup: "Train Station",
+                destination: "University Campus",
+                distance: "12.1 miles",
+                suggestedPrice: 35.00,
+                status: "completed",
+                bidAmount: 35.00,
+                scheduledTime: "2025-01-27 09:15",
+                date: "Jan 27, 2025",
+                amount: "35.00"
             )
         ]
     }
@@ -437,7 +506,7 @@ struct ProfilePageContext: Content {
     let title: String
     let pageType: String
     let driver: DriverProfileDTO
-    let stats: DriverStatsContext
+    let stats: DriversDriverStatsContext
     let successMessage: String?
     let errorMessage: String?
     let initial: String?
@@ -468,8 +537,43 @@ struct DriverAuthMiddleware: AsyncMiddleware {
     }
 }
 
-/*
-struct TripSummaryContext: Content {
+// MARK: - Dashboard DTOs and Context Structures
+
+struct DriversDriverStatsContext: Content {
+    let totalEarnings: String
+    let totalTrips: String
+    let averageRating: String
+    let thisWeekTrips: String
+    let activeBids: String?
+    let assignedTrips: String?
+    let earningsToday: String?
+    let completedTrips: String?
+    let successRate: String?
+    let weeklyTrips: String?
+    let weeklyEarnings: String?
+    let weeklyHours: String?
+    let availableTrips: String?
+
+    // Revenue Trajectory Properties
+    let monthlyEarnings: String?
+    let monthlyGrowth: String?
+    let monthlyGoal: String?
+    let goalProgress: String?
+    let goalExceeded: String?
+    let avgTripEarnings: String?
+    let daysLeft: String?
+}
+
+struct DriversDashboardPageContext: Content {
+    let title: String
+    let pageType: String
+    let driver: DriverProfileDTO
+    let stats: DriversDriverStatsContext
+    let recentTrips: [DriversTripSummaryContext]?
+    let profileIncomplete: Bool?
+}
+
+struct DriversTripSummaryContext: Content {
     let id: String
     let pickup: String
     let destination: String
@@ -481,4 +585,3 @@ struct TripSummaryContext: Content {
     let date: String?
     let amount: String?
 }
-*/
