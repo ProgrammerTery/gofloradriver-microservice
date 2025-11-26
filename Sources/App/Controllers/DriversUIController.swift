@@ -372,7 +372,7 @@ struct DriversUIController: RouteCollection {
             let response = try await makeAPIRequest(
                 req: req,
                 method: .PATCH,
-                endpoint: APIConfig.endpoints["driver-profiles"]! + "/update",
+                endpoint: APIConfig.endpoints["gofloradriver-profiles"]! + "/update",
                 body: buffer,
                 driverToken: driverToken
             )
@@ -438,7 +438,6 @@ struct DriversUIController: RouteCollection {
             weeklyEarnings: "580.00",
             weeklyHours: "24",
             availableTrips: "12",
-
             // Revenue Trajectory Properties
             monthlyEarnings: "3450.00",
             monthlyGrowth: "18",
@@ -494,38 +493,6 @@ struct DriversUIController: RouteCollection {
 }
 
 // MARK: - Data Structures
-
-struct LoginPageContext: Content {
-    let title: String
-    let pageType: String
-    let errorMessage: String?
-    let prefillEmail: String?
-}
-
-struct ProfilePageContext: Content {
-    let title: String
-    let pageType: String
-    let driver: DriverProfileDTO
-    let stats: DriversDriverStatsContext
-    let successMessage: String?
-    let errorMessage: String?
-    let initial: String?
-}
-
-struct EditProfilePageContext: Content {
-    let title: String
-    let pageType: String
-    let driver: DriverProfileDTO
-    let errorMessage: String?
-}
-
-struct ProfileUpdateFormData: Content {
-    let driverName: String
-    let driverPhone: String
-    let driverEmail: String
-    let driverAddress: String
-}
-
 // Simple auth middleware for session checking
 struct DriverAuthMiddleware: AsyncMiddleware {
     func respond(to request: Request, chainingTo next: AsyncResponder) async throws -> Response {
@@ -535,53 +502,4 @@ struct DriverAuthMiddleware: AsyncMiddleware {
             return request.redirect(to: "/products/gofloradriver/login")
         }
     }
-}
-
-// MARK: - Dashboard DTOs and Context Structures
-
-struct DriversDriverStatsContext: Content {
-    let totalEarnings: String
-    let totalTrips: String
-    let averageRating: String
-    let thisWeekTrips: String
-    let activeBids: String?
-    let assignedTrips: String?
-    let earningsToday: String?
-    let completedTrips: String?
-    let successRate: String?
-    let weeklyTrips: String?
-    let weeklyEarnings: String?
-    let weeklyHours: String?
-    let availableTrips: String?
-
-    // Revenue Trajectory Properties
-    let monthlyEarnings: String?
-    let monthlyGrowth: String?
-    let monthlyGoal: String?
-    let goalProgress: String?
-    let goalExceeded: String?
-    let avgTripEarnings: String?
-    let daysLeft: String?
-}
-
-struct DriversDashboardPageContext: Content {
-    let title: String
-    let pageType: String
-    let driver: DriverProfileDTO
-    let stats: DriversDriverStatsContext
-    let recentTrips: [DriversTripSummaryContext]?
-    let profileIncomplete: Bool?
-}
-
-struct DriversTripSummaryContext: Content {
-    let id: String
-    let pickup: String
-    let destination: String
-    let distance: String
-    let suggestedPrice: Double
-    let status: String
-    let bidAmount: Double?
-    let scheduledTime: String
-    let date: String?
-    let amount: String?
 }

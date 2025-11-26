@@ -1,5 +1,6 @@
 import Vapor
 import Leaf
+import DriversDTO
 
 struct LandingController: RouteCollection {
     
@@ -142,43 +143,4 @@ struct LandingController: RouteCollection {
 
 // MARK: - Context Models
 
-struct ModernLandingContext: Content {
-    let title: String
-    let heroTitle: String
-    let heroSubtitle: String
-    let stats: LiveStatsContext
-    let features: [FeatureContext]
-    let testimonials: [TestimonialContext]
-    let earnings: EarningsContext
-}
 
-struct LiveStatsContext: Content {
-    let totalDrivers: String
-    let avgEarnings: String
-    let cities: String
-    let satisfaction: String
-}
-
-struct FeatureContext: Content {
-    let icon: String
-    let title: String
-    let description: String
-    let highlight: String
-}
-
-struct TestimonialContext: Content {
-    let name: String
-    let role: String
-    let image: String
-    let rating: Int
-    let text: String
-    let earnings: String
-    let location: String
-}
-
-struct EarningsContext: Content {
-    let hourlyRange: String
-    let weeklyPotential: String
-    let monthlyPotential: String
-    let bonusOpportunities: [String]
-}

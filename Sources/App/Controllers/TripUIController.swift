@@ -172,7 +172,7 @@ struct TripUIController: RouteCollection {
         let driver = try await fetchDriverProfile(req)
         let historyTrips = try await fetchTripHistory(req)
         
-        let context = App.AvailableTripsPageContext(
+        let context = AvailableTripsPageContext(
             title: "Trip History",
             pageType: "trips",
             trips: historyTrips,
@@ -190,7 +190,7 @@ struct TripUIController: RouteCollection {
         return DriverProfileDTO(driverID:  req.session.data["driverID"] ?? "unknown", driverName: req.session.data["name"] ?? "Unknown Driver", driverPhone: "+263778463020", driverEmail: "waltack@example.com", driverAddress: "Victoria Falls City", registrationDate: Date(), driverLicense: "AQW5363783", vehicle_id: UUID())
     }
     
-    private func fetchAvailableTrips(_ req: Request) async throws -> [App.TripSummaryContext] {
+    private func fetchAvailableTrips(_ req: Request) async throws -> [TripSummaryContext] {
         do {
             let response = try await makeAPIRequest(
                 req: req,
@@ -210,10 +210,10 @@ struct TripUIController: RouteCollection {
                         distance: "15 miles",
                         suggestedPrice: 45.00,
                         status: "pending",
-                        bidAmount: nil,
+                        bidAmount: Double.random(in: 40...50),
                         scheduledTime: "2025-01-28 14:30",
                         date: Date().timeIntervalSince1970.description,
-                        amount: Int.random(in: 40...50).description
+                        amount: Double.random(in: 40...50)
                     ),
                     TripSummaryContext(
                         id: "trip-2",
@@ -222,10 +222,10 @@ struct TripUIController: RouteCollection {
                         distance: "8 miles",
                         suggestedPrice: 25.00,
                         status: "driversAccepting",
-                        bidAmount: nil,
+                        bidAmount: Double.random(in: 40...50),
                         scheduledTime: "2025-01-28 16:00",
                         date: Date().timeIntervalSince1970.description,
-                        amount: Int.random(in: 40...50).description
+                        amount: Double.random(in: 40...50)
                     )
                 ]
             }
@@ -288,7 +288,7 @@ struct TripUIController: RouteCollection {
         ]
     }
     
-    private func fetchTripHistory(_ req: Request) async throws -> [App.TripSummaryContext] {
+    private func fetchTripHistory(_ req: Request) async throws -> [TripSummaryContext] {
         // Mock data - in real implementation, call API for completed trips
         return [
             TripSummaryContext(
@@ -301,7 +301,7 @@ struct TripUIController: RouteCollection {
                 bidAmount: 28.00,
                 scheduledTime: "2025-01-27 10:00",
                 date: "Jan 27, 2025",
-                amount: "28.00"
+                amount: Double.random(in: 40...50)
             )
         ]
     }
