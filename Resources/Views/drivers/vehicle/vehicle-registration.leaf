@@ -1,5 +1,5 @@
 #extend("drivers/driversbase"):
-    #export("content"):
+    #export("contentDetail"):
         <div class="vehicle-container">
             <div class="vehicle-header">
                 <h1>Vehicle Registration</h1>

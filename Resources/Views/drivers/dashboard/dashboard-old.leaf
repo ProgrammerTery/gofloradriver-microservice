@@ -1,0 +1,579 @@
+#extend("drivers/driversbase"):
+
+    #export("sidebarContent"):
+        <div class="sidebar-content">
+            <div class="sidebar-section driver-stats">
+                <h3 class="sidebar-title">
+                    <i class="fas fa-chart-line"></i>
+                    Today's Stats
+                </h3>
+                <div class="stats-list">
+                    <div class="stat-item">
+                        <div class="stat-info">
+                            <i class="fas fa-gavel stat-icon"></i>
+                            <span class="stat-label">Active Bids</span>
+                        </div>
+                        <span class="stat-value">#if(stats.activeBids):#(stats.activeBids)#else:0#endif</span>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-info">
+                            <i class="fas fa-route stat-icon"></i>
+                            <span class="stat-label">Assigned Trips</span>
+                        </div>
+                        <span class="stat-value">#if(stats.assignedTrips):#(stats.assignedTrips)#else:0#endif</span>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-info">
+                            <i class="fas fa-dollar-sign stat-icon"></i>
+                            <span class="stat-label">Earnings Today</span>
+                        </div>
+                        <span class="stat-value earnings">$#if(stats.earningsToday):#(stats.earningsToday)#else:0.00#endif</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section quick-actions">
+                <h3 class="sidebar-title">
+                    <i class="fas fa-bolt"></i>
+                    Quick Actions
+                </h3>
+                <a href="/products/gofloradriver/trips" class="quick-action-btn">
+                    <i class="fas fa-search"></i>
+                    <span>Browse Trips</span>
+                </a>
+                <a href="/products/gofloradriver/bids" class="quick-action-btn">
+                    <i class="fas fa-gavel"></i>
+                    <span>View My Bids</span>
+                </a>
+                <a href="/products/gofloradriver/assigned" class="quick-action-btn">
+                    <i class="fas fa-route"></i>
+                    <span>Active Jobs</span>
+                </a>
+            </div>
+        </div>
+    #endexport
+
+    #export("content"):
+        <div class="dashboard-container">
+            
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <div class="welcome-content">
+                    <div class="welcome-header">
+                        <div class="welcome-icon">
+                            <i class="fas fa-hand-wave"></i>
+                        </div>
+                        <div class="welcome-text">
+                            <h1 class="welcome-title">Welcome Back, #if(driver.name):#(driver.name)#else:Driver#endif!</h1>
+                            <p class="status-text">
+                                <span class="status-indicator #if(driver.status == "online"):status-online#else:status-offline#endif"></span>
+                                You are currently <strong>#if(driver.status == "online"):Online#else:Offline#endif</strong>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="welcome-actions">
+                        <a href="/products/gofloradriver/status-toggle" class="btn btn-status">
+                            <i class="fas fa-power-off"></i>
+                            Go #if(driver.status == "online"):Offline#else:Online#endif
+                        </a>
+                        <span class="last-update">
+                            <i class="fas fa-clock"></i>
+                            #if(stats.lastUpdate):#(stats.lastUpdate)#else:Just now#endif
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Overview -->
+            <div class="dashboard-section">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Performance Overview
+                </h2>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon earnings">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <p class="kpi-label">Total Earnings</p>
+                            <h3 class="kpi-value">$#if(kpis.totalEarnings):#(kpis.totalEarnings)#else:0.00#endif</h3>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon trips">
+                            <i class="fas fa-road"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <p class="kpi-label">Trips Completed</p>
+                            <h3 class="kpi-value">#if(kpis.tripsCompleted):#(kpis.tripsCompleted)#else:0#endif</h3>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon rating">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <p class="kpi-label">Average Rating</p>
+                            <h3 class="kpi-value">#if(kpis.rating):#(kpis.rating)#else:N/A#endif</h3>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon bids">
+                            <i class="fas fa-hand-holding-usd"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <p class="kpi-label">Pending Bids</p>
+                            <h3 class="kpi-value">#if(kpis.pendingBids):#(kpis.pendingBids)#else:0#endif</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="dashboard-section">
+                <h2 class="section-title">
+                    <i class="fas fa-history"></i>
+                    Recent Trip Activity
+                </h2>
+                <div class="activity-card">
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>No recent activity to display</p>
+                        <a href="/products/gofloradriver/trips" class="btn btn-outline">Browse Available Trips</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    #endexport
+
+    #export("styles"):
+        <style>
+            /* Dashboard Container */
+            .dashboard-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 2rem;
+            }
+
+            /* Sidebar Enhancements */
+            .sidebar-content {
+                padding: 0;
+            }
+
+            .sidebar-section {
+                margin-bottom: 2rem;
+                padding-bottom: 2rem;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .sidebar-section:last-child {
+                border-bottom: none;
+            }
+
+            .sidebar-title {
+                font-size: 0.875rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: var(--text-muted);
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .sidebar-title i {
+                font-size: 0.75rem;
+            }
+
+            .stats-list {
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .stat-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.75rem;
+                background: var(--bg-light);
+                border-radius: var(--border-radius-sm);
+                transition: all 0.2s ease;
+            }
+
+            .stat-item:hover {
+                background: #e8eaed;
+            }
+
+            .stat-info {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .stat-icon {
+                font-size: 0.875rem;
+                color: var(--primary-color);
+            }
+
+            .stat-label {
+                font-size: 0.875rem;
+                color: var(--text-light);
+                font-weight: 500;
+            }
+
+            .stat-value {
+                font-weight: 700;
+                font-size: 1rem;
+                color: var(--text-dark);
+            }
+
+            .stat-value.earnings {
+                color: var(--success-color);
+            }
+
+            .quick-action-btn {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                width: 100%;
+                padding: 0.875rem 1rem;
+                margin-bottom: 0.5rem;
+                background: var(--bg-white);
+                color: var(--text-dark);
+                text-decoration: none;
+                border: 1px solid var(--border-color);
+                border-radius: var(--border-radius-sm);
+                font-size: 0.875rem;
+                font-weight: 500;
+                transition: all 0.2s ease;
+            }
+
+            .quick-action-btn:hover {
+                background: var(--primary-color);
+                color: white;
+                border-color: var(--primary-color);
+                transform: translateX(4px);
+            }
+
+            .quick-action-btn i {
+                font-size: 1rem;
+            }
+
+            /* Welcome Section */
+            .welcome-section {
+                background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+                border-radius: var(--border-radius);
+                padding: 2rem;
+                margin-bottom: 2rem;
+                box-shadow: var(--shadow-md);
+                color: white;
+            }
+
+            .welcome-content {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 2rem;
+            }
+
+            .welcome-header {
+                display: flex;
+                align-items: center;
+                gap: 1.5rem;
+                flex: 1;
+            }
+
+            .welcome-icon {
+                width: 60px;
+                height: 60px;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 2rem;
+            }
+
+            .welcome-title {
+                font-size: 1.75rem;
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+                color: white;
+            }
+
+            .status-text {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 1rem;
+                color: rgba(255, 255, 255, 0.9);
+                margin: 0;
+            }
+
+            .status-indicator {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                display: inline-block;
+            }
+
+            .status-online {
+                background: #4caf50;
+                box-shadow: 0 0 10px rgba(76, 175, 80, 0.8);
+            }
+
+            .status-offline {
+                background: #757575;
+            }
+
+            .welcome-actions {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 1rem;
+            }
+
+            .btn-status {
+                background: white;
+                color: var(--primary-color);
+                padding: 0.75rem 1.5rem;
+                border-radius: var(--border-radius-sm);
+                text-decoration: none;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .btn-status:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            .last-update {
+                font-size: 0.875rem;
+                color: rgba(255, 255, 255, 0.8);
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            /* Dashboard Section */
+            .dashboard-section {
+                margin-bottom: 2.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: var(--text-dark);
+                margin-bottom: 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+
+            .section-title i {
+                color: var(--primary-color);
+                font-size: 1.25rem;
+            }
+
+            /* KPI Grid */
+            .kpi-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .kpi-card {
+                background: white;
+                border-radius: var(--border-radius);
+                padding: 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 1.25rem;
+                box-shadow: var(--shadow-sm);
+                transition: all 0.3s ease;
+                border: 1px solid var(--border-color);
+            }
+
+            .kpi-card:hover {
+                transform: translateY(-4px);
+                box-shadow: var(--shadow-md);
+            }
+
+            .kpi-icon {
+                width: 60px;
+                height: 60px;
+                border-radius: var(--border-radius-sm);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+                flex-shrink: 0;
+            }
+
+            .kpi-icon.earnings {
+                background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+                color: white;
+            }
+
+            .kpi-icon.trips {
+                background: linear-gradient(135deg, #667eea 0%, #5568d3 100%);
+                color: white;
+            }
+
+            .kpi-icon.rating {
+                background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+                color: white;
+            }
+
+            .kpi-icon.bids {
+                background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+                color: white;
+            }
+
+            .kpi-content {
+                flex: 1;
+            }
+
+            .kpi-label {
+                font-size: 0.875rem;
+                color: var(--text-muted);
+                margin-bottom: 0.25rem;
+                font-weight: 500;
+            }
+
+            .kpi-value {
+                font-size: 1.75rem;
+                font-weight: 700;
+                color: var(--text-dark);
+                margin: 0;
+            }
+
+            /* Activity Card */
+            .activity-card {
+                background: white;
+                border-radius: var(--border-radius);
+                padding: 2.5rem;
+                box-shadow: var(--shadow-sm);
+                border: 1px solid var(--border-color);
+            }
+
+            .empty-state {
+                text-align: center;
+                padding: 3rem 1rem;
+            }
+
+            .empty-state i {
+                font-size: 4rem;
+                color: var(--text-muted);
+                margin-bottom: 1rem;
+                opacity: 0.5;
+            }
+
+            .empty-state p {
+                font-size: 1rem;
+                color: var(--text-light);
+                margin-bottom: 1.5rem;
+            }
+
+            .btn-outline {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.75rem 1.5rem;
+                border: 2px solid var(--primary-color);
+                color: var(--primary-color);
+                text-decoration: none;
+                border-radius: var(--border-radius-sm);
+                font-weight: 600;
+                transition: all 0.3s ease;
+            }
+
+            .btn-outline:hover {
+                background: var(--primary-color);
+                color: white;
+            }
+
+            /* Responsive Design */
+            @media (max-width: 1024px) {
+                .welcome-content {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                .welcome-actions {
+                    width: 100%;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .kpi-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+            }
+
+            @media (max-width: 768px) {
+                .dashboard-container {
+                    padding: 1rem;
+                }
+
+                .welcome-section {
+                    padding: 1.5rem;
+                }
+
+                .welcome-title {
+                    font-size: 1.25rem;
+                }
+
+                .welcome-icon {
+                    width: 50px;
+                    height: 50px;
+                    font-size: 1.5rem;
+                }
+
+                .kpi-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .section-title {
+                    font-size: 1.25rem;
+                }
+
+                .kpi-card {
+                    padding: 1.25rem;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .welcome-actions {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+
+                .btn-status {
+                    width: 100%;
+                    justify-content: center;
+                }
+
+                .last-update {
+                    justify-content: center;
+                }
+            }
+        </style>
+    #endexport
+    
+#endextend

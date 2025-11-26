@@ -1,0 +1,210 @@
+#extend("drivers/driversbase"):
+
+    #export("sidebarContent"):
+        <div style="padding: 0 1.5rem;">
+            <!-- History Stats -->
+            <div style="margin-bottom: 2.5rem;">
+                <h3 style="font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af; margin-bottom: 1.25rem;">
+                    Trip History
+                </h3>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="padding: 1.25rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; color: white; box-shadow: 0 2px 12px rgba(102, 126, 234, 0.2);">
+                        <div style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">Total Completed</div>
+                        <div style="font-size: 2rem; font-weight: 800;">#count(trips)</div>
+                    </div>
+                    
+                    #if(count(trips) > 0):
+                        <div style="padding: 1rem; background: white; border-radius: 12px; border: 1px solid #f3f4f6;">
+                            <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.375rem;">Total Earnings</div>
+                            <div style="font-size: 1.5rem; font-weight: 800; color: #10b981;">
+                                $#if(totalEarnings):#(totalEarnings)#else:0#endif
+                            </div>
+                        </div>
+                    #endif
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div>
+                <h3 style="font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af; margin-bottom: 1.25rem;">
+                    Filter by Date
+                </h3>
+                <div style="display: flex; flex-direction: column; gap: 0.625rem;">
+                    <a href="/products/gofloradriver/history?period=today" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1rem; background: white; color: #1a1a1a; text-decoration: none; border: 1px solid #f3f4f6; border-radius: 12px; font-size: 0.9375rem; font-weight: 500; transition: all 0.2s;">
+                        <i class="fas fa-calendar-day" style="font-size: 1rem; color: #667eea;"></i>
+                        <span>Today</span>
+                    </a>
+                    <a href="/products/gofloradriver/history?period=week" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1rem; background: white; color: #1a1a1a; text-decoration: none; border: 1px solid #f3f4f6; border-radius: 12px; font-size: 0.9375rem; font-weight: 500; transition: all 0.2s;">
+                        <i class="fas fa-calendar-week" style="font-size: 1rem; color: #667eea;"></i>
+                        <span>This Week</span>
+                    </a>
+                    <a href="/products/gofloradriver/history?period=month" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1rem; background: white; color: #1a1a1a; text-decoration: none; border: 1px solid #f3f4f6; border-radius: 12px; font-size: 0.9375rem; font-weight: 500; transition: all 0.2s;">
+                        <i class="fas fa-calendar-alt" style="font-size: 1rem; color: #667eea;"></i>
+                        <span>This Month</span>
+                    </a>
+                    <a href="/products/gofloradriver/history?period=all" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1rem; background: white; color: #1a1a1a; text-decoration: none; border: 1px solid #f3f4f6; border-radius: 12px; font-size: 0.9375rem; font-weight: 500; transition: all 0.2s;">
+                        <i class="fas fa-infinity" style="font-size: 1rem; color: #667eea;"></i>
+                        <span>All Time</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    #endexport
+
+    #export("content"):
+        <!-- Page Header -->
+        <div style="margin-bottom: 2rem;">
+            <h1 style="font-size: 2rem; font-weight: 800; color: #1a1a1a; margin-bottom: 0.5rem;">Trip History</h1>
+            <p style="color: #6b7280; font-size: 1rem;">Review your completed trips and earnings</p>
+        </div>
+
+        <!-- Summary Cards -->
+        #if(count(trips) > 0):
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+                <div style="background: white; border-radius: 16px; padding: 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-dollar-sign" style="font-size: 1.75rem; color: #10b981;"></i>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.375rem;">Total Earned</div>
+                            <div style="font-size: 2rem; font-weight: 800; color: #10b981;">
+                                $#if(totalEarnings):#(totalEarnings)#else:0#endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: white; border-radius: 16px; padding: 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-route" style="font-size: 1.75rem; color: #667eea;"></i>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.375rem;">Total Trips</div>
+                            <div style="font-size: 2rem; font-weight: 800; color: #1a1a1a;">#count(trips)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: white; border-radius: 16px; padding: 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-chart-line" style="font-size: 1.75rem; color: #f59e0b;"></i>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.375rem;">Avg. per Trip</div>
+                            <div style="font-size: 2rem; font-weight: 800; color: #1a1a1a;">
+                                $#if(averagePerTrip):#(averagePerTrip)#else:0#endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: white; border-radius: 16px; padding: 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-star" style="font-size: 1.75rem; color: #f59e0b;"></i>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.375rem;">Avg. Rating</div>
+                            <div style="font-size: 2rem; font-weight: 800; color: #1a1a1a;">
+                                #if(averageRating):#(averageRating)#else:N/A#endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trip History List -->
+            <div style="background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6;">
+                <h2 style="font-size: 1.25rem; font-weight: 800; color: #1a1a1a; margin-bottom: 1.5rem;">Completed Trips</h2>
+                
+                <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                    #for(trip in trips):
+                        <div style="padding: 1.5rem; background: #f9fafb; border-radius: 16px; border: 1px solid #f3f4f6; transition: all 0.2s;">
+                            <div style="display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: start;">
+                                <!-- Trip Details -->
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem;">
+                                        <h3 style="font-size: 1.125rem; font-weight: 700; color: #1a1a1a; margin: 0;">Trip #(trip.id)</h3>
+                                        <span style="padding: 0.375rem 0.875rem; background: rgba(16, 185, 129, 0.1); color: #10b981; border-radius: 20px; font-size: 0.8125rem; font-weight: 700;">
+                                            <i class="fas fa-check-circle"></i> Completed
+                                        </span>
+                                        #if(trip.rating):
+                                            <div style="display: flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.875rem; background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-radius: 20px; font-size: 0.8125rem; font-weight: 700;">
+                                                <i class="fas fa-star"></i>
+                                                <span>#(trip.rating)/5</span>
+                                            </div>
+                                        #endif
+                                    </div>
+
+                                    <!-- Route -->
+                                    <div style="position: relative; padding-left: 2rem; margin-bottom: 1.25rem;">
+                                        <div style="position: absolute; left: 0; top: 0.5rem; bottom: 0.5rem; width: 2px; background: linear-gradient(180deg, #667eea 0%, #10b981 100%);"></div>
+                                        <div style="position: absolute; left: -3px; top: 0.5rem; width: 8px; height: 8px; background: #667eea; border-radius: 50%; border: 2px solid white;"></div>
+                                        <div style="position: absolute; left: -3px; bottom: 0.5rem; width: 8px; height: 8px; background: #10b981; border-radius: 50%; border: 2px solid white;"></div>
+                                        
+                                        <div style="margin-bottom: 1rem;">
+                                            <div style="font-size: 0.75rem; color: #9ca3af; font-weight: 600; margin-bottom: 0.25rem;">FROM</div>
+                                            <div style="font-size: 0.9375rem; font-weight: 600; color: #1a1a1a;">#(trip.pickup)</div>
+                                        </div>
+                                        
+                                        <div>
+                                            <div style="font-size: 0.75rem; color: #9ca3af; font-weight: 600; margin-bottom: 0.25rem;">TO</div>
+                                            <div style="font-size: 0.9375rem; font-weight: 600; color: #1a1a1a;">#(trip.destination)</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Trip Info -->
+                                    <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <i class="fas fa-calendar" style="color: #9ca3af; font-size: 0.875rem;"></i>
+                                            <span style="font-size: 0.875rem; color: #6b7280;">#(trip.completedAt)</span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <i class="fas fa-ruler" style="color: #9ca3af; font-size: 0.875rem;"></i>
+                                            <span style="font-size: 0.875rem; color: #6b7280;">#(trip.distance)</span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <i class="fas fa-users" style="color: #9ca3af; font-size: 0.875rem;"></i>
+                                            <span style="font-size: 0.875rem; color: #6b7280;">#(trip.numberOfPassengers) passengers</span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <i class="fas fa-user" style="color: #9ca3af; font-size: 0.875rem;"></i>
+                                            <span style="font-size: 0.875rem; color: #6b7280;">#(trip.clientName)</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Earnings -->
+                                <div style="text-align: right; min-width: 140px;">
+                                    <div style="padding: 1.25rem 1.5rem; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%); border-radius: 14px;">
+                                        <div style="font-size: 0.8125rem; color: #6b7280; margin-bottom: 0.5rem;">Earned</div>
+                                        <div style="font-size: 1.75rem; font-weight: 800; color: #10b981;">$#(trip.finalPrice)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    #endfor
+                </div>
+            </div>
+        #else:
+            <!-- Empty State -->
+            <div style="background: white; border-radius: 20px; padding: 4rem 2rem; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6;">
+                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2.5rem;">
+                    <i class="fas fa-history" style="color: #667eea;"></i>
+                </div>
+                <h3 style="font-size: 1.5rem; font-weight: 700; color: #1a1a1a; margin-bottom: 0.75rem;">No Trip History</h3>
+                <p style="font-size: 1rem; color: #6b7280; margin-bottom: 2rem; max-width: 400px; margin-left: auto; margin-right: auto;">
+                    You haven't completed any trips yet. Start accepting trips to build your history and track your earnings.
+                </p>
+                <a href="/products/gofloradriver/trips" style="display: inline-flex; align-items: center; gap: 0.625rem; padding: 0.875rem 1.75rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 0.9375rem; box-shadow: 0 2px 12px rgba(102, 126, 234, 0.25); transition: all 0.2s;">
+                    <i class="fas fa-search"></i>
+                    <span>Browse Available Trips</span>
+                </a>
+            </div>
+        #endif
+    #endexport
+    
+#endextend

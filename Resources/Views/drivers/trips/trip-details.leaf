@@ -1,0 +1,248 @@
+#extend("drivers/driversbase"):
+
+    #export("sidebarContent"):
+        <div style="padding: 0 1.5rem;">
+            <!-- Trip Summary -->
+            <div style="margin-bottom: 2.5rem;">
+                <h3 style="font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af; margin-bottom: 1.25rem;">
+                    Trip Summary
+                </h3>
+                <div style="padding: 1.25rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; color: white; box-shadow: 0 4px 16px rgba(102, 126, 234, 0.25);">
+                    <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.5rem;">Suggested Price</div>
+                    <div style="font-size: 2.25rem; font-weight: 800; margin-bottom: 1rem;">$#(trip.suggestedPrice)</div>
+                    <div style="padding: 0.625rem 1rem; background: rgba(255, 255, 255, 0.2); border-radius: 10px; font-size: 0.875rem; font-weight: 600; text-align: center;">
+                        #(trip.distance)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div>
+                <h3 style="font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af; margin-bottom: 1.25rem;">
+                    Quick Actions
+                </h3>
+                <div style="display: flex; flex-direction: column; gap: 0.625rem;">
+                    <a href="/products/gofloradriver/trips" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1rem; background: white; color: #1a1a1a; text-decoration: none; border: 1px solid #f3f4f6; border-radius: 12px; font-size: 0.9375rem; font-weight: 500; transition: all 0.2s;">
+                        <i class="fas fa-arrow-left" style="font-size: 1rem; color: #667eea;"></i>
+                        <span>Back to Trips</span>
+                    </a>
+                    <a href="/products/gofloradriver/bids" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1rem; background: white; color: #1a1a1a; text-decoration: none; border: 1px solid #f3f4f6; border-radius: 12px; font-size: 0.9375rem; font-weight: 500; transition: all 0.2s;">
+                        <i class="fas fa-gavel" style="font-size: 1rem; color: #667eea;"></i>
+                        <span>My Bids</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    #endexport
+
+    #export("content"):
+        <!-- Success/Error Messages -->
+        #if(success):
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.25rem;"></i>
+                <span style="color: #166534; font-weight: 500;">#(success)</span>
+            </div>
+        #endif
+        
+        #if(error):
+            <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-exclamation-circle" style="color: #ef4444; font-size: 1.25rem;"></i>
+                <span style="color: #991b1b; font-weight: 500;">#(error)</span>
+            </div>
+        #endif
+
+        <!-- Page Header -->
+        <div style="margin-bottom: 2rem;">
+            <a href="/products/gofloradriver/trips" style="display: inline-flex; align-items: center; gap: 0.5rem; color: #667eea; text-decoration: none; font-weight: 600; margin-bottom: 1rem; transition: all 0.2s;">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Available Trips</span>
+            </a>
+            <h1 style="font-size: 2rem; font-weight: 800; color: #1a1a1a; margin-bottom: 0.5rem;">Trip Details</h1>
+            <p style="color: #6b7280; font-size: 1rem;">Review trip information and submit your bid</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 400px; gap: 2rem;">
+            <!-- Main Content -->
+            <div>
+                <!-- Trip Info Card -->
+                <div style="background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6; margin-bottom: 1.5rem;">
+                    <h2 style="font-size: 1.5rem; font-weight: 800; color: #1a1a1a; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fas fa-route" style="color: #667eea;"></i>
+                        Route Information
+                    </h2>
+
+                    <!-- Route -->
+                    <div style="position: relative; padding-left: 2.5rem; margin-bottom: 2rem;">
+                        <div style="position: absolute; left: 0.5rem; top: 1rem; bottom: 1rem; width: 3px; background: linear-gradient(180deg, #667eea 0%, #10b981 100%); border-radius: 2px;"></div>
+                        <div style="position: absolute; left: 0; top: 1rem; width: 14px; height: 14px; background: #667eea; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);"></div>
+                        <div style="position: absolute; left: 0; bottom: 1rem; width: 14px; height: 14px; background: #10b981; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);"></div>
+                        
+                        <div style="margin-bottom: 2.5rem; padding: 1rem; background: #f9fafb; border-radius: 12px;">
+                            <div style="font-size: 0.8125rem; color: #9ca3af; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">PICKUP LOCATION</div>
+                            <div style="font-size: 1.125rem; font-weight: 700; color: #1a1a1a;">#(trip.pickup)</div>
+                        </div>
+                        
+                        <div style="padding: 1rem; background: #f0fdf4; border-radius: 12px;">
+                            <div style="font-size: 0.8125rem; color: #059669; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">DESTINATION</div>
+                            <div style="font-size: 1.125rem; font-weight: 700; color: #1a1a1a;">#(trip.destination)</div>
+                        </div>
+                    </div>
+
+                    <!-- Trip Stats -->
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                        <div style="padding: 1.25rem; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(102, 126, 234, 0.05) 100%); border-radius: 16px;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                                <i class="fas fa-ruler" style="font-size: 1.25rem; color: #667eea;"></i>
+                                <span style="font-size: 0.875rem; color: #6b7280; font-weight: 600;">Distance</span>
+                            </div>
+                            <div style="font-size: 1.5rem; font-weight: 800; color: #1a1a1a;">#(trip.distance)</div>
+                        </div>
+                        
+                        <div style="padding: 1.25rem; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%); border-radius: 16px;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                                <i class="fas fa-dollar-sign" style="font-size: 1.25rem; color: #10b981;"></i>
+                                <span style="font-size: 0.875rem; color: #6b7280; font-weight: 600;">Suggested Price</span>
+                            </div>
+                            <div style="font-size: 1.5rem; font-weight: 800; color: #10b981;">$#(trip.suggestedPrice)</div>
+                        </div>
+                        
+                        <div style="padding: 1.25rem; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%); border-radius: 16px;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                                <i class="fas fa-clock" style="font-size: 1.25rem; color: #f59e0b;"></i>
+                                <span style="font-size: 0.875rem; color: #6b7280; font-weight: 600;">Scheduled Time</span>
+                            </div>
+                            <div style="font-size: 1.125rem; font-weight: 700; color: #1a1a1a;">#(trip.scheduledTime)</div>
+                        </div>
+                        
+                        <div style="padding: 1.25rem; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%); border-radius: 16px;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                                <i class="fas fa-users" style="font-size: 1.25rem; color: #3b82f6;"></i>
+                                <span style="font-size: 0.875rem; color: #6b7280; font-weight: 600;">Passengers</span>
+                            </div>
+                            <div style="font-size: 1.5rem; font-weight: 800; color: #1a1a1a;">#(trip.numberOfPassengers)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Client Info -->
+                <div style="background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6; margin-bottom: 1.5rem;">
+                    <h2 style="font-size: 1.5rem; font-weight: 800; color: #1a1a1a; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fas fa-user" style="color: #667eea;"></i>
+                        Client Information
+                    </h2>
+                    
+                    <div style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem; background: #f9fafb; border-radius: 12px;">
+                        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 700;">
+                           #if(trip.clientName):#(trip.clientName)#endif
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 1.125rem; font-weight: 700; color: #1a1a1a; margin-bottom: 0.25rem;">#(trip.clientName)</div>
+                            <div style="font-size: 0.875rem; color: #6b7280;">Verified Client</div>
+                        </div>
+                    </div>
+                    
+                    #if(trip.specialInstructions):
+                        <div style="margin-top: 1.5rem; padding: 1.25rem; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 8px;">
+                            <div style="font-size: 0.875rem; font-weight: 700; color: #92400e; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-info-circle"></i>
+                                Special Instructions
+                            </div>
+                            <div style="color: #78350f; font-size: 0.9375rem;">#(trip.specialInstructions)</div>
+                        </div>
+                    #endif
+                </div>
+            </div>
+
+            <!-- Bid Form Sidebar -->
+            <div>
+                #if(existingBid):
+                    <!-- Existing Bid Display -->
+                    <div style="background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6;">
+                        <div style="text-align: center; padding: 2rem 1rem;">
+                            <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25);">
+                                <i class="fas fa-check" style="font-size: 2rem; color: white;"></i>
+                            </div>
+                            <h3 style="font-size: 1.5rem; font-weight: 800; color: #1a1a1a; margin-bottom: 0.75rem;">Bid Submitted</h3>
+                            <p style="color: #6b7280; margin-bottom: 1.5rem;">You've already placed a bid on this trip</p>
+                            <div style="padding: 1.5rem; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%); border-radius: 16px; margin-bottom: 1.5rem;">
+                                <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">Your Bid Amount</div>
+                                <div style="font-size: 2.5rem; font-weight: 800; color: #10b981;">$#(existingBid.amount)</div>
+                            </div>
+                            <div style="padding: 1rem; background: #f9fafb; border-radius: 12px; font-size: 0.875rem; color: #6b7280;">
+                                Status: <strong style="color: #1a1a1a;">#(existingBid.status)</strong>
+                            </div>
+                        </div>
+                    </div>
+                #elseif(canBid):
+                    <!-- Bid Form -->
+                    <div style="background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6;">
+                        <h3 style="font-size: 1.25rem; font-weight: 800; color: #1a1a1a; margin-bottom: 1.5rem;">Place Your Bid</h3>
+                        
+                        <form method="POST" action="/products/gofloradriver/trips/#(trip.id)/bid" id="bidForm">
+                            <div style="margin-bottom: 1.5rem;">
+                                <label style="display: block; font-weight: 600; font-size: 0.9375rem; color: #1a1a1a; margin-bottom: 0.5rem;">
+                                    Your Bid Amount
+                                </label>
+                                <div style="position: relative;">
+                                    <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); font-size: 1.25rem; font-weight: 700; color: #6b7280;">$</span>
+                                    <input type="number" 
+                                           name="bidAmount" 
+                                           id="bidAmount"
+                                           step="0.01" 
+                                           min="1"
+                                           required 
+                                           placeholder="#(trip.suggestedPrice)"
+                                           style="width: 100%; padding: 0.875rem 1rem 0.875rem 2rem; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 1.25rem; font-weight: 700; transition: all 0.2s;">
+                                </div>
+                                <div style="margin-top: 0.75rem; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                                    <div style="font-size: 0.8125rem; color: #6b7280; margin-bottom: 0.5rem;">Suggested: <strong style="color: #1a1a1a;">$#(trip.suggestedPrice)</strong></div>
+                                    <div style="font-size: 0.75rem; color: #9ca3af;">💡 Competitive bids are typically within 10% of the suggested price</div>
+                                </div>
+                            </div>
+
+                            <button type="submit" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 1.0625rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 16px rgba(102, 126, 234, 0.25);">
+                                <i class="fas fa-gavel"></i> Submit Bid
+                            </button>
+                        </form>
+                    </div>
+                #else:
+                    <!-- Cannot Bid -->
+                    <div style="background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6;">
+                        <div style="text-align: center; padding: 2rem 1rem;">
+                            <div style="width: 64px; height: 64px; background: rgba(239, 68, 68, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                                <i class="fas fa-times-circle" style="font-size: 2rem; color: #ef4444;"></i>
+                            </div>
+                            <h3 style="font-size: 1.25rem; font-weight: 700; color: #1a1a1a; margin-bottom: 0.75rem;">Bidding Closed</h3>
+                            <p style="color: #6b7280;">This trip is no longer accepting bids</p>
+                        </div>
+                    </div>
+                #endif
+            </div>
+        </div>
+
+        <script>
+            const form = document.getElementById('bidForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const bidAmount = document.getElementById('bidAmount').value;
+                    if (!bidAmount || parseFloat(bidAmount) < 1) {
+                        e.preventDefault();
+                        alert('Please enter a valid bid amount');
+                        return;
+                    }
+                });
+                
+                // Focus styling
+                document.getElementById('bidAmount').addEventListener('focus', function() {
+                    this.style.borderColor = '#667eea';
+                    this.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                });
+                document.getElementById('bidAmount').addEventListener('blur', function() {
+                    this.style.borderColor = '#e5e7eb';
+                    this.style.boxShadow = 'none';
+                });
+            }
+        </script>
+    #endexport
+    
+#endextend

@@ -1,0 +1,255 @@
+#extend("drivers/driversbase"):
+
+    #export("sidebarContent"):
+        <div style="padding: 0 1.5rem;">
+            <!-- Stats Section -->
+            <div style="margin-bottom: 2.5rem;">
+                <h3 style="font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af; margin-bottom: 1.25rem;">
+                    Today's Stats
+                </h3>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f9fafb; border-radius: 12px; transition: all 0.2s;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="width: 36px; height: 36px; background: rgba(102, 126, 234, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #667eea;">
+                                <i class="fas fa-gavel" style="font-size: 0.875rem;"></i>
+                            </div>
+                            <span style="font-size: 0.875rem; font-weight: 500; color: #4b5563;">Active Bids</span>
+                        </div>
+                        <span style="font-size: 1.125rem; font-weight: 700; color: #1a1a1a;">#if(stats.activeBids):#(stats.activeBids)#else:0#endif</span>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f9fafb; border-radius: 12px; transition: all 0.2s;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="width: 36px; height: 36px; background: rgba(16, 185, 129, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #10b981;">
+                                <i class="fas fa-route" style="font-size: 0.875rem;"></i>
+                            </div>
+                            <span style="font-size: 0.875rem; font-weight: 500; color: #4b5563;">Assigned Trips</span>
+                        </div>
+                        <span style="font-size: 1.125rem; font-weight: 700; color: #1a1a1a;">#if(stats.assignedTrips):#(stats.assignedTrips)#else:0#endif</span>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; box-shadow: 0 2px 12px rgba(16, 185, 129, 0.2);">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="width: 36px; height: 36px; background: rgba(255, 255, 255, 0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+                                <i class="fas fa-dollar-sign" style="font-size: 0.875rem;"></i>
+                            </div>
+                            <span style="font-size: 0.875rem; font-weight: 600; color: white;">Earnings Today</span>
+                        </div>
+                        <span style="font-size: 1.125rem; font-weight: 700; color: white;">$#if(stats.earningsToday):#(stats.earningsToday)#else:0.00#endif</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div>
+                <h3 style="font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af; margin-bottom: 1.25rem;">
+                    Quick Actions
+                </h3>
+                <div style="display: flex; flex-direction: column; gap: 0.625rem;">
+                    <a href="/products/gofloradriver/trips" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1rem; background: white; color: #1a1a1a; text-decoration: none; border: 1px solid #f3f4f6; border-radius: 12px; font-size: 0.9375rem; font-weight: 500; transition: all 0.2s;">
+                        <i class="fas fa-search" style="font-size: 1rem; color: #667eea;"></i>
+                        <span>Browse Trips</span>
+                    </a>
+                    <a href="/products/gofloradriver/bids" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1rem; background: white; color: #1a1a1a; text-decoration: none; border: 1px solid #f3f4f6; border-radius: 12px; font-size: 0.9375rem; font-weight: 500; transition: all 0.2s;">
+                        <i class="fas fa-gavel" style="font-size: 1rem; color: #667eea;"></i>
+                        <span>View My Bids</span>
+                    </a>
+                    <a href="/products/gofloradriver/assigned" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1rem; background: white; color: #1a1a1a; text-decoration: none; border: 1px solid #f3f4f6; border-radius: 12px; font-size: 0.9375rem; font-weight: 500; transition: all 0.2s;">
+                        <i class="fas fa-clipboard-list" style="font-size: 1rem; color: #667eea;"></i>
+                        <span>Accepted Trips</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    #endexport
+
+    #export("content"):
+        <!-- Welcome Banner -->
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 24px; padding: 2.5rem; margin-bottom: 2.5rem; box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2); position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; filter: blur(60px);"></div>
+            <div style="position: absolute; bottom: -30px; left: -30px; width: 150px; height: 150px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; filter: blur(40px);"></div>
+            
+            <div style="position: relative; display: flex; justify-content: space-between; align-items: center; gap: 2rem; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 280px;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem;">
+                        <div style="width: 64px; height: 64px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 2px solid rgba(255, 255, 255, 0.3);">
+                            👋
+                        </div>
+                        <div>
+                            <h1 style="font-size: 2rem; font-weight: 800; color: white; margin: 0 0 0.375rem 0; letter-spacing: -0.02em;">
+                                Welcome Back, #if(driver.name):#(driver.name)#else:Driver#endif!
+                            </h1>
+                            <div style="display: flex; align-items: center; gap: 0.625rem;">
+                                <div style="width: 12px; height: 12px; background: #10b981; border-radius: 50%; box-shadow: 0 0 16px rgba(16, 185, 129, 0.8); animation: pulse 2s infinite;"></div>
+                                <span style="font-size: 1.0625rem; color: rgba(255, 255, 255, 0.95); font-weight: 500;">
+                                    You are currently <strong style="font-weight: 700;">#if(driver.status == "online"):Online#else:Offline#endif</strong>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 1rem;">
+                    <a href="/products/gofloradriver/status-toggle" style="display: inline-flex; align-items: center; gap: 0.75rem; padding: 1rem 2rem; background: white; color: #667eea; text-decoration: none; border-radius: 14px; font-weight: 700; font-size: 1.0625rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); transition: all 0.2s;">
+                        <i class="fas fa-power-off"></i>
+                        <span>Go #if(driver.status == "online"):Offline#else:Online#endif</span>
+                    </a>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; color: rgba(255, 255, 255, 0.85); font-size: 0.875rem;">
+                        <i class="fas fa-clock"></i>
+                        <span>Updated #if(stats.lastUpdate):#(stats.lastUpdate)#else:just now#endif</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Overview -->
+        <div style="margin-bottom: 2.5rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 800; color: #1a1a1a; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-chart-line" style="color: #667eea;"></i>
+                Performance Overview
+            </h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
+                <!-- Total Earnings Card -->
+                <div style="background: white; border-radius: 20px; padding: 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6; transition: all 0.3s; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%); border-radius: 50%; filter: blur(20px);"></div>
+                    <div style="position: relative;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+                            <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25);">
+                                <i class="fas fa-dollar-sign" style="font-size: 1.5rem; color: white;"></i>
+                            </div>
+                            <div style="padding: 0.375rem 0.875rem; background: rgba(16, 185, 129, 0.1); border-radius: 20px;">
+                                <span style="font-size: 0.8125rem; font-weight: 700; color: #10b981;">+12.5%</span>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 500;">Total Earnings</p>
+                        <h3 style="font-size: 2.25rem; font-weight: 800; color: #1a1a1a; margin: 0; letter-spacing: -0.02em;">
+                            $#if(kpis.totalEarnings):#(kpis.totalEarnings)#else:0.00#endif
+                        </h3>
+                    </div>
+                </div>
+
+                <!-- Trips Completed Card -->
+                <div style="background: white; border-radius: 20px; padding: 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6; transition: all 0.3s; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(102, 126, 234, 0.05) 100%); border-radius: 50%; filter: blur(20px);"></div>
+                    <div style="position: relative;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+                            <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #667eea 0%, #5568d3 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(102, 126, 234, 0.25);">
+                                <i class="fas fa-road" style="font-size: 1.5rem; color: white;"></i>
+                            </div>
+                            <div style="padding: 0.375rem 0.875rem; background: rgba(102, 126, 234, 0.1); border-radius: 20px;">
+                                <span style="font-size: 0.8125rem; font-weight: 700; color: #667eea;">+8</span>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 500;">Trips Completed</p>
+                        <h3 style="font-size: 2.25rem; font-weight: 800; color: #1a1a1a; margin: 0; letter-spacing: -0.02em;">
+                            #if(kpis.tripsCompleted):#(kpis.tripsCompleted)#else:0#endif
+                        </h3>
+                    </div>
+                </div>
+
+                <!-- Average Rating Card -->
+                <div style="background: white; border-radius: 20px; padding: 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6; transition: all 0.3s; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%); border-radius: 50%; filter: blur(20px);"></div>
+                    <div style="position: relative;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+                            <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(245, 158, 11, 0.25);">
+                                <i class="fas fa-star" style="font-size: 1.5rem; color: white;"></i>
+                            </div>
+                            <div style="padding: 0.375rem 0.875rem; background: rgba(245, 158, 11, 0.1); border-radius: 20px;">
+                                <span style="font-size: 0.8125rem; font-weight: 700; color: #f59e0b;">Excellent</span>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 500;">Average Rating</p>
+                        <h3 style="font-size: 2.25rem; font-weight: 800; color: #1a1a1a; margin: 0; letter-spacing: -0.02em;">
+                            #if(kpis.rating):#(kpis.rating)#else:N/A#endif
+                        </h3>
+                    </div>
+                </div>
+
+                <!-- Pending Bids Card -->
+                <div style="background: white; border-radius: 20px; padding: 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6; transition: all 0.3s; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%); border-radius: 50%; filter: blur(20px);"></div>
+                    <div style="position: relative;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+                            <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(239, 68, 68, 0.25);">
+                                <i class="fas fa-hand-holding-usd" style="font-size: 1.5rem; color: white;"></i>
+                            </div>
+                            <div style="padding: 0.375rem 0.875rem; background: rgba(239, 68, 68, 0.1); border-radius: 20px;">
+                                <span style="font-size: 0.8125rem; font-weight: 700; color: #ef4444;">Active</span>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 500;">Pending Bids</p>
+                        <h3 style="font-size: 2.25rem; font-weight: 800; color: #1a1a1a; margin: 0; letter-spacing: -0.02em;">
+                            #if(kpis.pendingBids):#(kpis.pendingBids)#else:0#endif
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div>
+            <h2 style="font-size: 1.5rem; font-weight: 800; color: #1a1a1a; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-history" style="color: #667eea;"></i>
+                Recent Trip Activity
+            </h2>
+            <div style="background: white; border-radius: 20px; padding: 3rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6; text-align: center;">
+                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2.5rem;">
+                    📦
+                </div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; color: #1a1a1a; margin-bottom: 0.75rem;">No Recent Activity</h3>
+                <p style="font-size: 0.9375rem; color: #6b7280; margin-bottom: 2rem; max-width: 400px; margin-left: auto; margin-right: auto;">
+                    You haven't completed any trips yet. Start bidding on available trips to grow your earnings!
+                </p>
+                <a href="/products/gofloradriver/trips" style="display: inline-flex; align-items: center; gap: 0.625rem; padding: 0.875rem 1.75rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 0.9375rem; box-shadow: 0 2px 12px rgba(102, 126, 234, 0.25); transition: all 0.2s;">
+                    <i class="fas fa-search"></i>
+                    <span>Browse Available Trips</span>
+                </a>
+            </div>
+        </div>
+    #endexport
+
+    #export("styles"):
+        <style>
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.6; }
+            }
+            
+            /* Hover effects for cards */
+            .main-content > div > div > div:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important;
+            }
+            
+            /* Hover effects for sidebar links */
+            .sidebar a:hover {
+                background: #f3f4f6 !important;
+                transform: translateX(4px);
+            }
+            
+            /* Responsive adjustments */
+            @media (max-width: 768px) {
+                .main-content > div:first-child > div {
+                    padding: 2rem 1.5rem !important;
+                }
+                
+                .main-content > div:first-child > div > div {
+                    flex-direction: column;
+                    align-items: flex-start !important;
+                }
+                
+                .main-content > div:first-child > div > div > div:last-child {
+                    align-items: stretch !important;
+                    width: 100%;
+                }
+                
+                .main-content > div:first-child > div > div > div:last-child a {
+                    width: 100%;
+                }
+            }
+        </style>
+    #endexport
+    
+#endextend

@@ -1,0 +1,237 @@
+#extend("drivers/driversbase"):
+
+    #export("sidebarContent"):
+        <div style="padding: 0 1.5rem;">
+            <!-- Edit Tips -->
+            <div style="margin-bottom: 2.5rem;">
+                <h3 style="font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af; margin-bottom: 1.25rem;">
+                    Editing Profile
+                </h3>
+                <div style="padding: 1.25rem; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.2);">
+                    <div style="display: flex; align-items: start; gap: 0.75rem; margin-bottom: 0.75rem;">
+                        <i class="fas fa-info-circle" style="color: #667eea; font-size: 1.25rem; margin-top: 0.125rem;"></i>
+                        <div>
+                            <div style="font-size: 0.875rem; font-weight: 600; color: #1a1a1a; margin-bottom: 0.5rem;">Tips</div>
+                            <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.8125rem; color: #4b5563; line-height: 1.6;">
+                                <li style="margin-bottom: 0.5rem;">• Keep your contact info up to date</li>
+                                <li style="margin-bottom: 0.5rem;">• Use a valid phone number</li>
+                                <li>• Email changes require verification</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <h3 style="font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af; margin-bottom: 1.25rem;">
+                    Quick Links
+                </h3>
+                <div style="display: flex; flex-direction: column; gap: 0.625rem;">
+                    <a href="/products/gofloradriver/profile" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1rem; background: white; color: #1a1a1a; text-decoration: none; border: 1px solid #f3f4f6; border-radius: 12px; font-size: 0.9375rem; font-weight: 500; transition: all 0.2s;">
+                        <i class="fas fa-arrow-left" style="font-size: 1rem; color: #667eea;"></i>
+                        <span>Back to Profile</span>
+                    </a>
+                    <a href="/products/gofloradriver/dashboard" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1rem; background: white; color: #1a1a1a; text-decoration: none; border: 1px solid #f3f4f6; border-radius: 12px; font-size: 0.9375rem; font-weight: 500; transition: all 0.2s;">
+                        <i class="fas fa-home" style="font-size: 1rem; color: #667eea;"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    #endexport
+
+    #export("content"):
+        <!-- Error Messages -->
+        #if(errorMessage):
+            <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-exclamation-circle" style="color: #ef4444; font-size: 1.25rem;"></i>
+                <span style="color: #991b1b; font-weight: 500;">#(errorMessage)</span>
+            </div>
+        #endif
+
+        <!-- Page Header -->
+        <div style="margin-bottom: 2rem;">
+            <a href="/products/gofloradriver/profile" style="display: inline-flex; align-items: center; gap: 0.5rem; color: #667eea; text-decoration: none; font-weight: 600; margin-bottom: 1rem; transition: all 0.2s;">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Profile</span>
+            </a>
+            <h1 style="font-size: 2rem; font-weight: 800; color: #1a1a1a; margin-bottom: 0.5rem;">Edit Profile</h1>
+            <p style="color: #6b7280; font-size: 1rem;">Update your personal information</p>
+        </div>
+
+        <!-- Edit Form -->
+        <div style="background: white; border-radius: 20px; padding: 2.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #f3f4f6;">
+            <form method="POST" action="/products/gofloradriver/profile/edit" id="editProfileForm">
+                <!-- Full Name -->
+                <div style="margin-bottom: 1.75rem;">
+                    <label for="driverName" style="display: block; font-weight: 600; font-size: 0.9375rem; color: #1a1a1a; margin-bottom: 0.625rem;">
+                        <i class="fas fa-user" style="color: #667eea; margin-right: 0.5rem;"></i>
+                        Full Name <span style="color: #ef4444;">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="driverName" 
+                        name="driverName" 
+                        value="#(driver.driverName)"
+                        required
+                        style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 1rem; transition: all 0.2s;">
+                </div>
+
+                <!-- Email Address -->
+                <div style="margin-bottom: 1.75rem;">
+                    <label for="driverEmail" style="display: block; font-weight: 600; font-size: 0.9375rem; color: #1a1a1a; margin-bottom: 0.625rem;">
+                        <i class="fas fa-envelope" style="color: #667eea; margin-right: 0.5rem;"></i>
+                        Email Address <span style="color: #ef4444;">*</span>
+                    </label>
+                    <input 
+                        type="email" 
+                        id="driverEmail" 
+                        name="driverEmail" 
+                        value="#(driver.driverEmail)"
+                        required
+                        style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 1rem; transition: all 0.2s;">
+                    <div style="margin-top: 0.5rem; font-size: 0.8125rem; color: #6b7280;">
+                        <i class="fas fa-info-circle"></i> Changing your email may require verification
+                    </div>
+                </div>
+
+                <!-- Phone Number -->
+                <div style="margin-bottom: 1.75rem;">
+                    <label for="driverPhone" style="display: block; font-weight: 600; font-size: 0.9375rem; color: #1a1a1a; margin-bottom: 0.625rem;">
+                        <i class="fas fa-phone" style="color: #667eea; margin-right: 0.5rem;"></i>
+                        Phone Number <span style="color: #ef4444;">*</span>
+                    </label>
+                    <input 
+                        type="tel" 
+                        id="driverPhone" 
+                        name="driverPhone" 
+                        value="#(driver.driverPhone)"
+                        required
+                        pattern="[\+]?[0-9]{10,15}"
+                        style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 1rem; transition: all 0.2s;">
+                    <div style="margin-top: 0.5rem; font-size: 0.8125rem; color: #6b7280;">
+                        <i class="fas fa-info-circle"></i> Format: +263771234567 or 0771234567
+                    </div>
+                </div>
+
+                <!-- Address -->
+                <div style="margin-bottom: 2rem;">
+                    <label for="driverAddress" style="display: block; font-weight: 600; font-size: 0.9375rem; color: #1a1a1a; margin-bottom: 0.625rem;">
+                        <i class="fas fa-map-marker-alt" style="color: #667eea; margin-right: 0.5rem;"></i>
+                        Address <span style="color: #ef4444;">*</span>
+                    </label>
+                    <textarea 
+                        id="driverAddress" 
+                        name="driverAddress" 
+                        rows="3"
+                        required
+                        style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 1rem; transition: all 0.2s; resize: vertical;">#(driver.driverAddress)</textarea>
+                </div>
+
+                <!-- Read-Only Information -->
+                <div style="padding: 1.5rem; background: #f9fafb; border-radius: 16px; border: 1px solid #e5e7eb; margin-bottom: 2rem;">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: #1a1a1a; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-lock" style="color: #9ca3af;"></i>
+                        Read-Only Information
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div>
+                            <div style="font-size: 0.75rem; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.375rem;">Driver ID</div>
+                            <div style="font-size: 0.9375rem; font-weight: 600; color: #6b7280;">#(driver.driverID)</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.75rem; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.375rem;">License Number</div>
+                            <div style="font-size: 0.9375rem; font-weight: 600; color: #6b7280;">#(driver.driverLicense)</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.75rem; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.375rem;">Member Since</div>
+                            <div style="font-size: 0.9375rem; font-weight: 600; color: #6b7280;">#date(driver.registrationDate, "MMM d, yyyy")</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem; padding: 0.75rem 1rem; background: rgba(102, 126, 234, 0.1); border-radius: 8px; font-size: 0.8125rem; color: #4b5563;">
+                        <i class="fas fa-info-circle" style="color: #667eea;"></i> These fields cannot be changed. Contact support for assistance.
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; flex-wrap: wrap;">
+                    <a href="/products/gofloradriver/profile" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.875rem 1.75rem; background: white; border: 2px solid #e5e7eb; color: #4b5563; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 0.9375rem; transition: all 0.2s;">
+                        <i class="fas fa-times"></i>
+                        <span>Cancel</span>
+                    </a>
+                    <button type="submit" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.875rem 1.75rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 0.9375rem; cursor: pointer; box-shadow: 0 2px 12px rgba(102, 126, 234, 0.25); transition: all 0.2s;">
+                        <i class="fas fa-save"></i>
+                        <span>Save Changes</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <script>
+            const form = document.getElementById('editProfileForm');
+            const inputs = form.querySelectorAll('input, textarea');
+
+            // Add focus styling
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.style.borderColor = '#667eea';
+                    this.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.style.borderColor = '#e5e7eb';
+                    this.style.boxShadow = 'none';
+                });
+            });
+
+            // Form validation
+            form.addEventListener('submit', function(e) {
+                const name = document.getElementById('driverName').value.trim();
+                const email = document.getElementById('driverEmail').value.trim();
+                const phone = document.getElementById('driverPhone').value.trim();
+                const address = document.getElementById('driverAddress').value.trim();
+
+                if (!name || name.length < 3) {
+                    e.preventDefault();
+                    alert('Please enter a valid full name (at least 3 characters)');
+                    document.getElementById('driverName').focus();
+                    return;
+                }
+
+                if (!email || !email.includes('@')) {
+                    e.preventDefault();
+                    alert('Please enter a valid email address');
+                    document.getElementById('driverEmail').focus();
+                    return;
+                }
+
+                if (!phone || phone.length < 10) {
+                    e.preventDefault();
+                    alert('Please enter a valid phone number (at least 10 digits)');
+                    document.getElementById('driverPhone').focus();
+                    return;
+                }
+
+                if (!address || address.length < 5) {
+                    e.preventDefault();
+                    alert('Please enter a valid address');
+                    document.getElementById('driverAddress').focus();
+                    return;
+                }
+            });
+
+            // Add hover effects to buttons
+            const submitButton = form.querySelector('button[type="submit"]');
+            submitButton.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 4px 16px rgba(102, 126, 234, 0.35)';
+            });
+            submitButton.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 2px 12px rgba(102, 126, 234, 0.25)';
+            });
+        </script>
+    #endexport
+    
+#endextend

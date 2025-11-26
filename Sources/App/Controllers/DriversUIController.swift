@@ -9,8 +9,10 @@ struct DriversUIController: RouteCollection {
         let driversUIRoute = routes.grouped("products", "gofloradriver")
 
         // Landing & Onboarding Routes (Public)
-        driversUIRoute.get(use: renderWelcome)
-        driversUIRoute.get("welcome", use: renderWelcome)
+      //  driversUIRoute.get(use: renderWelcome)
+        driversUIRoute.get("welcome") { req in
+            req.redirect(to: "/products/gofloradriver/landing")
+        }
         driversUIRoute.get("join", use: renderJoinDriver)
         driversUIRoute.get("signup", use: renderSignup)
         driversUIRoute.post("signup", use: handleSignup)
@@ -31,6 +33,8 @@ struct DriversUIController: RouteCollection {
         let protectedRoutes = driversUIRoute.grouped(DriverAuthMiddleware())
         protectedRoutes.get("dashboard", use: renderDashboard)
         protectedRoutes.get("profile", use: renderProfile)
+        protectedRoutes.get("profile", "edit", use: renderEditProfile)
+        protectedRoutes.post("profile", "edit", use: handleProfileUpdate)
         protectedRoutes.get("logout", use: handleLogout)
     }
 
@@ -151,7 +155,8 @@ struct DriversUIController: RouteCollection {
                 req.session.data["driverToken"] = driverResponse.token
                 req.session.data["email"] = driverResponse.email
                 req.session.data["name"] = driverResponse.name
-               // req.session.data["driverID"] = driverResponse.driverID ?? ""
+                req.session.data["driverID"] =  "Implementing Soon" //Call API to get driver ID
+                // req.session.data["driverID"] = driverResponse.driverID ?? ""
 
                 // Set remember me if requested (extends session duration)
                 if let rememberMe = try? req.content.get(String.self, at: "rememberMe"), rememberMe == "true" {
@@ -302,13 +307,67 @@ struct DriversUIController: RouteCollection {
 
     @Sendable func renderProfile(_ req: Request) async throws -> View {
         let driverProfile = try await fetchDriverProfile(req)
+        let stats = try await fetchDriverStats(req)
 
         let context = ProfilePageContext(
             title: "Driver Profile",
             pageType: "profile",
-            driver: driverProfile
+            driver: driverProfile,
+            stats: stats,
+            successMessage: req.query["success"],
+            errorMessage: req.query["error"],
+            initial: String(driverProfile.driverName.prefix(1))
         )
         return try await req.view.render("drivers/dashboard/profile", context)
+    }
+
+    @Sendable func renderEditProfile(_ req: Request) async throws -> View {
+        let driverProfile = try await fetchDriverProfile(req)
+
+        let context = EditProfilePageContext(
+            title: "Edit Profile",
+            pageType: "profile",
+            driver: driverProfile,
+            errorMessage: req.query["error"]
+        )
+        return try await req.view.render("drivers/dashboard/edit-profile", context)
+    }
+
+    @Sendable func handleProfileUpdate(_ req: Request) async throws -> Response {
+        let updateData = try req.content.decode(ProfileUpdateFormData.self)
+        let driverToken = req.session.data["driverToken"]
+
+        // Validate phone number format (basic validation)
+        if !updateData.driverPhone.isEmpty && updateData.driverPhone.count < 10 {
+            return req.redirect(to: "/products/gofloradriver/profile/edit?error=Invalid phone number format")
+        }
+
+        let jsonData = try JSONEncoder().encode(updateData)
+        let buffer = req.application.allocator.buffer(data: jsonData)
+
+        do {
+            let response = try await makeAPIRequest(
+                req: req,
+                method: .PATCH,
+                endpoint: APIConfig.endpoints["driver-profiles"]! + "/update",
+                body: buffer,
+                driverToken: driverToken
+            )
+
+            if response.status == .ok {
+                // Update session data with new values
+                req.session.data["name"] = updateData.driverName
+                req.session.data["email"] = updateData.driverEmail
+
+                return req.redirect(to: "/products/gofloradriver/profile?success=Profile updated successfully")
+            } else {
+                let errorData = try response.content.decode([String: String].self)
+                let error = errorData["message"] ?? "Failed to update profile"
+                return req.redirect(to: "/products/gofloradriver/profile/edit?error=\(error)")
+            }
+        } catch {
+            return req.redirect(to: "/products/gofloradriver/profile/edit?error=Network error. Please try again.")
+        }
     }
 
     @Sendable func handleLogout(_ req: Request) async throws -> Response {
@@ -374,6 +433,30 @@ struct LoginPageContext: Content {
     let prefillEmail: String?
 }
 
+struct ProfilePageContext: Content {
+    let title: String
+    let pageType: String
+    let driver: DriverProfileDTO
+    let stats: DriverStatsContext
+    let successMessage: String?
+    let errorMessage: String?
+    let initial: String?
+}
+
+struct EditProfilePageContext: Content {
+    let title: String
+    let pageType: String
+    let driver: DriverProfileDTO
+    let errorMessage: String?
+}
+
+struct ProfileUpdateFormData: Content {
+    let driverName: String
+    let driverPhone: String
+    let driverEmail: String
+    let driverAddress: String
+}
+
 // Simple auth middleware for session checking
 struct DriverAuthMiddleware: AsyncMiddleware {
     func respond(to request: Request, chainingTo next: AsyncResponder) async throws -> Response {
@@ -384,3 +467,18 @@ struct DriverAuthMiddleware: AsyncMiddleware {
         }
     }
 }
+
+/*
+struct TripSummaryContext: Content {
+    let id: String
+    let pickup: String
+    let destination: String
+    let distance: String
+    let suggestedPrice: Double
+    let status: String
+    let bidAmount: Double?
+    let scheduledTime: String
+    let date: String?
+    let amount: String?
+}
+*/
