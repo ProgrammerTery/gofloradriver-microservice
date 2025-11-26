@@ -460,6 +460,10 @@
                         <i class="fas fa-home"></i>
                         <span>Dashboard</span>
                     </a>
+                    <a href="/products/gofloradriver/assigned" class="nav-link #if(pageType == "trips"):active#endif">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Accepted Trips</span>
+                    </a>
                     <a href="/products/gofloradriver/trips" class="nav-link #if(pageType == "trips"):active#endif">
                         <i class="fas fa-route"></i>
                         <span>Trips</span>
@@ -472,6 +476,7 @@
                         <i class="fas fa-history"></i>
                         <span>History</span>
                     </a>
+
                 </nav>
                 
                 <div class="header-actions">

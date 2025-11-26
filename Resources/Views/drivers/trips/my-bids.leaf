@@ -58,7 +58,7 @@
                     </div>
                     <div>
                         <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">Pending</div>
-                        <div style="font-size: 1.75rem; font-weight: 800; color: #1a1a1a;">#count(bids.filter(bid => bid.status == "pending"))</div>
+                        <div style="font-size: 1.75rem; font-weight: 800; color: #1a1a1a;">#if(pendingCount):#(pendingCount)#else:0#endif</div>
                     </div>
                 </div>
             </div>
@@ -70,7 +70,7 @@
                     </div>
                     <div>
                         <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">Approved</div>
-                        <div style="font-size: 1.75rem; font-weight: 800; color: #1a1a1a;">#count(bids.filter(bid => bid.status == "approved"))</div>
+                        <div style="font-size: 1.75rem; font-weight: 800; color: #1a1a1a;">#if(approvedCount):#(approvedCount)#else:0#endif</div>
                     </div>
                 </div>
             </div>
@@ -82,7 +82,7 @@
                     </div>
                     <div>
                         <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">Rejected</div>
-                        <div style="font-size: 1.75rem; font-weight: 800; color: #1a1a1a;">#count(bids.filter(bid => bid.status == "rejected"))</div>
+                        <div style="font-size: 1.75rem; font-weight: 800; color: #1a1a1a;">#if(rejectedCount):#(rejectedCount)#else:0#endif</div>
                     </div>
                 </div>
             </div>
