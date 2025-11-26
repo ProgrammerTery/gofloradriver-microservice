@@ -1,5 +1,7 @@
 import Vapor
 import Leaf
+import DriversDTO
+import SharedModels
 
 struct VehicleUIController: RouteCollection {
 
@@ -213,9 +215,4 @@ struct VehicleUIController: RouteCollection {
 }
 
 // Helper struct for API response parsing
-struct ServiceTypeAPIResponse: Content {
-    let id: String
-    let name: String
-    let description: String
-    let baseRate: Double
-}
+
