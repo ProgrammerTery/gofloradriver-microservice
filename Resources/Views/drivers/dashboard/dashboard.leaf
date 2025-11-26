@@ -72,17 +72,8 @@
                     <h1 style="font-size: 2.25rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.5rem;">
                         Welcome Back, #if(driver.driverName):#(driver.driverName)#else:Driver#endif
                     </h1>
-                    <div style="display: flex; align-items: center; gap: 0.625rem;">
-                        <div style="width: 10px; height: 10px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 12px rgba(16, 185, 129, 0.6); animation: pulse 2s infinite;"></div>
-                        <span style="font-size: 1rem; color: var(--gray-600);">
-                            Status: <strong style="color: var(--accent); font-weight: 600;">#if(driver.status == "online"):Online & Ready#else:Offline#endif</strong>
-                        </span>
-                    </div>
+    
                 </div>
-                <a href="/products/gofloradriver/status-toggle" class="trips-btn-primary" style="padding: 1rem 1.75rem;">
-                    <i class="fas fa-power-off"></i>
-                    <span>Go #if(driver.status == "online"):Offline#else:Online#endif</span>
-                </a>
             </div>
         </div>
 
