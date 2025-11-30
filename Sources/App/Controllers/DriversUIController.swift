@@ -156,7 +156,7 @@ struct DriversUIController: RouteCollection {
                 req.session.data["driverToken"] = driverResponse.token
                 req.session.data["email"] = driverResponse.email
                 req.session.data["name"] = driverResponse.name
-                req.session.data["driverID"] =  "Implementing Soon" //Call API to get driver ID
+                req.session.data["driverID"] = driverResponse.driverID.uuidString  //Call API to get driver ID
                 // req.session.data["driverID"] = driverResponse.driverID ?? ""
 
                 // Set remember me if requested (extends session duration)
