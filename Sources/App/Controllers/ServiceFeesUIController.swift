@@ -159,7 +159,7 @@ struct ServiceFeesUIController: RouteCollection {
         let driverToken = req.session.data["driverToken"] ?? ""
         let driverProfile = try await fetchDriverProfile(req)
         let stats = try await fetchServiceFeeStats(req, driverToken: driverToken)
-        let currencyStats: [(currency: String, stats: CurrencyStatsDTO)] = stats.currencyBreakdown.map { (key, value) in (key, value) }
+        let currencyStats: [CurrencyStatItem] = stats?.currencyBreakdown.map { (key, value) in CurrencyStatItem(currency: key, stats: value) } ?? []
         let context = ServiceFeesStatsPageContext(
             title: "Service Fees Stats",
             pageType: "service-fees-stats",
@@ -172,28 +172,62 @@ struct ServiceFeesUIController: RouteCollection {
 
     // Helper methods (stubs, to be implemented)
     private func fetchDriverProfile(_ req: Request) async throws -> DriverProfileDTO {
-        // ...existing code...
-        return DriverProfileDTO(driverID: "", driverName: "", driverPhone: "", driverEmail: "", driverAddress: "", registrationDate: Date(), driverLicense: "", vehicle_id: nil)
+        guard let driverToken = req.session.data["driverToken"], !driverToken.isEmpty else {
+            throw Abort.redirect(to: "/products/gofloradriver/login")
+        }
+        let endpoint = APIConfig.endpoints["gofloradriver-profiles"] ?? "urlfailed"
+        let response = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint + "/me", driverToken: driverToken)
+        return try response.content.decode(DriverProfileDTO.self)
     }
+
     private func fetchPaymentMethods(_ req: Request, driverToken: String) async throws -> [PayNowPaymentMethodResponseDTO] {
-        // ...existing code...
-        return []
+        let baseURL = APIConfig.mainAppBaseURL
+        let endpoint = baseURL + "/api/payment-methods"
+        let response = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: driverToken)
+        guard response.status.code >= 200 && response.status.code < 300 else {
+            throw Abort(response.status)
+        }
+        guard let responseBody = response.body else {
+            throw Abort(.internalServerError, reason: "No response body")
+        }
+        let decoder = JSONDecoder()
+        let responseData = Data(buffer: responseBody)
+        return try decoder.decode([PayNowPaymentMethodResponseDTO].self, from: responseData)
     }
+
     private func fetchServiceFees(_ req: Request, driverToken: String, page: Int, perPage: Int) async throws -> DriverCustomServiceFeesListResponse {
-        // ...existing code...
-        return DriverCustomServiceFeesListResponse(serviceFees: [], total: 0, page: page, perPage: perPage)
+        var queryItems = [URLQueryItem(name: "page", value: "\(page)"),
+                          URLQueryItem(name: "per", value: "\(perPage)")]
+        let endpoint = (APIConfig.endpoints["service-fees"] ?? "urlfailed") + "/my-fees?" + queryItems.map { "\($0.name)=\($0.value ?? "")" }.joined(separator: "&")
+        let response = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: driverToken)
+        return try response.content.decode(DriverCustomServiceFeesListResponse.self)
     }
+
     private func fetchServiceFeeStats(_ req: Request, driverToken: String) async throws -> DriverServiceFeesStatsDTO? {
-        // ...existing code...
-        return nil
+        let endpoint = (APIConfig.endpoints["service-fees"] ?? "urlfailed") + "/stats"
+        let response = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: driverToken)
+        return try? response.content.decode(DriverServiceFeesStatsDTO.self)
     }
+
     private func fetchServiceFeeByID(_ req: Request, driverToken: String, feeID: String) async throws -> DriverCustomServiceFeesDTO {
-        // ...existing code...
-        throw Abort(.notFound)
+        let endpoint = (APIConfig.endpoints["service-fees"] ?? "urlfailed") + "/\(feeID)"
+        let response = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: driverToken)
+        return try response.content.decode(DriverCustomServiceFeesDTO.self)
     }
+
     private func fetchPaymentMethodByID(_ req: Request, driverToken: String, paymentMethodID: String) async throws -> PayNowPaymentMethodResponseDTO? {
-        // ...existing code...
-        return nil
+        let baseURL = APIConfig.mainAppBaseURL
+        let endpoint = baseURL + "/api/payment-methods/\(paymentMethodID)"
+        let response = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: driverToken)
+        guard response.status.code >= 200 && response.status.code < 300 else {
+            return nil
+        }
+        guard let responseBody = response.body else {
+            return nil
+        }
+        let decoder = JSONDecoder()
+        let responseData = Data(buffer: responseBody)
+        return try? decoder.decode(PayNowPaymentMethodResponseDTO.self, from: responseData)
     }
     private func makeAPIRequest(req: Request, method: HTTPMethod, endpoint: String, body: ByteBuffer? = nil, driverToken: String? = nil) async throws -> ClientResponse {
         var headers = HTTPHeaders()

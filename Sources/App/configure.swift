@@ -19,4 +19,8 @@ public func configure(_ app: Application) async throws {
     
     // Register routes
     try routes(app)
+
+    // Register UI controllers for Service Fees and Invoices
+    try app.register(collection: ServiceFeesUIController())
+    try app.register(collection: InvoicesUIController())
 }
