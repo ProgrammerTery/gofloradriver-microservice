@@ -1,5 +1,5 @@
 #extend("drivers/driversbase"):
-    #export("contentDetail"):
+    #export("content"):
         <div class="auth-container">
             <div class="auth-header">
                 <h1>Driver Registration</h1>
@@ -10,6 +10,8 @@
             <div class="alert alert-error">
                 <span class="alert-icon">⚠️</span>
                 <span>#(errorMessage)</span>
+            </div>
+            #endif
             </div>
             #endif
             
