@@ -400,22 +400,6 @@ struct DriversUIController: RouteCollection {
 
     // MARK: - Helper Methods
 
-    private func makeAPIRequest(req: Request, method: HTTPMethod, endpoint: String,  body: ByteBuffer? = nil, driverToken: String? = nil) async throws -> ClientResponse {
-        var headers = HTTPHeaders()
-        headers.add(name: .contentType, value: "application/json")
-        if let token = driverToken {
-            headers.add(name: .authorization, value: "Bearer \(token)")
-        }
-
-        let clientRequest = ClientRequest(
-            method: method,
-            url: URI(string: endpoint),
-            headers: headers,
-            body: body
-        )
-
-        return try await req.client.send(clientRequest)
-    }
 
     private func fetchDriverProfile(_ req: Request) async throws -> DriverProfileDTO {
         // Mock data - in real implementation, call API with session token

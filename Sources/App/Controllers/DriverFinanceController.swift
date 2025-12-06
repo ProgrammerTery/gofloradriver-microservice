@@ -1,6 +1,6 @@
 import Vapor
 import Leaf
-import GoFloraSharedPackage
+import DriversDTO
 import Foundation
 
 struct DriverFinanceController: RouteCollection {
@@ -78,14 +78,16 @@ struct DriverFinanceController: RouteCollection {
         }
 
         let createRequest = try req.content.decode(CreateDriverCustomServiceFeesRequest.self)
+        let jsonData = try JSONEncoder().encode(createRequest)
+        let buffer = req.application.allocator.buffer(data: jsonData)
 
         do {
-            _ = try await callMainAppAPI(
+            _ = try await makeAPIRequest(
                 req: req,
                 method: .POST,
-                path: "/api/driver/service-fees",
-                body: createRequest,
-                responseType: DriverCustomServiceFeesDTO.self
+                endpoint: "/api/driver/service-fees",
+                body: buffer,
+                driverToken:driverToken
             )
 
             req.session.data["success_message"] = "Service fee created successfully"
@@ -108,12 +110,14 @@ struct DriverFinanceController: RouteCollection {
         }
 
         do {
-            let serviceFee = try await callMainAppAPI(
+            let serviceFeeResponse = try await makeAPIRequest(
                 req: req,
                 method: .GET,
-                path: "/api/driver/service-fees/\(serviceFeeID)",
-                responseType: DriverCustomServiceFeesDTO.self
+                endpoint: "/api/driver/service-fees/\(serviceFeeID)",
+                driverToken: driverToken
             )
+
+            let serviceFee = try serviceFeeResponse.content.decode(DriverCustomServiceFeesDTO.self)
 
             let context = EditServiceFeePageContext(
                 title: "Edit Service Fee",
@@ -142,13 +146,16 @@ struct DriverFinanceController: RouteCollection {
 
         let updateRequest = try req.content.decode(UpdateDriverCustomServiceFeesRequest.self)
 
+        let jsonData = try JSONEncoder().encode(updateRequest)
+        let buffer = req.application.allocator.buffer(data: jsonData)
+
         do {
-            _ = try await callMainAppAPI(
+            _ = try await makeAPIRequest(
                 req: req,
                 method: .PUT,
-                path: "/api/driver/service-fees/\(serviceFeeID)",
-                body: updateRequest,
-                responseType: DriverCustomServiceFeesDTO.self
+                endpoint: "/api/driver/service-fees/\(serviceFeeID)",
+                 body: buffer,
+                driverToken: driverToken
             )
 
             req.session.data["success_message"] = "Service fee updated successfully"
@@ -171,10 +178,11 @@ struct DriverFinanceController: RouteCollection {
         }
 
         do {
-            try await callMainAppAPIWithoutResponse(
+            try await makeAPIRequest(
                 req: req,
                 method: .DELETE,
-                path: "/api/driver/service-fees/\(serviceFeeID)"
+                endpoint: "/api/driver/service-fees/\(serviceFeeID)",
+                driverToken: driverToken
             )
 
             req.session.data["success_message"] = "Service fee deleted successfully"
@@ -197,11 +205,11 @@ struct DriverFinanceController: RouteCollection {
         }
 
         do {
-            _ = try await callMainAppAPI(
+            _ = try await makeAPIRequest(
                 req: req,
                 method: .POST,
-                path: "/api/driver/service-fees/\(serviceFeeID)/toggle-active",
-                responseType: DriverCustomServiceFeesDTO.self
+                endpoint: "/api/driver/service-fees/\(serviceFeeID)/toggle-active",
+                driverToken: driverToken
             )
 
             req.session.data["success_message"] = "Service fee status updated successfully"
@@ -303,12 +311,20 @@ struct DriverFinanceController: RouteCollection {
         }
 
         do {
-            let invoice = try await callMainAppAPI(
+            let invoiceresponse = try await makeAPIRequest(
                 req: req,
                 method: .GET,
-                path: "/api/driver/invoices/\(invoiceID)",
-                responseType: DriverInvoiceDTO.self
+                endpoint: "/api/driver/invoices/\(invoiceID)",
+                driverToken: driverToken
             )
+             let invoice = try  invoiceresponse.content.decode(DriverInvoiceDTO.self)
+
+            if let id = invoice.id {
+            } else {
+                   throw Abort(.notFound, reason: "Invoice not found")
+               }
+
+
 
             let context = InvoiceDetailPageContext(
                 title: "Invoice Details",
@@ -334,14 +350,16 @@ struct DriverFinanceController: RouteCollection {
         }
 
         let markPaidRequest = try req.content.decode(MarkInvoicePaidRequest.self)
+        let jsonData = try JSONEncoder().encode(markPaidRequest)
+        let buffer = req.application.allocator.buffer(data: jsonData)
 
         do {
-            _ = try await callMainAppAPI(
+            _ = try await makeAPIRequest(
                 req: req,
                 method: .POST,
-                path: "/api/driver/invoices/\(invoiceID)/mark-paid",
-                body: markPaidRequest,
-                responseType: DriverInvoiceDTO.self
+                endpoint: "/api/driver/invoices/\(invoiceID)/mark-paid",
+                body: buffer,
+                driverToken: driverToken
             )
 
             req.session.data["success_message"] = "Invoice marked as paid successfully"
@@ -357,6 +375,9 @@ struct DriverFinanceController: RouteCollection {
     // MARK: - API Helper Methods
 
     private func fetchServiceFees(_ req: Request) async throws -> DriverCustomServiceFeesListResponse {
+        guard let driverToken = req.session.data["driverToken"], !driverToken.isEmpty else {
+            throw Abort.redirect(to: "/products/gofloradriver/login")
+        }
         let page = req.query[Int.self, at: "page"] ?? 1
         let perPage = req.query[Int.self, at: "per"] ?? 20
         let active = req.query[Bool.self, at: "active"]
@@ -368,26 +389,32 @@ struct DriverFinanceController: RouteCollection {
             queryItems.append(URLQueryItem(name: "active", value: "\(active)"))
         }
 
-        let path = "/api/driver/service-fees/my-fees?" + queryItems.map { "\($0.name)=\($0.value ?? "")" }.joined(separator: "&")
+        let endpoint = "/api/driver/service-fees/my-fees?" + queryItems.map { "\($0.name)=\($0.value ?? "")" }.joined(separator: "&")
 
-        return try await callMainAppAPI(
+      return try await makeAPIRequest(
             req: req,
             method: .GET,
-            path: path,
-            responseType: DriverCustomServiceFeesListResponse.self
-        )
+            endpoint: endpoint,
+            driverToken: driverToken
+        ).content.decode(DriverCustomServiceFeesListResponse.self)
     }
 
     private func fetchServiceFeesStats(_ req: Request) async throws -> DriverServiceFeesStatsDTO {
-        return try await callMainAppAPI(
+        guard let driverToken = req.session.data["driverToken"], !driverToken.isEmpty else {
+            throw Abort.redirect(to: "/products/gofloradriver/login")
+        }
+        return try await makeAPIRequest(
             req: req,
             method: .GET,
-            path: "/api/driver/service-fees/stats",
-            responseType: DriverServiceFeesStatsDTO.self
-        )
+            endpoint: "/api/driver/service-fees/stats",
+            driverToken: driverToken
+        ).content.decode(DriverServiceFeesStatsDTO.self)
     }
 
     private func fetchInvoices(_ req: Request) async throws -> DriverInvoiceListResponse {
+        guard let driverToken = req.session.data["driverToken"], !driverToken.isEmpty else {
+            throw Abort.redirect(to: "/products/gofloradriver/login")
+        }
         let page = req.query[Int.self, at: "page"] ?? 1
         let perPage = req.query[Int.self, at: "per"] ?? 20
         let status = req.query[String.self, at: "status"]
@@ -399,26 +426,32 @@ struct DriverFinanceController: RouteCollection {
             queryItems.append(URLQueryItem(name: "status", value: status))
         }
 
-        let path = "/api/driver/invoices?" + queryItems.map { "\($0.name)=\($0.value ?? "")" }.joined(separator: "&")
+        let endpoint = "/api/driver/invoices?" + queryItems.map { "\($0.name)=\($0.value ?? "")" }.joined(separator: "&")
 
-        return try await callMainAppAPI(
+        return try await makeAPIRequest(
             req: req,
             method: .GET,
-            path: path,
-            responseType: DriverInvoiceListResponse.self
-        )
+            endpoint: endpoint,
+            driverToken: driverToken
+        ).content.decode(DriverInvoiceListResponse.self)
     }
 
     private func fetchInvoiceStats(_ req: Request) async throws -> DriverInvoiceStatsDTO {
-        return try await callMainAppAPI(
+        guard let driverToken = req.session.data["driverToken"], !driverToken.isEmpty else {
+            throw Abort.redirect(to: "/products/gofloradriver/login")
+        }
+        return try await makeAPIRequest(
             req: req,
             method: .GET,
-            path: "/api/driver/invoices/stats",
-            responseType: DriverInvoiceStatsDTO.self
-        )
+            endpoint: "/api/driver/invoices/stats",
+            driverToken: driverToken
+        ).content.decode(DriverInvoiceStatsDTO.self)
     }
 
     private func fetchEarningsReport(_ req: Request) async throws -> DriverEarningsReportDTO {
+        guard let driverToken = req.session.data["driverToken"], !driverToken.isEmpty else {
+            throw Abort.redirect(to: "/products/gofloradriver/login")
+        }
         let fromDate = req.query[String.self, at: "from_date"]
         let toDate = req.query[String.self, at: "to_date"]
 
@@ -431,14 +464,14 @@ struct DriverFinanceController: RouteCollection {
             queryItems.append(URLQueryItem(name: "to_date", value: toDate))
         }
 
-        let path = "/api/driver/invoices/earnings" + (queryItems.isEmpty ? "" : "?" + queryItems.map { "\($0.name)=\($0.value ?? "")" }.joined(separator: "&"))
+        let endpoint = "/api/driver/invoices/earnings" + (queryItems.isEmpty ? "" : "?" + queryItems.map { "\($0.name)=\($0.value ?? "")" }.joined(separator: "&"))
 
-        return try await callMainAppAPI(
+        return try await makeAPIRequest(
             req: req,
             method: .GET,
-            path: path,
-            responseType: DriverEarningsReportDTO.self
-        )
+            endpoint: endpoint,
+           driverToken: driverToken
+        ).content.decode(DriverEarningsReportDTO.self)
     }
 
     private func fetchPaymentMethods(_ req: Request) async throws -> [PaymentMethodDTO] {
@@ -470,7 +503,7 @@ struct DriverFinanceController: RouteCollection {
         return try decoder.decode([PaymentMethodDTO].self, from: responseData)
     }
 
-    // MARK: - Generic API Call Methods
+  
 
 
 }
