@@ -1,18 +1,18 @@
 #extend("drivers/driversbase"):
-    #export("contentDetail"):
+    #export("content"):
         <div class="auth-container">
             <div class="auth-header">
                 <h1>Driver Registration</h1>
                 <p>Complete your driver profile to start earning</p>
             </div>
-            
+
             #if(errorMessage):
             <div class="alert alert-error">
                 <span class="alert-icon">⚠️</span>
                 <span>#(errorMessage)</span>
             </div>
             #endif
-            
+
             <form method="POST" action="/products/gofloradriver/register" class="auth-form" id="driverRegistrationForm">
                 <div class="form-section">
                     <h3>Personal Information</h3>
@@ -20,20 +20,20 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="driverID">Driver ID</label>
-                            <input type="text" 
-                                   id="driverID" 
-                                   name="driverID" 
-                                   required 
+                            <input type="text"
+                                   id="driverID"
+                                   name="driverID"
+                                   required
                                    placeholder="Enter your National ID"
                                    pattern="[A-Za-z0-9_-]+"
                                    title="Only letters, numbers, underscores and hyphens allowed">
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="driverName">Full Name</label>
-                            <input type="text" 
-                                   id="driverName" 
-                                   name="driverName" 
+                            <input type="text"
+                                   id="driverName"
+                                   name="driverName"
                                    required
                                    #if(prefillData):
                                    value="#(prefillData.driverName)"
@@ -41,49 +41,49 @@
                                    placeholder="Walter Vector">
                         </div>
                     </div>
-                    
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="driverEmail">Email Address</label>
-                            <input type="email" 
-                                   id="driverEmail" 
-                                   name="driverEmail" 
-                                   required 
+                            <input type="email"
+                                   id="driverEmail"
+                                   name="driverEmail"
+                                   required
                                    #if(prefillData):
                                    value="#(prefillData.driverEmail)"
                                    #endif
                                    placeholder="your@email.com">
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="driverPhone">Phone Number</label>
-                            <input type="tel" 
-                                   id="driverPhone" 
-                                   name="driverPhone" 
-                                   required 
+                            <input type="tel"
+                                   id="driverPhone"
+                                   name="driverPhone"
+                                   required
                                    placeholder="+263778463020">
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="form-section">
                     <h3>Address & License</h3>
-                    
+
                     <div class="form-group">
                         <label for="driverAddress">Home Address</label>
-                        <textarea id="driverAddress" 
-                                  name="driverAddress" 
-                                  required 
+                        <textarea id="driverAddress"
+                                  name="driverAddress"
+                                  required
                                   rows="3"
                                   placeholder="123 Main Street, City, State, ZIP Code"></textarea>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="driverLicense">Driver's License Number</label>
-                        <input type="text" 
-                               id="driverLicense" 
-                               name="driverLicense" 
-                               required 
+                        <input type="text"
+                               id="driverLicense"
+                               name="driverLicense"
+                               required
                                placeholder="DL123456789">
                     </div>
 
@@ -98,17 +98,17 @@
            required>
 </div>
                 </div>
-                
+
                 <button type="submit" class="btn btn-primary btn-full">
                     Complete Registration
                 </button>
             </form>
-            
+
             <div class="auth-footer">
                 <p><a href="/products/gofloradriver/signup">← Back to signup</a></p>
             </div>
         </div>
-        
+
         <script>
             document.getElementById('driverRegistrationForm').addEventListener('submit', function(e) {
                 const driverID = document.getElementById('driverID').value;
@@ -116,14 +116,14 @@
                 const driverEmail = document.getElementById('driverEmail').value;
                 const driverPhone = document.getElementById('driverPhone').value;
                 const driverLicense = document.getElementById('driverLicense').value;
-                
+
                 // Basic validation
                 if (!driverID || !driverName || !driverEmail || !driverPhone || !driverLicense) {
                     e.preventDefault();
                     alert('Please fill in all required fields.');
                     return false;
                 }
-                
+
                 // Driver ID validation
                 if (!/^[A-Za-z0-9_-]+$/.test(driverID)) {
                     e.preventDefault();
