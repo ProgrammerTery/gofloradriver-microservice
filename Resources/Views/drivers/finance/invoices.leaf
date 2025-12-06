@@ -1,0 +1,562 @@
+#extend("drivers/driversbase"):
+    #export("contentDetail"):
+        <div class="main-content">
+            <div class="container">
+                <!-- Header Section -->
+                <div class="finance-header">
+                    <div class="header-content">
+                        <h1 class="page-title">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                            Invoice Management
+                        </h1>
+                        <p class="page-subtitle">Track your earnings, invoices, and payment status</p>
+                    </div>
+                    <div class="header-actions">
+                        <a href="/products/gofloradriver/finance/invoices/stats" class="btn btn-secondary">
+                            <i class="fas fa-chart-line"></i> View Statistics
+                        </a>
+                        <a href="/products/gofloradriver/finance/invoices/earnings" class="btn btn-primary">
+                            <i class="fas fa-chart-bar"></i> Earnings Report
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Success/Error Messages -->
+                #if(successMessage):
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <span>#(successMessage)</span>
+                </div>
+                #endif
+
+                #if(errorMessage):
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>#(errorMessage)</span>
+                </div>
+                #endif
+
+                <!-- Revenue Overview Cards -->
+                <div class="revenue-overview">
+                    <div class="revenue-card total">
+                        <div class="revenue-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="revenue-content">
+                            <div class="revenue-amount">$#format(totalAmount, ",.2f")</div>
+                            <div class="revenue-label">Total Revenue</div>
+                            <div class="revenue-count">#(stats.totalInvoices) invoices</div>
+                        </div>
+                    </div>
+                    
+                    <div class="revenue-card paid">
+                        <div class="revenue-icon">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                        <div class="revenue-content">
+                            <div class="revenue-amount">$#format(paidAmount, ",.2f")</div>
+                            <div class="revenue-label">Paid Amount</div>
+                            <div class="revenue-count">#(stats.paidInvoices) paid</div>
+                        </div>
+                        <div class="revenue-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: #if(totalAmount > 0):#(paidAmount / totalAmount * 100)#else:0#endif%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="revenue-card pending">
+                        <div class="revenue-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="revenue-content">
+                            <div class="revenue-amount">$#format(pendingAmount, ",.2f")</div>
+                            <div class="revenue-label">Pending Amount</div>
+                            <div class="revenue-count">#(stats.pendingInvoices) pending</div>
+                        </div>
+                        <div class="revenue-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill pending" style="width: #if(totalAmount > 0):#(pendingAmount / totalAmount * 100)#else:0#endif%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="revenue-card average">
+                        <div class="revenue-icon">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <div class="revenue-content">
+                            <div class="revenue-amount">$#format(stats.averageInvoiceAmount, ",.2f")</div>
+                            <div class="revenue-label">Average Invoice</div>
+                            <div class="revenue-count">per trip</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters-section">
+                    <div class="filter-group">
+                        <form method="GET" action="/products/gofloradriver/finance/invoices" class="filter-form">
+                            <div class="filter-item">
+                                <label for="status">Status</label>
+                                <select name="status" id="status" onchange="this.form.submit()">
+                                    <option value="">All Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="paid">Paid</option>
+                                    <option value="canceled">Canceled</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label for="from_date">From Date</label>
+                                <input type="date" name="from_date" id="from_date" onchange="this.form.submit()">
+                            </div>
+                            <div class="filter-item">
+                                <label for="to_date">To Date</label>
+                                <input type="date" name="to_date" id="to_date" onchange="this.form.submit()">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Invoices Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Invoices</h3>
+                        <div class="card-actions">
+                            <span class="record-count">#(pagination.total) records</span>
+                        </div>
+                    </div>
+                    
+                    #if(count(invoices) > 0):
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Trip Details</th>
+                                    <th>Amount Breakdown</th>
+                                    <th>Total Amount</th>
+                                    <th>Payment Method</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                #for(invoice in invoices) {
+                                <tr class="table-row invoice-#(invoice.status)">
+                                    <td>
+                                        <div class="invoice-id">
+                                            <strong>#(invoice.id)</strong>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="trip-details">
+                                            <div class="trip-route">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                <span>#(invoice.tripPickupLocation ?? "Unknown") → #(invoice.tripDropoffLocation ?? "Unknown")</span>
+                                            </div>
+                                            <div class="trip-status">
+                                                <span class="status-badge trip-#(invoice.tripStatus ?? "")">#(invoice.tripStatus ?? "Unknown")</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="amount-breakdown">
+                                            <div class="breakdown-item">
+                                                <span class="breakdown-label">Base:</span>
+                                                <span class="breakdown-amount">$#format(invoice.baseFare, ",.2f")</span>
+                                            </div>
+                                            <div class="breakdown-item">
+                                                <span class="breakdown-label">Service:</span>
+                                                <span class="breakdown-amount">$#format(invoice.driverServiceFee, ",.2f")</span>
+                                            </div>
+                                            <div class="breakdown-item">
+                                                <span class="breakdown-label">Platform:</span>
+                                                <span class="breakdown-amount">$#format(invoice.platformFee, ",.2f")</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="total-amount">
+                                            <span class="amount-value">$#format(invoice.amount, ",.2f")</span>
+                                            <span class="amount-currency">#(invoice.currency)</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="payment-method">
+                                            <i class="fas fa-credit-card"></i>
+                                            <span>#(invoice.methodType ?? invoice.method)</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        #if(invoice.status == "paid"):
+                                        <span class="status-badge paid">
+                                            <i class="fas fa-check-circle"></i> Paid
+                                        </span>
+                                        #elseif(invoice.status == "pending"):
+                                        <span class="status-badge pending">
+                                            <i class="fas fa-clock"></i> Pending
+                                        </span>
+                                        #elseif(invoice.status == "canceled"):
+                                        <span class="status-badge canceled">
+                                            <i class="fas fa-times-circle"></i> Canceled
+                                        </span>
+                                        #else:
+                                        <span class="status-badge unknown">
+                                            <i class="fas fa-question-circle"></i> #(invoice.status)
+                                        </span>
+                                        #endif
+                                    </td>
+                                    <td>
+                                        <div class="date-info">
+                                            <div class="created-date">#date(invoice.createdAt, "MMM dd, yyyy")</div>
+                                            #if(invoice.paidAt):
+                                            <div class="paid-date">Paid: #date(invoice.paidAt, "MMM dd")</div>
+                                            #endif
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="/products/gofloradriver/finance/invoices/#(invoice.id)" class="btn btn-sm btn-secondary" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            #if(invoice.status == "pending"):
+                                            <form method="POST" action="/products/gofloradriver/finance/invoices/#(invoice.id)/mark-paid" style="display: inline;">
+                                                <input type="hidden" name="paidAt" value="#now()">
+                                                <button type="submit" class="btn btn-sm btn-success" title="Mark as Paid" onclick="return confirm('Mark this invoice as paid?')">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </form>
+                                            #endif
+                                        </div>
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    #if(pagination.totalPages > 1):
+                    <div class="pagination-wrapper">
+                        <div class="pagination">
+                            #if(pagination.currentPage > 1):
+                            <a href="?page=#(pagination.currentPage - 1)" class="pagination-btn">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                            #endif
+                            
+                            #for(page in 1...pagination.totalPages) {
+                                #if(page == pagination.currentPage):
+                                <span class="pagination-btn active">#(page)</span>
+                                #else:
+                                <a href="?page=#(page)" class="pagination-btn">#(page)</a>
+                                #endif
+                            }
+                            
+                            #if(pagination.currentPage < pagination.totalPages):
+                            <a href="?page=#(pagination.currentPage + 1)" class="pagination-btn">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            #endif
+                        </div>
+                    </div>
+                    #endif
+                    
+                    #else:
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                        <h3>No Invoices Found</h3>
+                        <p>You don't have any invoices yet. Start driving to generate your first invoice!</p>
+                        <a href="/products/gofloradriver/trips" class="btn btn-primary">
+                            <i class="fas fa-car"></i> View Available Trips
+                        </a>
+                    </div>
+                    #endif
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .revenue-overview {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .revenue-card {
+                background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
+                border-radius: var(--border-radius-lg);
+                padding: 2rem;
+                color: white;
+                position: relative;
+                overflow: hidden;
+                box-shadow: var(--shadow-lg);
+                transition: all 0.3s ease;
+            }
+
+            .revenue-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            }
+
+            .revenue-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            }
+
+            .revenue-card.paid::before {
+                background: linear-gradient(90deg, var(--success-color), #34d399);
+            }
+
+            .revenue-card.pending::before {
+                background: linear-gradient(90deg, var(--warning-color), #fbbf24);
+            }
+
+            .revenue-card.average::before {
+                background: linear-gradient(90deg, var(--accent-color), #ff8e8e);
+            }
+
+            .revenue-icon {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.1);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+                backdrop-filter: blur(10px);
+            }
+
+            .revenue-amount {
+                font-size: 2.5rem;
+                font-weight: 800;
+                line-height: 1;
+                margin-bottom: 0.5rem;
+                font-family: 'Montserrat', sans-serif;
+            }
+
+            .revenue-label {
+                font-size: 1rem;
+                opacity: 0.8;
+                margin-bottom: 0.25rem;
+                font-weight: 600;
+            }
+
+            .revenue-count {
+                font-size: 0.9rem;
+                opacity: 0.7;
+                font-weight: 500;
+            }
+
+            .revenue-progress {
+                margin-top: 1rem;
+            }
+
+            .progress-bar {
+                height: 6px;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 3px;
+                overflow: hidden;
+            }
+
+            .progress-fill {
+                height: 100%;
+                background: var(--success-color);
+                border-radius: 3px;
+                transition: width 0.3s ease;
+            }
+
+            .progress-fill.pending {
+                background: var(--warning-color);
+            }
+
+            .trip-details {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .trip-route {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            .trip-route i {
+                color: var(--primary-color);
+                font-size: 0.8rem;
+            }
+
+            .amount-breakdown {
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+                font-size: 0.85rem;
+            }
+
+            .breakdown-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .breakdown-label {
+                color: var(--text-light);
+                font-weight: 500;
+            }
+
+            .breakdown-amount {
+                font-weight: 600;
+                color: var(--text-dark);
+            }
+
+            .total-amount {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .amount-value {
+                font-size: 1.2rem;
+                font-weight: 800;
+                color: var(--success-color);
+            }
+
+            .amount-currency {
+                font-size: 0.8rem;
+                color: var(--text-light);
+                margin-top: 0.25rem;
+            }
+
+            .payment-method {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            .payment-method i {
+                color: var(--primary-color);
+            }
+
+            .status-badge.paid {
+                background: rgba(34, 197, 94, 0.1);
+                color: var(--success-color);
+                border: 1px solid rgba(34, 197, 94, 0.2);
+            }
+
+            .status-badge.pending {
+                background: rgba(245, 158, 11, 0.1);
+                color: var(--warning-color);
+                border: 1px solid rgba(245, 158, 11, 0.2);
+            }
+
+            .status-badge.canceled {
+                background: rgba(239, 68, 68, 0.1);
+                color: var(--error-color);
+                border: 1px solid rgba(239, 68, 68, 0.2);
+            }
+
+            .status-badge.trip-completed {
+                background: rgba(34, 197, 94, 0.1);
+                color: var(--success-color);
+                font-size: 0.75rem;
+            }
+
+            .status-badge.trip-active {
+                background: rgba(59, 130, 246, 0.1);
+                color: var(--primary-color);
+                font-size: 0.75rem;
+            }
+
+            .date-info {
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+                font-size: 0.85rem;
+            }
+
+            .created-date {
+                font-weight: 600;
+                color: var(--text-dark);
+            }
+
+            .paid-date {
+                color: var(--success-color);
+                font-size: 0.8rem;
+                font-weight: 500;
+            }
+
+            .invoice-id {
+                font-family: 'Roboto Mono', monospace;
+                font-size: 0.9rem;
+            }
+
+            .table-row.invoice-paid {
+                background: rgba(34, 197, 94, 0.02);
+            }
+
+            .table-row.invoice-pending {
+                background: rgba(245, 158, 11, 0.02);
+            }
+
+            .table-row.invoice-canceled {
+                background: rgba(239, 68, 68, 0.02);
+                opacity: 0.7;
+            }
+
+            @media (max-width: 768px) {
+                .revenue-overview {
+                    grid-template-columns: 1fr;
+                }
+
+                .filter-form {
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+
+                .filter-item {
+                    width: 100%;
+                }
+
+                .table-wrapper {
+                    overflow-x: auto;
+                }
+
+                .data-table {
+                    min-width: 1000px;
+                }
+
+                .finance-header {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 1rem;
+                }
+
+                .header-actions {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.5rem;
+                    width: 100%;
+                }
+
+                .header-actions .btn {
+                    width: 100%;
+                    text-align: center;
+                }
+            }
+        </style>
+#endextend

@@ -1,0 +1,581 @@
+#extend("drivers/driversbase"):
+    #export("contentDetail"):
+        <div class="main-content">
+            <div class="container">
+                <!-- Header Section -->
+                <div class="finance-header">
+                    <div class="header-content">
+                        <h1 class="page-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Earnings Report
+                        </h1>
+                        <p class="page-subtitle">
+                            Detailed breakdown of your earnings for #(report.period.from) to #(report.period.to)
+                        </p>
+                    </div>
+                    <div class="header-actions">
+                        <a href="/products/gofloradriver/finance/invoices" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Invoices
+                        </a>
+                        <button onclick="window.print()" class="btn btn-primary">
+                            <i class="fas fa-print"></i> Print Report
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Earnings Summary Cards -->
+                <div class="earnings-summary">
+                    <div class="summary-card total">
+                        <div class="summary-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-amount">$#format(report.summary.totalEarnings, ",.2f")</div>
+                            <div class="summary-label">Total Earnings</div>
+                            <div class="summary-subtext">#(report.summary.invoiceCount) completed trips</div>
+                        </div>
+                        <div class="summary-chart">
+                            <canvas id="totalEarningsChart" width="80" height="80"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card base-fare">
+                        <div class="summary-icon">
+                            <i class="fas fa-road"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-amount">$#format(report.summary.totalBaseFares, ",.2f")</div>
+                            <div class="summary-label">Base Fares</div>
+                            <div class="summary-percentage">#format((report.summary.totalBaseFares / report.summary.totalEarnings * 100), ".1f")% of total</div>
+                        </div>
+                        <div class="summary-progress">
+                            <div class="progress-ring">
+                                <div class="progress-fill" style="transform: rotate(#((report.summary.totalBaseFares / report.summary.totalEarnings * 360))deg);"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card service-fees">
+                        <div class="summary-icon">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-amount">$#format(report.summary.totalDriverFees, ",.2f")</div>
+                            <div class="summary-label">Service Fees</div>
+                            <div class="summary-percentage">#format((report.summary.totalDriverFees / report.summary.totalEarnings * 100), ".1f")% of total</div>
+                        </div>
+                        <div class="summary-progress">
+                            <div class="progress-ring">
+                                <div class="progress-fill" style="transform: rotate(#((report.summary.totalDriverFees / report.summary.totalEarnings * 360))deg);"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card platform-fees">
+                        <div class="summary-icon">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-amount">$#format(report.summary.totalPlatformFees, ",.2f")</div>
+                            <div class="summary-label">Platform Fees</div>
+                            <div class="summary-percentage">#format((report.summary.totalPlatformFees / report.summary.totalEarnings * 100), ".1f")% of total</div>
+                        </div>
+                        <div class="summary-progress">
+                            <div class="progress-ring">
+                                <div class="progress-fill" style="transform: rotate(#((report.summary.totalPlatformFees / report.summary.totalEarnings * 360))deg);"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Currency Breakdown -->
+                <div class="currency-section">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-coins"></i>
+                            Currency Breakdown
+                        </h2>
+                    </div>
+                    
+                    <div class="currency-grid">
+                        #for(currencyPair in report.currencyBreakdown) {
+                        <div class="currency-card">
+                            <div class="currency-header">
+                                <div class="currency-name">#(currencyPair.key)</div>
+                                <div class="currency-total">$#format(currencyPair.value.totalAmount, ",.2f")</div>
+                            </div>
+                            <div class="currency-breakdown">
+                                <div class="breakdown-row">
+                                    <span class="breakdown-label">Base Fares:</span>
+                                    <span class="breakdown-value">$#format(currencyPair.value.baseFares, ",.2f")</span>
+                                </div>
+                                <div class="breakdown-row">
+                                    <span class="breakdown-label">Service Fees:</span>
+                                    <span class="breakdown-value">$#format(currencyPair.value.serviceFees, ",.2f")</span>
+                                </div>
+                                <div class="breakdown-row">
+                                    <span class="breakdown-label">Platform Fees:</span>
+                                    <span class="breakdown-value">$#format(currencyPair.value.platformFees, ",.2f")</span>
+                                </div>
+                                <div class="breakdown-divider"></div>
+                                <div class="breakdown-row total">
+                                    <span class="breakdown-label">Invoice Count:</span>
+                                    <span class="breakdown-value">#(currencyPair.value.invoiceCount)</span>
+                                </div>
+                            </div>
+                            <div class="currency-chart">
+                                <canvas class="currency-pie-chart" width="120" height="120" 
+                                        data-base="#(currencyPair.value.baseFares)"
+                                        data-service="#(currencyPair.value.serviceFees)"
+                                        data-platform="#(currencyPair.value.platformFees)">
+                                </canvas>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Performance Insights -->
+                <div class="insights-section">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-lightbulb"></i>
+                            Performance Insights
+                        </h2>
+                    </div>
+                    
+                    <div class="insights-grid">
+                        <div class="insight-card">
+                            <div class="insight-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="insight-content">
+                                <h3>Average per Trip</h3>
+                                <div class="insight-value">$#format((report.summary.totalEarnings / report.summary.invoiceCount), ",.2f")</div>
+                                <div class="insight-description">Your average earning per completed trip</div>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <div class="insight-icon">
+                                <i class="fas fa-calendar-day"></i>
+                            </div>
+                            <div class="insight-content">
+                                <h3>Daily Average</h3>
+                                <div class="insight-value">$#format((report.summary.totalEarnings / 30), ",.2f")</div>
+                                <div class="insight-description">Based on 30-day period average</div>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <div class="insight-icon">
+                                <i class="fas fa-percent"></i>
+                            </div>
+                            <div class="insight-content">
+                                <h3>Service Fee Ratio</h3>
+                                <div class="insight-value">#format((report.summary.totalDriverFees / report.summary.totalBaseFares * 100), ".1f")%</div>
+                                <div class="insight-description">Service fees as percentage of base fares</div>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <div class="insight-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="insight-content">
+                                <h3>Trip Efficiency</h3>
+                                <div class="insight-value">#(report.summary.invoiceCount)</div>
+                                <div class="insight-description">Completed trips in reporting period</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .earnings-summary {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1.5rem;
+                margin-bottom: 3rem;
+            }
+
+            .summary-card {
+                background: linear-gradient(135deg, rgba(15, 23, 42, 0.97), rgba(30, 41, 59, 0.95));
+                border-radius: var(--border-radius-lg);
+                padding: 2rem;
+                color: white;
+                position: relative;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                gap: 1.5rem;
+                box-shadow: var(--shadow-lg);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .summary-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            }
+
+            .summary-card.base-fare::before {
+                background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            }
+
+            .summary-card.service-fees::before {
+                background: linear-gradient(90deg, var(--success-color), #34d399);
+            }
+
+            .summary-card.platform-fees::before {
+                background: linear-gradient(90deg, var(--warning-color), #fbbf24);
+            }
+
+            .summary-icon {
+                width: 70px;
+                height: 70px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.1);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.75rem;
+                backdrop-filter: blur(10px);
+                flex-shrink: 0;
+            }
+
+            .summary-content {
+                flex: 1;
+            }
+
+            .summary-amount {
+                font-size: 2.25rem;
+                font-weight: 800;
+                line-height: 1;
+                margin-bottom: 0.5rem;
+                font-family: 'Montserrat', sans-serif;
+            }
+
+            .summary-label {
+                font-size: 1rem;
+                opacity: 0.9;
+                margin-bottom: 0.25rem;
+                font-weight: 600;
+            }
+
+            .summary-subtext,
+            .summary-percentage {
+                font-size: 0.85rem;
+                opacity: 0.7;
+                font-weight: 500;
+            }
+
+            .summary-chart,
+            .summary-progress {
+                flex-shrink: 0;
+            }
+
+            .progress-ring {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                background: conic-gradient(var(--success-color) 0deg, rgba(255, 255, 255, 0.2) 0deg);
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .currency-section,
+            .insights-section {
+                margin-bottom: 3rem;
+            }
+
+            .section-header {
+                margin-bottom: 2rem;
+                padding-bottom: 1rem;
+                border-bottom: 2px solid var(--border-color);
+            }
+
+            .section-header h2 {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                font-size: 1.75rem;
+                font-weight: 700;
+                color: var(--text-dark);
+                margin: 0;
+            }
+
+            .section-header h2 i {
+                color: var(--primary-color);
+            }
+
+            .currency-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .currency-card {
+                background: var(--bg-white);
+                border-radius: var(--border-radius);
+                padding: 1.5rem;
+                box-shadow: var(--shadow-sm);
+                border: 1px solid var(--border-color);
+                position: relative;
+            }
+
+            .currency-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 2px solid var(--border-color);
+            }
+
+            .currency-name {
+                font-size: 1.5rem;
+                font-weight: 800;
+                color: var(--primary-color);
+                font-family: 'Roboto Mono', monospace;
+            }
+
+            .currency-total {
+                font-size: 1.75rem;
+                font-weight: 800;
+                color: var(--text-dark);
+                font-family: 'Montserrat', sans-serif;
+            }
+
+            .currency-breakdown {
+                margin-bottom: 1.5rem;
+            }
+
+            .breakdown-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.5rem 0;
+                border-bottom: 1px solid var(--border-color);
+                font-size: 0.9rem;
+            }
+
+            .breakdown-row:last-child {
+                border-bottom: none;
+            }
+
+            .breakdown-row.total {
+                font-weight: 700;
+                background: rgba(102, 126, 234, 0.05);
+                margin: 0 -1rem;
+                padding: 0.75rem 1rem;
+                border-radius: var(--border-radius-sm);
+                margin-top: 0.5rem;
+            }
+
+            .breakdown-label {
+                color: var(--text-light);
+                font-weight: 600;
+            }
+
+            .breakdown-value {
+                font-weight: 700;
+                color: var(--text-dark);
+            }
+
+            .breakdown-divider {
+                height: 1px;
+                background: var(--border-color);
+                margin: 0.75rem 0;
+            }
+
+            .currency-chart {
+                position: absolute;
+                top: 1.5rem;
+                right: 1.5rem;
+                opacity: 0.1;
+                z-index: 0;
+            }
+
+            .insights-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .insight-card {
+                background: var(--bg-white);
+                border-radius: var(--border-radius);
+                padding: 1.5rem;
+                box-shadow: var(--shadow-sm);
+                border: 1px solid var(--border-color);
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                transition: all 0.3s ease;
+            }
+
+            .insight-card:hover {
+                box-shadow: var(--shadow-md);
+                transform: translateY(-2px);
+            }
+
+            .insight-icon {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 1.5rem;
+                flex-shrink: 0;
+            }
+
+            .insight-content h3 {
+                margin: 0 0 0.5rem 0;
+                font-size: 1rem;
+                font-weight: 600;
+                color: var(--text-dark);
+            }
+
+            .insight-value {
+                font-size: 1.75rem;
+                font-weight: 800;
+                color: var(--primary-color);
+                margin-bottom: 0.25rem;
+                font-family: 'Montserrat', sans-serif;
+            }
+
+            .insight-description {
+                font-size: 0.85rem;
+                color: var(--text-light);
+                line-height: 1.4;
+            }
+
+            @media (max-width: 768px) {
+                .earnings-summary {
+                    grid-template-columns: 1fr;
+                }
+
+                .summary-card {
+                    flex-direction: column;
+                    text-align: center;
+                    gap: 1rem;
+                }
+
+                .currency-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .insights-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .insight-card {
+                    flex-direction: column;
+                    text-align: center;
+                }
+
+                .finance-header {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 1rem;
+                }
+
+                .currency-chart {
+                    position: static;
+                    opacity: 1;
+                    margin-top: 1rem;
+                }
+            }
+
+            @media print {
+                .header-actions {
+                    display: none;
+                }
+                
+                .summary-card,
+                .currency-card,
+                .insight-card {
+                    break-inside: avoid;
+                }
+            }
+        </style>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Initialize currency breakdown pie charts
+                document.querySelectorAll('.currency-pie-chart').forEach(canvas => {
+                    const ctx = canvas.getContext('2d');
+                    const baseFares = parseFloat(canvas.dataset.base) || 0;
+                    const serviceFees = parseFloat(canvas.dataset.service) || 0;
+                    const platformFees = parseFloat(canvas.dataset.platform) || 0;
+
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Base Fares', 'Service Fees', 'Platform Fees'],
+                            datasets: [{
+                                data: [baseFares, serviceFees, platformFees],
+                                backgroundColor: [
+                                    '#3b82f6',
+                                    '#22c55e',
+                                    '#f59e0b'
+                                ],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: { enabled: false }
+                            },
+                            cutout: '60%'
+                        }
+                    });
+                });
+
+                // Initialize total earnings chart
+                const totalCtx = document.getElementById('totalEarningsChart');
+                if (totalCtx) {
+                    new Chart(totalCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                            datasets: [{
+                                data: [#(report.summary.totalEarnings * 0.2), #(report.summary.totalEarnings * 0.4), #(report.summary.totalEarnings * 0.7), #(report.summary.totalEarnings)],
+                                borderColor: '#22c55e',
+                                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 0
+                            }]
+                        },
+                        options: {
+                            responsive: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: { enabled: false }
+                            },
+                            scales: {
+                                x: { display: false },
+                                y: { display: false }
+                            }
+                        }
+                    });
+                }
+            });
+        </script>
+#endextend

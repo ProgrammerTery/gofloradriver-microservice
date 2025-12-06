@@ -1,0 +1,495 @@
+#extend("drivers/driversbase"):
+    #export("contentDetail"):
+        <div class="main-content">
+            <div class="container container-sm">
+                <!-- Header Section -->
+                <div class="form-header">
+                    <h1 class="page-title">
+                        <i class="fas fa-plus-circle"></i>
+                        Create Service Fee
+                    </h1>
+                    <p class="page-subtitle">Set up custom service fees for your payment methods</p>
+                </div>
+
+                <!-- Error Messages -->
+                #if(errorMessage):
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>#(errorMessage)</span>
+                </div>
+                #endif
+
+                <div class="card form-card">
+                    <form method="POST" action="/products/gofloradriver/finance/service-fees" class="service-fee-form">
+                        <!-- Payment Method Selection -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-credit-card"></i>
+                                Payment Method
+                            </h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="paymentMethodId">Payment Method *</label>
+                                    <select name="paymentMethodId" id="paymentMethodId" required>
+                                        <option value="">Select payment method</option>
+                                        #for(method in paymentMethods) {
+                                            #if(method.isActive):
+                                            <option value="#(method.id)">#(method.name) - #(method.description ?? "")</option>
+                                            #endif
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="methodType">Method Type *</label>
+                                    <select name="methodType" id="methodType" required>
+                                        <option value="">Select method type</option>
+                                        <option value="credit_card">Credit Card</option>
+                                        <option value="debit_card">Debit Card</option>
+                                        <option value="bank_transfer">Bank Transfer</option>
+                                        <option value="digital_wallet">Digital Wallet</option>
+                                        <option value="cash">Cash</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fee Configuration -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-calculator"></i>
+                                Fee Configuration
+                            </h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="currency">Currency *</label>
+                                    <select name="currency" id="currency" required>
+                                        <option value="">Select currency</option>
+                                        #for(curr in currencies) {
+                                            <option value="#(curr)">#(curr)</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="feeAmount">Fee Amount *</label>
+                                    <div class="input-group">
+                                        <span class="input-prefix">$</span>
+                                        <input type="number" name="feeAmount" id="feeAmount" step="0.01" min="0" required placeholder="0.00">
+                                    </div>
+                                    <div class="field-help">
+                                        <i class="fas fa-info-circle"></i>
+                                        Service fee you charge for this payment method
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="priority">Priority</label>
+                                    <input type="number" name="priority" id="priority" min="1" max="100" value="1" placeholder="1">
+                                    <div class="field-help">
+                                        <i class="fas fa-info-circle"></i>
+                                        Lower numbers = higher priority (1 is highest)
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="checkbox-group">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" name="isActive" value="true" checked>
+                                            <span class="checkbox-custom"></span>
+                                            <span class="checkbox-text">Active</span>
+                                        </label>
+                                        <div class="field-help">
+                                            <i class="fas fa-info-circle"></i>
+                                            Only active fees will be applied to trips
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fee Preview -->
+                        <div class="form-section preview-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-eye"></i>
+                                Fee Preview
+                            </h3>
+                            <div class="fee-preview">
+                                <div class="preview-card">
+                                    <div class="preview-item">
+                                        <span class="preview-label">Payment Method:</span>
+                                        <span class="preview-value" id="previewPaymentMethod">-</span>
+                                    </div>
+                                    <div class="preview-item">
+                                        <span class="preview-label">Method Type:</span>
+                                        <span class="preview-value" id="previewMethodType">-</span>
+                                    </div>
+                                    <div class="preview-item">
+                                        <span class="preview-label">Currency:</span>
+                                        <span class="preview-value" id="previewCurrency">-</span>
+                                    </div>
+                                    <div class="preview-item featured">
+                                        <span class="preview-label">Service Fee:</span>
+                                        <span class="preview-value" id="previewFeeAmount">$0.00</span>
+                                    </div>
+                                    <div class="preview-item">
+                                        <span class="preview-label">Priority:</span>
+                                        <span class="preview-value" id="previewPriority">1</span>
+                                    </div>
+                                    <div class="preview-item">
+                                        <span class="preview-label">Status:</span>
+                                        <span class="preview-value" id="previewStatus">Active</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hidden Fields -->
+                        <input type="hidden" name="driverId" value="#(driverId ?? "")">
+
+                        <!-- Form Actions -->
+                        <div class="form-actions">
+                            <a href="/products/gofloradriver/finance/service-fees" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Create Service Fee
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .form-header {
+                text-align: center;
+                margin-bottom: 2rem;
+                padding-bottom: 1rem;
+                border-bottom: 2px solid var(--border-color);
+            }
+
+            .form-card {
+                background: var(--bg-white);
+                border-radius: var(--border-radius-lg);
+                box-shadow: var(--shadow-md);
+                overflow: hidden;
+            }
+
+            .service-fee-form {
+                padding: 2rem;
+            }
+
+            .form-section {
+                margin-bottom: 2.5rem;
+                padding-bottom: 2rem;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .form-section:last-of-type {
+                border-bottom: none;
+                margin-bottom: 1rem;
+            }
+
+            .section-title {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: var(--text-dark);
+                margin-bottom: 1.5rem;
+                padding-bottom: 0.5rem;
+                border-bottom: 2px solid var(--primary-color);
+            }
+
+            .section-title i {
+                color: var(--primary-color);
+                font-size: 1.1rem;
+            }
+
+            .form-row {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .form-group {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .form-group label {
+                font-weight: 600;
+                color: var(--text-dark);
+                font-size: 0.95rem;
+            }
+
+            .form-group input,
+            .form-group select {
+                padding: 0.875rem 1rem;
+                border: 2px solid var(--border-color);
+                border-radius: var(--border-radius-sm);
+                font-size: 1rem;
+                transition: all 0.3s ease;
+                background: var(--bg-white);
+            }
+
+            .form-group input:focus,
+            .form-group select:focus {
+                outline: none;
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+            .input-group {
+                position: relative;
+                display: flex;
+                align-items: center;
+            }
+
+            .input-prefix {
+                position: absolute;
+                left: 1rem;
+                color: var(--text-light);
+                font-weight: 600;
+                font-size: 1rem;
+                z-index: 1;
+            }
+
+            .input-group input {
+                padding-left: 2rem;
+            }
+
+            .field-help {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 0.85rem;
+                color: var(--text-light);
+                margin-top: 0.25rem;
+            }
+
+            .field-help i {
+                color: var(--primary-color);
+                font-size: 0.8rem;
+            }
+
+            .checkbox-group {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .checkbox-label {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                cursor: pointer;
+                user-select: none;
+                font-weight: 500;
+            }
+
+            .checkbox-label input[type="checkbox"] {
+                display: none;
+            }
+
+            .checkbox-custom {
+                width: 20px;
+                height: 20px;
+                border: 2px solid var(--border-color);
+                border-radius: 4px;
+                position: relative;
+                transition: all 0.3s ease;
+                background: var(--bg-white);
+            }
+
+            .checkbox-label input[type="checkbox"]:checked + .checkbox-custom {
+                background: var(--primary-color);
+                border-color: var(--primary-color);
+            }
+
+            .checkbox-label input[type="checkbox"]:checked + .checkbox-custom::after {
+                content: '✓';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: white;
+                font-weight: 700;
+                font-size: 0.8rem;
+            }
+
+            .preview-section {
+                background: linear-gradient(135deg, var(--bg-light), rgba(102, 126, 234, 0.05));
+                margin: -2rem;
+                margin-top: 2.5rem;
+                padding: 2rem;
+                border-bottom: none;
+            }
+
+            .preview-card {
+                background: var(--bg-white);
+                border-radius: var(--border-radius);
+                padding: 1.5rem;
+                box-shadow: var(--shadow-sm);
+                border: 1px solid var(--border-color);
+            }
+
+            .preview-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.75rem 0;
+                border-bottom: 1px solid var(--border-color);
+                font-size: 0.95rem;
+            }
+
+            .preview-item:last-child {
+                border-bottom: none;
+            }
+
+            .preview-item.featured {
+                background: rgba(102, 126, 234, 0.05);
+                margin: 0 -1rem;
+                padding: 1rem;
+                border-radius: var(--border-radius-sm);
+                border: none;
+            }
+
+            .preview-label {
+                color: var(--text-light);
+                font-weight: 600;
+            }
+
+            .preview-value {
+                color: var(--text-dark);
+                font-weight: 700;
+            }
+
+            .preview-item.featured .preview-value {
+                color: var(--primary-color);
+                font-size: 1.1rem;
+            }
+
+            .form-actions {
+                display: flex;
+                justify-content: space-between;
+                gap: 1rem;
+                padding-top: 2rem;
+                border-top: 1px solid var(--border-color);
+                margin-top: 2rem;
+            }
+
+            @media (max-width: 768px) {
+                .service-fee-form {
+                    padding: 1.5rem;
+                }
+
+                .form-row {
+                    grid-template-columns: 1fr;
+                    gap: 1rem;
+                }
+
+                .form-actions {
+                    flex-direction: column;
+                }
+
+                .preview-section {
+                    margin: -1.5rem;
+                    margin-top: 2.5rem;
+                    padding: 1.5rem;
+                }
+            }
+
+            /* Form Validation Styles */
+            .form-group input:invalid,
+            .form-group select:invalid {
+                border-color: var(--error-color);
+            }
+
+            .form-group input:valid,
+            .form-group select:valid {
+                border-color: var(--success-color);
+            }
+
+            /* Animation for preview updates */
+            .preview-value {
+                transition: all 0.3s ease;
+            }
+
+            .preview-value.updating {
+                color: var(--primary-color);
+                transform: scale(1.05);
+            }
+        </style>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.querySelector('.service-fee-form');
+                const paymentMethodSelect = document.getElementById('paymentMethodId');
+                const methodTypeSelect = document.getElementById('methodType');
+                const currencySelect = document.getElementById('currency');
+                const feeAmountInput = document.getElementById('feeAmount');
+                const priorityInput = document.getElementById('priority');
+                const isActiveCheckbox = document.querySelector('input[name="isActive"]');
+
+                // Preview elements
+                const previewElements = {
+                    paymentMethod: document.getElementById('previewPaymentMethod'),
+                    methodType: document.getElementById('previewMethodType'),
+                    currency: document.getElementById('previewCurrency'),
+                    feeAmount: document.getElementById('previewFeeAmount'),
+                    priority: document.getElementById('previewPriority'),
+                    status: document.getElementById('previewStatus')
+                };
+
+                function updatePreview() {
+                    // Payment Method
+                    const selectedPaymentMethod = paymentMethodSelect.options[paymentMethodSelect.selectedIndex];
+                    previewElements.paymentMethod.textContent = selectedPaymentMethod.value ? selectedPaymentMethod.text.split(' - ')[0] : '-';
+
+                    // Method Type
+                    previewElements.methodType.textContent = methodTypeSelect.value ? 
+                        methodTypeSelect.options[methodTypeSelect.selectedIndex].text : '-';
+
+                    // Currency
+                    previewElements.currency.textContent = currencySelect.value || '-';
+
+                    // Fee Amount
+                    const amount = parseFloat(feeAmountInput.value) || 0;
+                    const currency = currencySelect.value || '';
+                    previewElements.feeAmount.textContent = currency ? 
+                        `${amount.toFixed(2)} ${currency}` : `$${amount.toFixed(2)}`;
+
+                    // Priority
+                    previewElements.priority.textContent = priorityInput.value || '1';
+
+                    // Status
+                    previewElements.status.textContent = isActiveCheckbox.checked ? 'Active' : 'Inactive';
+
+                    // Add updating animation
+                    Object.values(previewElements).forEach(el => {
+                        el.classList.add('updating');
+                        setTimeout(() => el.classList.remove('updating'), 300);
+                    });
+                }
+
+                // Attach event listeners
+                [paymentMethodSelect, methodTypeSelect, currencySelect, feeAmountInput, priorityInput, isActiveCheckbox]
+                    .forEach(element => {
+                        element.addEventListener('change', updatePreview);
+                        element.addEventListener('input', updatePreview);
+                    });
+
+                // Form submission
+                form.addEventListener('submit', function(e) {
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+                    submitBtn.disabled = true;
+                });
+
+                // Initialize preview
+                updatePreview();
+            });
+        </script>
+#endextend
