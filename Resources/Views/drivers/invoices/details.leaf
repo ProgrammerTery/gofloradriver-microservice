@@ -1,0 +1,40 @@
+#extend("drivers/driversbase"):
+    #export("content"):
+        <div class="trips-dashboard-section">
+            <h1>Invoice Details</h1>
+            #if(successMessage):<div class="alert alert-success">#(successMessage)</div>#endif
+            #if(errorMessage):<div class="alert alert-error">#(errorMessage)</div>#endif
+            <div class="trips-card">
+                <h2>Trip</h2>
+                <p>#if(invoice.tripPickupLocation):#(invoice.tripPickupLocation)#else:N/A#endif → #if(invoice.tripDropoffLocation):#(invoice.tripDropoffLocation)#else:N/A#endif</p>
+                <p>Status: #if(invoice.tripStatus):#(invoice.tripStatus)#else:N/A#endif</p>
+            </div>
+            <div class="trips-card">
+                <h2>Fee Breakdown</h2>
+                <ul>
+                    <li>Base Fare: $#if(invoice.baseFare):#(invoice.baseFare)#else:0.00#endif</li>
+                    <li>Driver Service Fee: $#if(invoice.driverServiceFee):#(invoice.driverServiceFee)#else:0.00#endif</li>
+                    <li>Platform Fee: $#if(invoice.platformFee):#(invoice.platformFee)#else:0.00#endif</li>
+                    <li>Total Amount: $#if(invoice.amount):#(invoice.amount)#else:0.00#endif</li>
+                </ul>
+            </div>
+            <div class="trips-card">
+                <h2>Payment Info</h2>
+                <ul>
+                    <li>Method: #if(invoice.method):#(invoice.method)#else:N/A#endif</li>
+                    <li>Status: <span class="trips-badge #if(invoice.status == "paid"):completed#else:pending#endif">#(invoice.status)</span></li>
+                    <li>Paid At: #if(invoice.paidAt):#(invoice.paidAt)#else:Not paid yet#endif</li>
+                    <li>Created: #if(invoice.createdAt):#(invoice.createdAt)#else:N/A#endif</li>
+                </ul>
+            </div>
+            <div class="trips-actions">
+                #if(canMarkPaid):
+                    <form method="post" action="/products/gofloradriver/invoices/#if(invoice.id):#(invoice.id)#endif/mark-paid" style="display:inline;">
+                        <button type="submit" class="trips-btn-primary">Mark as Paid</button>
+                    </form>
+                #endif
+                <a href="/products/gofloradriver/invoices" class="trips-btn-secondary">Back to List</a>
+            </div>
+        </div>
+    #endexport
+#endextend

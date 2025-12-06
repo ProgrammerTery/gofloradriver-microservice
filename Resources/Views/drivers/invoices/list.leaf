@@ -1,0 +1,78 @@
+#extend("drivers/driversbase"):
+    #export("content"):
+        <div class="trips-dashboard-section">
+            <h1>My Invoices</h1>
+            <!-- Tabs -->
+            <div class="tabs">
+                <a href="?filter=all&page=1" #if(filter == "all"):class="active"#endif>All</a>
+                <a href="?filter=pending&page=1" #if(filter == "pending"):class="active"#endif>Pending</a>
+                <a href="?filter=paid&page=1" #if(filter == "paid"):class="active"#endif>Paid</a>
+            </div>
+            <!-- Stats Cards -->
+            <div class="trips-stats-grid">
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Total Amount</div>
+                    <div class="trips-stat-value">$#if(totalAmount):#(totalAmount)#else:0.00#endif</div>
+                </div>
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Paid Amount</div>
+                    <div class="trips-stat-value">$#if(paidAmount):#(paidAmount)#else:0.00#endif</div>
+                </div>
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Pending Amount</div>
+                    <div class="trips-stat-value">$#if(pendingAmount):#(pendingAmount)#else:0.00#endif</div>
+                </div>
+            </div>
+            <!-- Alerts -->
+            #if(successMessage):<div class="alert alert-success">#(successMessage)</div>#endif
+            #if(errorMessage):<div class="alert alert-error">#(errorMessage)</div>#endif
+            <!-- Table -->
+            <div class="trips-table-wrapper">
+                <table class="trips-table">
+                    <thead>
+                        <tr>
+                            <th>Invoice ID</th>
+                            <th>Trip</th>
+                            <th>Base Fare</th>
+                            <th>Driver Fee</th>
+                            <th>Platform Fee</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Payment Method</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        #if(count(invoices) > 0):
+                            #for(invoice in invoices):
+                                <tr>
+                                    <td>#if(invoice.id):#(invoice.id)#else:N/A#endif</td>
+                                    <td>#if(invoice.tripPickupLocation):#(invoice.tripPickupLocation)#else:N/A#endif → #if(invoice.tripDropoffLocation):#(invoice.tripDropoffLocation)#else:N/A#endif</td>
+                                    <td>$#if(invoice.baseFare):#(invoice.baseFare)#else:0.00#endif</td>
+                                    <td>$#if(invoice.driverServiceFee):#(invoice.driverServiceFee)#else:0.00#endif</td>
+                                    <td>$#if(invoice.platformFee):#(invoice.platformFee)#else:0.00#endif</td>
+                                    <td>$#if(invoice.amount):#(invoice.amount)#else:0.00#endif</td>
+                                    <td><span class="trips-badge #if(invoice.status == "paid"):completed#else:pending#endif">#(invoice.status)</span></td>
+                                    <td>#if(invoice.method):#(invoice.method)#else:N/A#endif</td>
+                                    <td>#if(invoice.createdAt):#(invoice.createdAt)#else:N/A#endif</td>
+                                    <td>
+                                        <a href="/products/gofloradriver/invoices/#if(invoice.id):#(invoice.id)#endif" class="trips-btn-secondary">View</a>
+                                    </td>
+                                </tr>
+                            #endfor
+                        #else:
+                            <tr><td colspan="10" style="text-align:center;">No invoices found.</td></tr>
+                        #endif
+                    </tbody>
+                </table>
+            </div>
+            <!-- Pagination -->
+            <div class="trips-pagination">
+                #if(hasPrevPage):<a href="?filter=#(filter)&page=#(page-1)" class="trips-btn-secondary">Previous</a>#endif
+                <span>Page #(page) of #(totalPages)</span>
+                #if(hasNextPage):<a href="?filter=#(filter)&page=#(page+1)" class="trips-btn-secondary">Next</a>#endif
+            </div>
+        </div>
+    #endexport
+#endextend

@@ -1,0 +1,48 @@
+#extend("drivers/driversbase"):
+    #export("content"):
+        <div class="trips-dashboard-section">
+            <h1>Service Fees Stats</h1>
+            <div class="trips-stats-grid">
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Total Fees</div>
+                    <div class="trips-stat-value">#if(stats):#(stats.totalFees)#else:0#endif</div>
+                </div>
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Active Fees</div>
+                    <div class="trips-stat-value">#if(stats):#(stats.activeFees)#else:0#endif</div>
+                </div>
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Inactive Fees</div>
+                    <div class="trips-stat-value">#if(stats):#(stats.inactiveFees)#else:0#endif</div>
+                </div>
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Total Amount</div>
+                    <div class="trips-stat-value">$#if(stats):#(stats.totalFeeAmount)#else:0.00#endif</div>
+                </div>
+            </div>
+            <h2>Currency Breakdown</h2>
+            <table class="trips-table">
+                <thead>
+                    <tr>
+                        <th>Currency</th>
+                        <th>Count</th>
+                        <th>Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    #if(count(currencyStats) > 0):
+                        #for(currStat in currencyStats):
+                            <tr>
+                                <td>#(currStat.currency)</td>
+                                <td>#(currStat.stats.count)</td>
+                                <td>$#(currStat.stats.totalAmount)</td>
+                            </tr>
+                        #endfor
+                    #else:
+                        <tr><td colspan="3">No currency data available</td></tr>
+                    #endif
+                </tbody>
+            </table>
+        </div>
+    #endexport
+#endextend

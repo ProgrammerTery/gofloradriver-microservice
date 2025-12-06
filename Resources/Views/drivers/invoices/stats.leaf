@@ -1,0 +1,37 @@
+#extend("drivers/driversbase"):
+    #export("content"):
+        <div class="trips-dashboard-section">
+            <h1>Invoice Statistics</h1>
+            <div class="trips-stats-grid">
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Total Invoices</div>
+                    <div class="trips-stat-value">#if(stats):#(stats.totalInvoices)#else:0#endif</div>
+                </div>
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Paid Invoices</div>
+                    <div class="trips-stat-value">#if(stats):#(stats.paidInvoices)#else:0#endif</div>
+                </div>
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Pending Invoices</div>
+                    <div class="trips-stat-value">#if(stats):#(stats.pendingInvoices)#else:0#endif</div>
+                </div>
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Total Amount</div>
+                    <div class="trips-stat-value">$#if(stats):#(stats.totalAmount)#else:0.00#endif</div>
+                </div>
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Paid Amount</div>
+                    <div class="trips-stat-value">$#if(stats):#(stats.paidAmount)#else:0.00#endif</div>
+                </div>
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Pending Amount</div>
+                    <div class="trips-stat-value">$#if(stats):#(stats.pendingAmount)#else:0.00#endif</div>
+                </div>
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Average Invoice</div>
+                    <div class="trips-stat-value">$#if(stats):#(stats.averageInvoiceAmount)#else:0.00#endif</div>
+                </div>
+            </div>
+        </div>
+    #endexport
+#endextend
