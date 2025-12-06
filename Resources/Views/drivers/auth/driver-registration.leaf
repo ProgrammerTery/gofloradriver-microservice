@@ -12,8 +12,7 @@
                 <span>#(errorMessage)</span>
             </div>
             #endif
-            </div>
-            #endif
+           
             
             <form method="POST" action="/products/gofloradriver/register" class="auth-form" id="driverRegistrationForm">
                 <div class="form-section">
@@ -36,11 +35,11 @@
                             <input type="text" 
                                    id="driverName" 
                                    name="driverName" 
-                                   required
+                                required
                                    #if(prefillData):
                                    value="#(prefillData.driverName)"
                                    #endif
-                                   placeholder="Walter Vector">
+                                placeholder="Walter Vector" readonly>
                         </div>
                     </div>
                     
@@ -50,11 +49,11 @@
                             <input type="email" 
                                    id="driverEmail" 
                                    name="driverEmail" 
-                                   required 
+                                required 
                                    #if(prefillData):
                                    value="#(prefillData.driverEmail)"
                                    #endif
-                                   placeholder="your@email.com">
+                                placeholder="your@email.com" readonly>
                         </div>
                         
                         <div class="form-group">
@@ -134,5 +133,19 @@
                 }
             });
         </script>
+        <style>
+            input[readonly], textarea[readonly] {
+                background-color: #f3f4f6; /* gray-100 */
+                color: #6b7280; /* gray-500 */
+                cursor: not-allowed;
+                border-color: #d1d5db; /* gray-300 */
+            }
+            .form-group input[readonly] + .hint,
+            .field input[readonly] + .hint {
+                color: #6b7280;
+                font-size: 12px;
+                margin-top: 4px;
+            }
+        </style>
     #endexport
 #endextend
