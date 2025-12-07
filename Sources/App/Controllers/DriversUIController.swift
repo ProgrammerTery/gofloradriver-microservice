@@ -230,6 +230,9 @@ struct DriversUIController: RouteCollection {
                 req.session.data["driverID"] = registrationData.driverID
                 req.session.data["name"] = registrationData.driverName
                 req.session.data["email"] = registrationData.driverEmail
+                // Mark profile as complete
+                req.session.data["profileComplete"] = "true"
+                req.session.data["profileIncomplete"] = nil
 
                 return req.redirect(to: "/products/gofloradriver/vehicle-choice")
             } else {
@@ -265,6 +268,9 @@ struct DriversUIController: RouteCollection {
         if choiceData.registerVehicleNow {
             return req.redirect(to: "/products/gofloradriver/vehicle/service-type")
         } else {
+            // Mark vehicle as incomplete for reminders
+            req.session.data["vehicleIncomplete"] = "true"
+            req.session.data["vehicleComplete"] = nil
             return req.redirect(to: "/products/gofloradriver/success")
         }
     }
@@ -299,12 +305,12 @@ struct DriversUIController: RouteCollection {
         // Store minimal driver info if not already present
         if req.session.data["driverID"] == nil {
             req.session.data["driverID"] = UUID().uuidString
-            req.session.data["name"] = "Driver \(Int.random(in: 1000...9999))"
+            req.session.data["name"] = req.session.data["name"] ?? "Temp Driver"
             req.session.data["email"] = req.session.data["email"] ?? "temp@example.com"
         }
 
         // Redirect to dashboard with incomplete profile flag
-        return req.redirect(to: "/products/gofloradriver/dashboard")
+        return req.redirect(to: "/products/gofloradriver/dashboard?reminder=complete-profile")
     }
 
     // MARK: - Protected Routes
@@ -315,7 +321,8 @@ struct DriversUIController: RouteCollection {
         let recentTrips = try await fetchRecentTrips(req)
 
         // Check if profile is incomplete (from skip registration)
-        let profileIncomplete = req.session.data["profileIncomplete"] == "true"
+        let profileIncomplete = req.session.data["profileIncomplete"] == "true" || req.session.data["profileComplete"] != "true"
+        let vehicleIncomplete = req.session.data["vehicleIncomplete"] == "true" || req.session.data["vehicleComplete"] != "true"
 
         let context = DriversDashboardPageContext(
             title: "Driver Dashboard",
@@ -323,7 +330,8 @@ struct DriversUIController: RouteCollection {
             driver: driverProfile,
             stats: stats,
             recentTrips: recentTrips,
-            profileIncomplete: profileIncomplete
+            profileIncomplete: profileIncomplete,
+            vehicleIncomplete: vehicleIncomplete
         )
         return try await req.view.render("drivers/dashboard/dashboard", context)
     }
@@ -381,6 +389,9 @@ struct DriversUIController: RouteCollection {
                 // Update session data with new values
                 req.session.data["name"] = updateData.driverName
                 req.session.data["email"] = updateData.driverEmail
+                // Mark profile completion flags so dashboard reminders disappear
+                req.session.data["profileComplete"] = "true"
+                req.session.data["profileIncomplete"] = nil
 
                 return req.redirect(to: "/products/gofloradriver/profile?success=Profile updated successfully")
             } else {

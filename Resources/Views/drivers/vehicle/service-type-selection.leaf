@@ -1,110 +1,74 @@
 #extend("drivers/driversbase"):
-    #export("contentDetail"):
-        <div class="vehicle-container">
-            <div class="vehicle-header">
-                <h1>Select Your Service Type</h1>
-                <p>Choose the type of transportation service you'll provide</p>
+    #export("content"):
+        <style>
+            .vt-container { max-width: 880px; margin: 0 auto; padding: 24px; }
+            .vt-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+            .vt-title { font-size: 1.75rem; font-weight: 700; color: #111827; }
+            .vt-sub { font-size: 0.95rem; color: #6b7280; }
+            .vt-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 20px; }
+            .vt-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 14px; box-shadow: 0 6px 24px rgba(17, 24, 39, .06); padding: 16px; display: flex; gap: 12px; align-items: flex-start; transition: transform .18s ease, box-shadow .18s ease; }
+            .vt-card:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(17,24,39,.08); }
+            .vt-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #4f46e5; background: rgba(79,70,229,.12); }
+            .vt-body { flex: 1; }
+            .vt-name { font-weight: 700; color: #111827; }
+            .vt-meta { font-size: 13px; color: #6b7280; margin-top: 2px; }
+            .vt-rate { font-size: 13px; color: #374151; margin-top: 6px; }
+            .vt-badge { font-size: 12px; color: #0f766e; background: #ccfbf1; border: 1px solid #99f6e4; padding: 4px 8px; border-radius: 999px; }
+            .vt-actions { display:flex; gap:10px; margin-top: 22px; }
+            .btn-modern { padding:10px 14px; border-radius:10px; border:1px solid #e5e7eb; background:#111827; color:#fff; text-decoration:none; }
+            .btn-secondary { padding:10px 14px; border-radius:10px; border:1px solid #e5e7eb; background:#ffffff; color:#111827; text-decoration:none; }
+            .vt-radio { margin-top: 2px; }
+            @media (max-width: 640px) { .vt-container { padding: 12px; } }
+        </style>
+
+        <div class="vt-container">
+            <div class="vt-header">
+                <div>
+                    <div class="vt-title">Select Service Type</div>
+                    <div class="vt-sub">Choose the transport service that matches your vehicle and trips.</div>
+                </div>
             </div>
-            
+
             #if(errorMessage):
-            <div class="alert alert-error">
-                <span class="alert-icon">⚠️</span>
-                <span>#(errorMessage)</span>
-            </div>
+            <div style="padding:10px 12px; background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; border-radius:10px;">#(errorMessage)</div>
             #endif
-            
-            <form method="POST" action="/products/gofloradriver/vehicle/service-type" id="serviceTypeForm">
-                <div class="service-types-grid">
-                    #for(serviceType in serviceTypes):
-                    <div class="service-type-card">
-                        <input type="radio" 
-                               name="serviceTypeID" 
-                               value="#(serviceType.id)" 
-                               id="service-#(serviceType.id)" 
-                               required>
-                        <label for="service-#(serviceType.id)" class="service-type-label">
-                            <div class="service-type-header">
-                                <h3>#(serviceType.name)</h3>
-                                <div class="service-type-price">$#(serviceType.baseRate)/trip</div>
+
+            <form action="/products/gofloradriver/vehicle/service-type" method="post">
+                <input type="hidden" name="driverID" value="#(driverID)">
+
+                <div class="vt-grid">
+                    #for(service in serviceTypes):
+                        <label class="vt-card">
+                            <div class="vt-icon">
+                                <i class="fas fa-car-side"></i>
                             </div>
-                            <p class="service-type-description">#(serviceType.description)</p>
-                            <div class="service-type-features">
-                                #if(serviceType.name == "Economy"):
-                                <ul>
-                                    <li>Standard vehicles (sedans, compacts)</li>
-                                    <li>Up to 4 passengers</li>
-                                    <li>Basic service level</li>
-                                    <li>Competitive pricing</li>
-                                </ul>
-                                #elseif(serviceType.name == "Premium"):
-                                <ul>
-                                    <li>Luxury vehicles (premium sedans)</li>
-                                    <li>Up to 4 passengers</li>
-                                    <li>Enhanced comfort</li>
-                                    <li>Higher earning potential</li>
-                                </ul>
-                                #elseif(serviceType.name == "SUV"):
-                                <ul>
-                                    <li>Large vehicles (SUVs, vans)</li>
-                                    <li>Up to 6-8 passengers</li>
-                                    <li>Extra cargo space</li>
-                                    <li>Group transportation</li>
-                                </ul>
-                                #else:
-                                <ul>
-                                    <li>Flexible service options</li>
-                                    <li>Competitive rates</li>
-                                    <li>Professional service</li>
-                                </ul>
+                            <div class="vt-body">
+                                <div class="vt-name">#(service.transportServiceType)</div>
+                                #if(service.description):
+                                <div class="vt-meta">#(service.description)</div>
                                 #endif
+                                <div class="vt-rate">
+                                    #if(service.baseFare):
+                                        Base Fare: $#(service.baseFare)
+                                    #else:
+                                        Base Fare: N/A
+                                    #endif
+                                </div>
+                                <!-- Transfer badge removed per request -->
+                                <div class="vt-radio">
+                                    <input type="radio" name="serviceTypeID" value="#(service.id)" required>
+                                </div>
                             </div>
                         </label>
-                    </div>
                     #endfor
                 </div>
-                
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary btn-full">
-                        Continue to Vehicle Details
-                    </button>
+
+                <div class="vt-actions">
+                    <button type="submit" class="btn-modern">Continue</button>
+                    <a href="/products/gofloradriver/vehicle/register" class="btn-secondary">Skip for now</a>
                 </div>
             </form>
-            
-            <div class="service-info">
-                <h4>💡 Tips for Choosing Your Service Type</h4>
-                <ul class="tips-list">
-                    <li><strong>Economy:</strong> Best for drivers with standard vehicles looking for consistent trips</li>
-                    <li><strong>Premium:</strong> Higher rates but requires newer, luxury vehicles</li>
-                    <li><strong>SUV:</strong> Great for larger vehicles and group transportation needs</li>
-                </ul>
-                <p class="note">You can change your service type later from your dashboard.</p>
-            </div>
         </div>
-        
-        <script>
-            document.getElementById('serviceTypeForm').addEventListener('submit', function(e) {
-                const selectedService = document.querySelector('input[name="serviceTypeID"]:checked');
-                if (!selectedService) {
-                    e.preventDefault();
-                    alert('Please select a service type to continue.');
-                    return false;
-                }
-            });
-            
-            // Add visual feedback for selected cards
-            document.querySelectorAll('input[name="serviceTypeID"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    // Remove selection from all cards
-                    document.querySelectorAll('.service-type-card').forEach(card => {
-                        card.classList.remove('selected');
-                    });
-                    
-                    // Add selection to current card
-                    if (this.checked) {
-                        this.closest('.service-type-card').classList.add('selected');
-                    }
-                });
-            });
-        </script>
     #endexport
 #endextend
+                <p class="note">You can change your service type later from your dashboard.</p>

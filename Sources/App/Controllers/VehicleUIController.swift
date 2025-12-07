@@ -28,7 +28,7 @@ struct VehicleUIController: RouteCollection {
 
         let serviceTypes = try await fetchServiceTypes(req)
 
-        let context = ServiceTypeSelectionContext(
+        let context: ServiceTypeSelectionContext = ServiceTypeSelectionContext(
             title: "Select Service Type",
             pageType: "vehicle",
             driverID: driverID,
@@ -104,6 +104,9 @@ struct VehicleUIController: RouteCollection {
                 req.session.data["vehicleLicensePlate"] = vehicleData.licensePlate
                 req.session.data["vehicleColor"] = vehicleData.color
                 req.session.data["hasVehicle"] = "true"
+                // Mark vehicle completion flags
+                req.session.data["vehicleComplete"] = "true"
+                req.session.data["vehicleIncomplete"] = nil
 
                 return req.redirect(to: "/products/gofloradriver/vehicle/confirm")
             } else {
@@ -130,7 +133,9 @@ struct VehicleUIController: RouteCollection {
             throw Abort(.badRequest, reason: "Vehicle registration session data not found.")
         }
 
-        let selectedServiceType = try await fetchServiceTypeById(req, id: selectedServiceTypeID)
+       guard let selectedServiceType: TransportServiceDTO = try await fetchServiceTypeById(req, id: selectedServiceTypeID) else {
+           throw Abort(.badRequest, reason: "Selected service type not found.")
+       }
 
         let vehicle = VehicleContext(
             make: vehicleMake,
@@ -145,14 +150,14 @@ struct VehicleUIController: RouteCollection {
             pageType: "success",
             driverName: driverName,
             vehicle: vehicle,
-            serviceType: selectedServiceType ?? ServiceTypeContext(id: "", name: "Unknown", description: "", baseRate: 0.0)
+            serviceType: selectedServiceType 
         )
         return try await req.view.render("drivers/vehicle/vehicle-confirmation", context).encodeResponse(for: req)
     }
 
     // MARK: - Helper Methods
 
-    private func fetchServiceTypes(_ req: Request) async throws -> [ServiceTypeContext] {
+    private func fetchServiceTypes(_ req: Request) async throws -> [TransportServiceDTO] {
         do {
             let response = try await makeAPIRequest(
                 req: req,
@@ -161,36 +166,28 @@ struct VehicleUIController: RouteCollection {
             )
 
             if response.status == .ok {
-                let serviceTypes = try response.content.decode([ServiceTypeAPIResponse].self)
+                let serviceTypes: [TransportServiceDTO] = try response.content.decode([TransportServiceDTO].self)
                 return serviceTypes.map { serviceType in
-                    ServiceTypeContext(
-                        id: serviceType.id,
-                        name: serviceType.name,
-                        description: serviceType.description,
-                        baseRate: serviceType.baseRate
+                    TransportServiceDTO(
+                        transportServiceType: serviceType.transportServiceType,
+                         id: serviceType.id,
+                         baseFare: serviceType.baseFare,
+                          description: serviceType.description, 
+                          isTransfer: serviceType.isTransfer
                     )
                 }
             } else {
-                // Return default service types if API fails
-                return [
-                    ServiceTypeContext(id: "1", name: "Economy", description: "Standard transportation", baseRate: 15.0),
-                    ServiceTypeContext(id: "2", name: "Premium", description: "Comfort transportation", baseRate: 25.0),
-                    ServiceTypeContext(id: "3", name: "SUV", description: "Large group transportation", baseRate: 35.0)
-                ]
+                throw Abort(.badRequest, reason: "Failed to fetch service types from API.")
             }
         } catch {
             // Return default service types if network error
-            return [
-                ServiceTypeContext(id: "1", name: "Economy", description: "Standard transportation", baseRate: 15.0),
-                ServiceTypeContext(id: "2", name: "Premium", description: "Comfort transportation", baseRate: 25.0),
-                ServiceTypeContext(id: "3", name: "SUV", description: "Large group transportation", baseRate: 35.0)
-            ]
+            throw error
         }
     }
 
-    private func fetchServiceTypeById(_ req: Request, id: String) async throws -> ServiceTypeContext? {
+    private func fetchServiceTypeById(_ req: Request, id: String) async throws -> TransportServiceDTO? {
         let allServiceTypes = try await fetchServiceTypes(req)
-        return allServiceTypes.first { $0.id == id }
+        return allServiceTypes.first { $0.id?.uuidString == id }
     }
 
     private func makeAPIRequest(req: Request, method: HTTPMethod, endpoint: String, body: [String: Any]? = nil) async throws -> ClientResponse {
