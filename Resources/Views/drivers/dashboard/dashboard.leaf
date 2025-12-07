@@ -56,6 +56,14 @@
                         <i class="fas fa-clipboard-list" style="font-size: 1rem; color: #667eea;"></i>
                         <span>Accepted Trips</span>
                     </a>
+                    <a href="/products/gofloradriver/service-fees/my-fees" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1rem; background: white; color: #1a1a1a; text-decoration: none; border: 1px solid #f3f4f6; border-radius: 12px; font-size: 0.9375rem; font-weight: 500; transition: all 0.2s;">
+                        <i class="fas fa-percent" style="font-size: 1rem; color: #4f46e5;"></i>
+                        <span>Manage Service Fees</span>
+                    </a>
+                    <a href="/products/gofloradriver/invoices" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1rem; background: white; color: #1a1a1a; text-decoration: none; border: 1px solid #f3f4f6; border-radius: 12px; font-size: 0.9375rem; font-weight: 500; transition: all 0.2s;">
+                        <i class="fas fa-file-invoice" style="font-size: 1rem; color: #22c55e;"></i>
+                        <span>View Invoices</span>
+                    </a>
                 </div>
             </div>
         </div>
