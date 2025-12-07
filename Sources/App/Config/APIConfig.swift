@@ -6,7 +6,7 @@ struct APIConfig {
     static let endpoints = [
         "drivers": "\(mainAppBaseURL)/api/gofloradrivers",
         "transportServiceTypes": "\(mainAppBaseURL)/api/transportservicetype",
-        "vehicles": "\(mainAppBaseURL)/api/vehicles",
+        "vehicles": "\(mainAppBaseURL)/api/gofloravehicles",
         "gofloradriver": "\(mainAppBaseURL)/api/gofloradriver",
         "gofloradriver-profiles": "\(mainAppBaseURL)/api/driver-profiles",
         "service-fees": "\(mainAppBaseURL)/api/driver/service-fees",

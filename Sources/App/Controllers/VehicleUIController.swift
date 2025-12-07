@@ -51,7 +51,7 @@ struct VehicleUIController: RouteCollection {
     // MARK: - Vehicle Registration
 
     @Sendable func renderVehicleRegistration(_ req: Request) async throws -> Response {
-        guard let driverID = req.session.data["driverID"],
+        guard let driverID = req.session.data["driverID"],   
               let driverName = req.session.data["name"],
               let selectedServiceTypeID = req.session.data["selectedServiceTypeID"] else {
             return req.redirect(to: "/products/gofloradriver/vehicle/service-type")
@@ -59,7 +59,7 @@ struct VehicleUIController: RouteCollection {
 
         let selectedServiceType = try await fetchServiceTypeById(req, id: selectedServiceTypeID)
 
-        let context = VehicleRegistrationPageContext(
+        let context: VehicleRegistrationPageContext = VehicleRegistrationPageContext(
             title: "Vehicle Registration",
             pageType: "vehicle",
             driverID: driverID,
@@ -71,11 +71,41 @@ struct VehicleUIController: RouteCollection {
     }
 
     @Sendable func handleVehicleRegistration(_ req: Request) async throws -> Response {
+        guard let driverToken = req.session.data["driverToken"] else {
+            return req.redirect(to: "/products/gofloradriver/register")
+        }
+
         guard let driverID = req.session.data["driverID"] else {
             return req.redirect(to: "/products/gofloradriver/register")
         }
 
         let vehicleData = try req.content.decode(VehicleRegistrationFormData.self)
+
+
+let vehicleDetails : VehicleDTO = VehicleDTO(
+    id: nil, 
+    registrationNumber: "remove this field",
+     licensePlateNumber: vehicleData.licensePlate,
+      make: vehicleData.make,
+       model: vehicleData.model,
+       yearOfManufacture: "\(vehicleData.year)", 
+       bodyType: "remove this field", 
+       color: vehicleData.color, 
+       engineSize: "remove this field", 
+       fuelType: "remove this field", 
+       transmissionType: "remove this field", 
+       seatingCapacity: "remove this field",
+        ownerName: "remove this field",
+         ownerAddress: "remove this field",
+          contactInformation: "remove this field",
+           insuranceDetails: "remove this field",
+            vehicleHistory: "remove this field",
+             emissionsStandards: "remove this field",
+              servicetypeId: UUID(uuidString: vehicleData.serviceTypeID)!
+
+)
+let jsonData = try JSONEncoder().encode(vehicleDetails)
+let buffer = req.application.allocator.buffer(data: jsonData)
 
         // Prepare data for VehicleController API
         let vehiclePayload: [String: Any] = [
@@ -93,7 +123,8 @@ struct VehicleUIController: RouteCollection {
                 req: req,
                 method: .POST,
                 endpoint: APIConfig.endpoints["vehicles"]!,
-                body: vehiclePayload
+                body: buffer,
+                driverToken: driverToken
             )
 
             if response.status == .created || response.status == .ok {
@@ -123,26 +154,27 @@ struct VehicleUIController: RouteCollection {
 
     @Sendable func renderVehicleConfirmation(_ req: Request) async throws -> Response {
         guard let driverName = req.session.data["driverName"],
-              let vehicleMake = req.session.data["vehicleMake"],
-              let vehicleModel = req.session.data["vehicleModel"],
-              let vehicleYearStr = req.session.data["vehicleYear"],
-              let vehicleYear = Int(vehicleYearStr),
-              let vehicleLicensePlate = req.session.data["vehicleLicensePlate"],
-              let vehicleColor = req.session.data["vehicleColor"],
-              let selectedServiceTypeID = req.session.data["selectedServiceTypeID"] else {
-            throw Abort(.badRequest, reason: "Vehicle registration session data not found.")
+              let driverID = req.session.data["driverID"],
+              let selectedServiceTypeID = req.session.data["selectedServiceTypeID"],
+              let driverToken = req.session.data["driverToken"] else {
+            return req.redirect(to: "/products/gofloradriver/vehicle/register")
         }
 
-       guard let selectedServiceType: TransportServiceDTO = try await fetchServiceTypeById(req, id: selectedServiceTypeID) else {
-           throw Abort(.badRequest, reason: "Selected service type not found.")
-       }
+        guard let selectedServiceType: TransportServiceDTO = try await fetchServiceTypeById(req, id: selectedServiceTypeID) else {
+            throw Abort(.badRequest, reason: "Selected service type not found.")
+        }
+
+        // Query API for vehicle details rather than relying on session
+        guard let apiVehicle = try await fetchVehicleForDriver(req, driverID: driverID, driverToken: driverToken) else {
+            return req.redirect(to: "/products/gofloradriver/vehicle/register?error=Vehicle not found, please re-enter details")
+        }
 
         let vehicle = VehicleContext(
-            make: vehicleMake,
-            model: vehicleModel,
-            year: vehicleYear,
-            licensePlate: vehicleLicensePlate,
-            color: vehicleColor
+            make: apiVehicle.make,
+            model: apiVehicle.model,
+            year: Int(apiVehicle.yearOfManufacture) ?? 0,
+            licensePlate: apiVehicle.licensePlateNumber,
+            color: apiVehicle.color
         )
 
         let context = VehicleConfirmationContext(
@@ -150,7 +182,7 @@ struct VehicleUIController: RouteCollection {
             pageType: "success",
             driverName: driverName,
             vehicle: vehicle,
-            serviceType: selectedServiceType 
+            serviceType: selectedServiceType
         )
         return try await req.view.render("drivers/vehicle/vehicle-confirmation", context).encodeResponse(for: req)
     }
@@ -190,24 +222,31 @@ struct VehicleUIController: RouteCollection {
         return allServiceTypes.first { $0.id?.uuidString == id }
     }
 
-    private func makeAPIRequest(req: Request, method: HTTPMethod, endpoint: String, body: [String: Any]? = nil) async throws -> ClientResponse {
+    private func makeAPIRequest(req: Request, method: HTTPMethod, endpoint: String, body: ByteBuffer? = nil, driverToken: String? = nil ) async throws -> ClientResponse {
         var headers = HTTPHeaders()
         headers.add(name: .contentType, value: "application/json")
 
-        var clientBody: ByteBuffer?
-        if let body = body {
-            let jsonData = try JSONSerialization.data(withJSONObject: body)
-            clientBody = req.application.allocator.buffer(data: jsonData)
+        if let driverToken = driverToken {
+        headers.add(name: "Authorization", value: "Bearer \(driverToken)")
+
         }
 
         let clientRequest = ClientRequest(
             method: method,
             url: URI(string: endpoint),
             headers: headers,
-            body: clientBody
+            body: body
         )
 
         return try await req.client.send(clientRequest)
+    }
+
+    // Fetch a driver's vehicle from API using token
+    private func fetchVehicleForDriver(_ req: Request, driverID: String, driverToken: String) async throws -> VehicleDTO? {
+        let endpoint = (APIConfig.endpoints["vehicles"] ?? "urlfailed") + "/by-driver/\(driverID)"
+        let response = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: driverToken)
+        guard response.status == .ok else { return nil }
+        return try response.content.decode(VehicleDTO.self)
     }
 }
 

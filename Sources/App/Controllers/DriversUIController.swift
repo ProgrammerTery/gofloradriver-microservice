@@ -164,6 +164,9 @@ struct DriversUIController: RouteCollection {
                     req.session.data["rememberMe"] = "true"
                 }
 
+                // Post-login status sync: query API to set completeness flags
+                await postLoginSyncCompleteness(req, token: driverResponse.token, driverID: driverResponse.driverID.uuidString)
+
                 // Check if user has completed registration
                 if  !driverResponse.email.isEmpty {
                     // User has completed driver registration, go to dashboard
@@ -426,6 +429,80 @@ struct DriversUIController: RouteCollection {
         )
 
         return try await req.client.send(clientRequest)
+    }
+
+    // After login, query profile & vehicle APIs to set completeness flags
+    private func postLoginSyncCompleteness(_ req: Request, token: String, driverID: String) async {
+        // Profile completeness
+        if let isProfileComplete = await fetchProfileCompleteness(req, token: token) {
+            if isProfileComplete {
+                req.session.data["profileComplete"] = "true"
+                req.session.data["profileIncomplete"] = nil
+            } else {
+                req.session.data["profileIncomplete"] = "true"
+                req.session.data["profileComplete"] = nil
+            }
+        }
+
+        // Vehicle completeness
+        if let hasVehicle = await fetchVehicleExists(req, driverID: driverID, token: token) {
+            if hasVehicle {
+                req.session.data["vehicleComplete"] = "true"
+                req.session.data["vehicleIncomplete"] = nil
+                req.session.data["hasVehicle"] = "true"
+            } else {
+                req.session.data["vehicleIncomplete"] = "true"
+                req.session.data["vehicleComplete"] = nil
+                req.session.data["hasVehicle"] = nil
+            }
+        }
+    }
+
+    // Returns true if profile appears complete, false if incomplete, nil on error
+    private func fetchProfileCompleteness(_ req: Request, token: String) async -> Bool? {
+        let base = APIConfig.endpoints["gofloradriver-profiles"] ?? APIConfig.endpoints["driver-profiles"] ?? "urlfailed"
+        let endpoint = base + "/me"
+        do {
+            let resp = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: token)
+            if resp.status == .ok {
+                let profile = try resp.content.decode(DriverProfileDTO.self)
+                let nameOk = !profile.driverName.isEmpty
+                let emailOk = !profile.driverEmail.isEmpty
+                // License can be optional during onboarding; rely on name+email
+                return nameOk && emailOk
+            } else if resp.status == .notFound {
+                return false
+            } else {
+                return nil
+            }
+        } catch {
+            return nil
+        }
+    }
+
+    // Returns true if a vehicle exists, false if none, nil on error
+    private func fetchVehicleExists(_ req: Request, driverID: String, token: String) async -> Bool? {
+        let base = APIConfig.endpoints["vehicles"] ?? "urlfailed"
+        let endpoint = base + "/\(driverID)" + "/checkvehiclestatus"
+        do {
+            let resp = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: token)
+            if resp.status == .ok {
+                // Endpoint may return a single VehicleDTO or an array; try both
+                if (try? resp.content.decode(VehicleDTO.self)) != nil {
+                    return true
+                }
+                if let vehicles = try? resp.content.decode([VehicleDTO].self) {
+                    return !vehicles.isEmpty
+                }
+                return nil
+            } else if resp.status == .notFound {
+                return false
+            } else {
+                return nil
+            }
+        } catch {
+            return nil
+        }
     }
 
     private func fetchDriverProfile(_ req: Request) async throws -> DriverProfileDTO {
