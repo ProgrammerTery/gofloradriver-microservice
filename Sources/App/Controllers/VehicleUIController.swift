@@ -34,7 +34,7 @@ struct VehicleUIController: RouteCollection {
             driverID: driverID,
             driverName: driverName,
             serviceTypes: serviceTypes,
-            errorMessage: req.query["error"]
+            errorMessage: ""
         )
         return try await req.view.render("drivers/vehicle/service-type-selection", context).encodeResponse(for: req)
     }
@@ -65,7 +65,7 @@ struct VehicleUIController: RouteCollection {
             driverID: driverID,
             driverName: driverName,
             selectedServiceType: selectedServiceType,
-            errorMessage: req.query["error"]
+            errorMessage: ""
         )
         return try await req.view.render("drivers/vehicle/vehicle-registration", context).encodeResponse(for: req)
     }

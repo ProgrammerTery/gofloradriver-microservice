@@ -487,14 +487,7 @@ struct DriversUIController: RouteCollection {
         do {
             let resp = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: token)
             if resp.status == .ok {
-                // Endpoint may return a single VehicleDTO or an array; try both
-                if (try? resp.content.decode(VehicleDTO.self)) != nil {
-                    return true
-                }
-                if let vehicles = try? resp.content.decode([VehicleDTO].self) {
-                    return !vehicles.isEmpty
-                }
-                return nil
+                return true
             } else if resp.status == .notFound {
                 return false
             } else {
