@@ -136,3 +136,21 @@ struct InvoiceFormData: Content {
     let platformFee: Double
     let status: String
 }
+
+// Vehicles Page Contexts
+public struct VehiclesListContext: Content {
+    public let title: String
+    public let pageType: String
+    public let driverName: String
+    public let vehicles: [VehicleDTO]
+    public let successMessage: String?
+    public let errorMessage: String?
+}
+
+public struct VehicleDeleteConfirmationContext: Content {
+    public let title: String
+    public let pageType: String
+    public let driverName: String
+    public let vehicle: VehicleDTO
+    public let errorMessage: String?
+}

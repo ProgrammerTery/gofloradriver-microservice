@@ -213,8 +213,9 @@ struct DriversUIController: RouteCollection {
     @Sendable func handleDriverRegistration(_ req: Request) async throws -> Response {
         let registrationData = try req.content.decode(DriverProfileDTO.self)
 
-
-        let jsonData = try JSONEncoder().encode(registrationData)
+        let jsonEncoder = JSONEncoder()
+        jsonEncoder.dateEncodingStrategy = .iso8601
+        let jsonData = try jsonEncoder.encode(registrationData)
         let driverData = req.application.allocator.buffer(data: jsonData)
         // Call the DriverProfilesController API for registration
         let driverToken = req.session.data["driverToken"]
@@ -223,7 +224,7 @@ struct DriversUIController: RouteCollection {
             let response = try await makeAPIRequest(
                 req: req,
                 method: .POST,
-                endpoint: APIConfig.endpoints["driver-profiles"]! + "/register",
+                endpoint: APIConfig.endpoints["gofloradriver-profiles"]! + "/create",
                 body: driverData,
                 driverToken: driverToken
             )
@@ -460,7 +461,7 @@ struct DriversUIController: RouteCollection {
 
     // Returns true if profile appears complete, false if incomplete, nil on error
     private func fetchProfileCompleteness(_ req: Request, token: String) async -> Bool? {
-        let base = APIConfig.endpoints["gofloradriver-profiles"] ?? APIConfig.endpoints["driver-profiles"] ?? "urlfailed"
+        let base = APIConfig.endpoints["gofloradriver-profiles"] ?? "urlfailed"
         let endpoint = base + "/me"
         do {
             let resp = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: token)

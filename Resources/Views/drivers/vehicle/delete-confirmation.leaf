@@ -1,0 +1,45 @@
+#extend("drivers/driversbase")
+
+#export("content")
+<div class="container" style="max-width: 900px; margin: 0 auto; padding: 24px;">
+  <h1 style="font-size: 24px; margin-bottom: 12px; color:#b00020;">Confirm Vehicle Deletion</h1>
+  <p style="color: #666; margin-bottom: 16px;">Driver: #(driverName)</p>
+  #if(errorMessage):
+    <div style="background:#fee; color:#900; padding:12px; border:1px solid #f99; border-radius:8px; margin-bottom:16px;">#(errorMessage)</div>
+  #endif
+
+  <div style="border:1px solid #ddd; border-radius:8px; padding:16px; background:white; margin-bottom:16px;">
+    <h2 style="font-size:18px; margin-bottom:8px;">#(vehicle.make) #(vehicle.model) — #(vehicle.licensePlateNumber)</h2>
+    <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px; font-size:14px;">
+      <div><strong>ID:</strong> #if(vehicle.id): #(vehicle.id) #else: — #endif</div>
+      <div><strong>Registration Number:</strong> #if(vehicle.registrationNumber): #(vehicle.registrationNumber) #else: — #endif</div>
+      <div><strong>License Plate:</strong> #(vehicle.licensePlateNumber)</div>
+      <div><strong>Make:</strong> #(vehicle.make)</div>
+      <div><strong>Model:</strong> #(vehicle.model)</div>
+      <div><strong>Year:</strong> #(vehicle.yearOfManufacture)</div>
+      <div><strong>Body Type:</strong> #if(vehicle.bodyType): #(vehicle.bodyType) #else: — #endif</div>
+      <div><strong>Color:</strong> #(vehicle.color)</div>
+      <div><strong>Engine Size:</strong> #if(vehicle.engineSize): #(vehicle.engineSize) #else: — #endif</div>
+      <div><strong>Fuel Type:</strong> #if(vehicle.fuelType): #(vehicle.fuelType) #else: — #endif</div>
+      <div><strong>Transmission:</strong> #if(vehicle.transmissionType): #(vehicle.transmissionType) #else: — #endif</div>
+      <div><strong>Seating Capacity:</strong> #if(vehicle.seatingCapacity): #(vehicle.seatingCapacity) #else: — #endif</div>
+      <div><strong>Owner Name:</strong> #if(vehicle.ownerName): #(vehicle.ownerName) #else: — #endif</div>
+      <div><strong>Owner Address:</strong> #if(vehicle.ownerAddress): #(vehicle.ownerAddress) #else: — #endif</div>
+      <div><strong>Contact Info:</strong> #if(vehicle.contactInformation): #(vehicle.contactInformation) #else: — #endif</div>
+      <div><strong>Insurance:</strong> #if(vehicle.insuranceDetails): #(vehicle.insuranceDetails) #else: — #endif</div>
+      <div><strong>Vehicle History:</strong> #if(vehicle.vehicleHistory): #(vehicle.vehicleHistory) #else: — #endif</div>
+      <div><strong>Emissions Standards:</strong> #if(vehicle.emissionsStandards): #(vehicle.emissionsStandards) #else: — #endif</div>
+      <div><strong>Service Type ID:</strong> #if(vehicle.servicetypeId): #(vehicle.servicetypeId) #else: — #endif</div>
+    </div>
+  </div>
+
+  #if(vehicle.id):
+  <form method="post" action="/products/gofloradriver/vehicle/#(vehicle.id)/delete" style="display:flex; gap:8px;">
+    <button type="submit" style="padding:10px 14px; background:#b00020; color:white; border:none; border-radius:6px; cursor:pointer;">Confirm Delete</button>
+    <a href="/products/gofloradriver/vehicle/list" style="padding:10px 14px; background:#f0f0f0; color:#333; border-radius:6px; text-decoration:none;">Cancel</a>
+  </form>
+  #else:
+    <a href="/products/gofloradriver/vehicle/list" style="padding:10px 14px; background:#f0f0f0; color:#333; border-radius:6px; text-decoration:none;">Back to list</a>
+  #endif
+</div>
+#endexport
