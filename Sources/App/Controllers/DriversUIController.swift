@@ -500,77 +500,56 @@ struct DriversUIController: RouteCollection {
     }
 
     private func fetchDriverProfile(_ req: Request) async throws -> DriverProfileDTO {
-        // Mock data - in real implementation, call API with session token
-        return DriverProfileDTO(driverID:  req.session.data["driverID"] ?? "unknown", driverName: req.session.data["name"] ?? "Unknown Driver", driverPhone: "+263778463020", driverEmail: "waltack@example.com", driverAddress: "Victoria Falls City", registrationDate: Date(), driverLicense: "AQW5363783", vehicle_id: UUID())
+        let driverToken = req.session.data["driverToken"]
+        let response = try await makeAPIRequest(
+            req: req,
+            method: .GET,
+            endpoint: APIConfig.endpoints["gofloradriver-profiles"]! + "/me",
+            driverToken: driverToken
+        )
+
+        if response.status == .ok {
+            let driverProfile = try response.content.decode(DriverProfileDTO.self)
+            return driverProfile
+        } else {
+            throw Abort(.unauthorized, reason: "Failed to fetch driver profile")
+        }
     }
+        
 
     private func fetchDriverStats(_ req: Request) async throws -> DriversDriverStatsContext {
-        // In a real implementation, these would come from API calls
-        return DriversDriverStatsContext(
-            totalEarnings: "4250.00",
-            totalTrips: "125",
-            averageRating: "4.9",
-            thisWeekTrips: "8",
-            activeBids: "3",
-            assignedTrips: "2",
-            earningsToday: "145.50",
-            completedTrips: "123",
-            successRate: "98",
-            weeklyTrips: "8",
-            weeklyEarnings: "580.00",
-            weeklyHours: "24",
-            availableTrips: "12",
-            // Revenue Trajectory Properties
-            monthlyEarnings: "3450.00",
-            monthlyGrowth: "18",
-            monthlyGoal: "3000.00",
-            goalProgress: "115",
-            goalExceeded: "25",
-            avgTripEarnings: "32",
-            daysLeft: "6"
-        )
+        // In a real implementation,
+        let driverToken = req.session.data["driverToken"]
+        let response = try await makeAPIRequest(
+            req: req,
+            method: .GET,
+            endpoint: APIConfig.endpoints["gofloradrivers"]! + "/stats",
+            driverToken: driverToken
+        )   
+        if response.status == .ok {
+            let stats = try response.content.decode(DriversDriverStatsContext.self)
+            return stats
+        } else {
+            throw Abort(.unauthorized, reason: "Failed to fetch driver stats")
+            /**/
+        }   
     }
 
     private func fetchRecentTrips(_ req: Request) async throws -> [DriversTripSummaryContext] {
         // In a real implementation, this would come from API calls
-        return [
-            DriversTripSummaryContext(
-                id: "trip-001",
-                pickup: "Downtown Mall",
-                destination: "Airport Terminal 1",
-                distance: "15.2 miles",
-                suggestedPrice: 45.00,
-                status: "completed",
-                bidAmount: 42.00,
-                scheduledTime: "2025-01-28 14:30",
-                date: "Jan 28, 2025",
-                amount: "42.00"
-            ),
-            DriversTripSummaryContext(
-                id: "trip-002",
-                pickup: "Business District",
-                destination: "Hotel Plaza",
-                distance: "8.5 miles",
-                suggestedPrice: 25.00,
-                status: "completed",
-                bidAmount: 28.00,
-                scheduledTime: "2025-01-28 16:00",
-                date: "Jan 28, 2025",
-                amount: "28.00"
-            ),
-            DriversTripSummaryContext(
-                id: "trip-003",
-                pickup: "Train Station",
-                destination: "University Campus",
-                distance: "12.1 miles",
-                suggestedPrice: 35.00,
-                status: "completed",
-                bidAmount: 35.00,
-                scheduledTime: "2025-01-27 09:15",
-                date: "Jan 27, 2025",
-                amount: "35.00"
-            )
-        ]
+        let driverToken = req.session.data["driverToken"]
+        let response = try await makeAPIRequest(
+            req: req,
+            method: .GET,
+            endpoint: APIConfig.endpoints["gofloradrivers"]! + "/recenttrips",
+            driverToken: driverToken
+        )
+        if response.status == .ok {
+            let trips = try response.content.decode([DriversTripSummaryContext].self)
+            return trips
+        } else {    
+            throw Abort(.unauthorized, reason: "Failed to fetch recent trips")
+        }       
     }
 }
 

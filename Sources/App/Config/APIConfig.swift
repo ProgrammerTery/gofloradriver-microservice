@@ -8,6 +8,7 @@ struct APIConfig {
         "transportServiceTypes": "\(mainAppBaseURL)/api/transportservicetype",
         "vehicles": "\(mainAppBaseURL)/api/gofloravehicles",
         "gofloradriver": "\(mainAppBaseURL)/api/gofloradriver",
+         "gofloradrivers": "\(mainAppBaseURL)/api/gofloradrivers",
         "gofloradriver-profiles": "\(mainAppBaseURL)/api/gofloradriver-profiles",
         "service-fees": "\(mainAppBaseURL)/api/driver/service-fees",
         "invoices": "\(mainAppBaseURL)/api/driver/invoices"
