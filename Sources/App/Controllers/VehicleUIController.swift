@@ -84,7 +84,7 @@ struct VehicleUIController: RouteCollection {
 
 let vehicleDetails : VehicleDTO = VehicleDTO(
     id: nil, 
-    registrationNumber: "remove this field",
+    registrationNumber: "remove this field" + UUID().uuidString,
      licensePlateNumber: vehicleData.licensePlate,
       make: vehicleData.make,
        model: vehicleData.model,
@@ -127,13 +127,15 @@ let buffer = req.application.allocator.buffer(data: jsonData)
                 driverToken: driverToken
             )
 
-            if response.status == .created || response.status == .ok {
+            let savedVehicle: VehicleDTO = try response.content.decode(VehicleDTO.self)
+
+            if savedVehicle.id != nil {
                 // Store vehicle data in session
-                req.session.data["vehicleMake"] = vehicleData.make
-                req.session.data["vehicleModel"] = vehicleData.model
-                req.session.data["vehicleYear"] = String(vehicleData.year)
-                req.session.data["vehicleLicensePlate"] = vehicleData.licensePlate
-                req.session.data["vehicleColor"] = vehicleData.color
+                req.session.data["vehicleMake"] = savedVehicle.make
+                req.session.data["vehicleModel"] = savedVehicle.model
+                req.session.data["vehicleYear"] = savedVehicle.yearOfManufacture
+                req.session.data["vehicleLicensePlate"] = savedVehicle.licensePlateNumber
+                req.session.data["vehicleColor"] = savedVehicle.color
                 req.session.data["hasVehicle"] = "true"
                 // Mark vehicle completion flags
                 req.session.data["vehicleComplete"] = "true"
