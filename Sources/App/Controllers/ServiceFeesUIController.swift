@@ -1,8 +1,6 @@
 import Vapor
 import Leaf
 import DriversDTO
-
-// Import the custom payment method DTO
 import Foundation
 
 struct ServiceFeesUIController: RouteCollection {
@@ -182,7 +180,7 @@ struct ServiceFeesUIController: RouteCollection {
 
     private func fetchPaymentMethods(_ req: Request, driverToken: String) async throws -> [PayNowPaymentMethodResponseDTO] {
         let baseURL = APIConfig.mainAppBaseURL
-        let endpoint = baseURL + "/api/payment-methods"
+        let endpoint = baseURL + "/api/payments/methods"
         let response = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: driverToken)
         guard response.status.code >= 200 && response.status.code < 300 else {
             throw Abort(response.status)
