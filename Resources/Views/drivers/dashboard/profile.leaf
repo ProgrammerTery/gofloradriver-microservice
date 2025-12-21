@@ -181,7 +181,7 @@
                                     <div style="font-size: 1rem; font-weight: 700; color: #10b981;">Vehicle Registered</div>
                                 </div>
                             </div>
-                            <a href="/products/gofloradriver/vehicle/manage" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.625rem 1rem; background: white; color: #10b981; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 0.875rem; transition: all 0.2s;">
+                            <a href="/products/gofloradriver/vehicle/list" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.625rem 1rem; background: white; color: #10b981; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 0.875rem; transition: all 0.2s;">
                                 <i class="fas fa-cog"></i>
                                 <span>Manage Vehicle</span>
                             </a>

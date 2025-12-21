@@ -1,6 +1,5 @@
-#extend("drivers/driversbase")
-
-#export("content")
+#extend("drivers/driversbase"):
+#export("content"):
 <div class="container" style="max-width: 1000px; margin: 0 auto; padding: 24px;">
   <h1 style="font-size: 24px; margin-bottom: 12px;">My Vehicles</h1>
   <p style="color: #666; margin-bottom: 16px;">Driver: #(driverName)</p>
@@ -52,4 +51,5 @@
     </div>
   #endif
 </div>
-#endexport
+    #endexport
+#endextend

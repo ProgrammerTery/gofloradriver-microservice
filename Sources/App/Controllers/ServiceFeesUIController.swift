@@ -17,32 +17,54 @@ struct ServiceFeesUIController: RouteCollection {
     }
 
     // GET /my-fees
-    @Sendable func renderMyFees(_ req: Request) async throws -> View {
-        let driverToken = req.session.data["driverToken"] ?? ""
-        let page = Int(req.query["page"] ?? "1") ?? 1
-        let perPage = Int(req.query["perPage"] ?? "25") ?? 25
-        let driverProfile = try await fetchDriverProfile(req)
-        let paymentMethods = try await fetchPaymentMethods(req, driverToken: driverToken)
-        let feesResponse = try await fetchServiceFees(req, driverToken: driverToken, page: page, perPage: perPage)
-        let stats = try await fetchServiceFeeStats(req, driverToken: driverToken)
-        let totalPages = Int(ceil(Double(feesResponse.total) / Double(perPage)))
-        let context = ServiceFeesListPageContext(
-            title: "My Service Fees",
-            pageType: "service-fees-list",
-            driver: driverProfile,
-            serviceFees: feesResponse.serviceFees,
-            stats: stats,
-            total: feesResponse.total,
-            page: page,
-            perPage: perPage,
-            paymentMethods: paymentMethods,
-            successMessage: req.query["success"],
-            errorMessage: req.query["error"],
-            totalPages: totalPages,
-            hasNextPage: page < totalPages,
-            hasPrevPage: page > 1
-        )
-        return try await req.view.render("drivers/service-fees/my-fees", context)
+    @Sendable func renderMyFees(_ req: Request) async throws -> Response {
+        do {
+            let driverToken = req.session.data["driverToken"] ?? ""
+            let page = Int(req.query["page"] ?? "1") ?? 1
+            let perPage = Int(req.query["perPage"] ?? "25") ?? 25
+            let driverProfile = try await fetchDriverProfile(req)
+            let paymentMethods = try await fetchPaymentMethods(req, driverToken: driverToken)
+            let feesResponse = try await fetchServiceFees(req, driverToken: driverToken, page: page, perPage: perPage)
+            let stats = try await fetchServiceFeeStats(req, driverToken: driverToken)
+            let totalPages = Int(ceil(Double(feesResponse.total) / Double(perPage)))
+            let context = ServiceFeesListPageContext(
+                title: "My Service Fees",
+                pageType: "service-fees-list",
+                driver: driverProfile,
+                serviceFees: feesResponse.serviceFees,
+                stats: stats,
+                total: feesResponse.total,
+                page: page,
+                perPage: perPage,
+                paymentMethods: paymentMethods,
+                successMessage: req.query["success"],
+                errorMessage: req.query["error"],
+                totalPages: totalPages,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1
+            )
+            return try await req.view.render("drivers/service-fees/my-fees", context).encodeResponse(for: req)
+        } catch {
+          // return req.redirect(to: "/products/gofloradriver/dashboard?error=An unexpected error occurred. Please try again later.")
+            let driverProfile = try await fetchDriverProfile(req)
+            let context = ServiceFeesListPageContext(
+                title: "My Service Fees",
+                pageType: "service-fees-list",
+                driver: driverProfile ,
+                serviceFees: [],
+                stats: nil,
+                total: 0,
+                page: 1,
+                perPage: 25,
+                paymentMethods: [],
+                successMessage: nil,
+                errorMessage: nil,
+                totalPages: 0,
+                hasNextPage: false,
+                hasPrevPage: false
+            )
+            return try await req.view.render("drivers/service-fees/my-fees", context).encodeResponse(for: req)
+        }
     }
 
     // GET /create
@@ -180,7 +202,7 @@ struct ServiceFeesUIController: RouteCollection {
 
     private func fetchPaymentMethods(_ req: Request, driverToken: String) async throws -> [PayNowPaymentMethodResponseDTO] {
         let baseURL = APIConfig.mainAppBaseURL
-        let endpoint = baseURL + "/api/payments/methods"
+        let endpoint = baseURL + "/api/goflorapayment/paymentmethods"
         let response = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: driverToken)
         guard response.status.code >= 200 && response.status.code < 300 else {
             throw Abort(response.status)
@@ -189,6 +211,7 @@ struct ServiceFeesUIController: RouteCollection {
             throw Abort(.internalServerError, reason: "No response body")
         }
         let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
         let responseData = Data(buffer: responseBody)
         return try decoder.decode([PayNowPaymentMethodResponseDTO].self, from: responseData)
     }
@@ -215,7 +238,7 @@ struct ServiceFeesUIController: RouteCollection {
 
     private func fetchPaymentMethodByID(_ req: Request, driverToken: String, paymentMethodID: String) async throws -> PayNowPaymentMethodResponseDTO? {
         let baseURL = APIConfig.mainAppBaseURL
-        let endpoint = baseURL + "/api/payment-methods/\(paymentMethodID)"
+        let endpoint = baseURL + "/api/goflorapayment/\(paymentMethodID)"
         let response = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: driverToken)
         guard response.status.code >= 200 && response.status.code < 300 else {
             return nil

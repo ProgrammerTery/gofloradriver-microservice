@@ -58,7 +58,7 @@
                     </div>
                     <div>
                         <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">Pending</div>
-                        <div style="font-size: 1.75rem; font-weight: 800; color: #1a1a1a;">#if(pendingCount):#(pendingCount)#else:0#endif</div>
+                        <div style="font-size: 1.75rem; font-weight: 800; color: #1a1a1a;">#if(pendingBidsCount):#(pendingBidsCount)#else:0#endif</div>
                     </div>
                 </div>
             </div>
@@ -70,7 +70,7 @@
                     </div>
                     <div>
                         <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">Approved</div>
-                        <div style="font-size: 1.75rem; font-weight: 800; color: #1a1a1a;">#if(approvedCount):#(approvedCount)#else:0#endif</div>
+                        <div style="font-size: 1.75rem; font-weight: 800; color: #1a1a1a;">#if(acceptedBidsCount):#(acceptedBidsCount)#else:0#endif</div>
                     </div>
                 </div>
             </div>
@@ -152,14 +152,14 @@
                             <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 1rem;">
                                 <div style="padding: 1.5rem; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-radius: 16px; min-width: 180px;">
                                     <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">Your Bid</div>
-                                    <div style="font-size: 2rem; font-weight: 800; color: #667eea;">$#(bid.amount)</div>
-                                    #if(bid.amount > bid.suggestedPrice):
+                                    <div style="font-size: 2rem; font-weight: 800; color: #667eea;">$#(bid.bidAmount)</div>
+                                    #if(bid.bidAmount > bid.suggestedPrice):
                                         <div style="font-size: 0.75rem; color: #ef4444; margin-top: 0.5rem; font-weight: 600;">
-                                            +$#(bid.amount - bid.suggestedPrice) above
+                                            +$#(bid.bidAmount - bid.suggestedPrice) above
                                         </div>
-                                    #elseif(bid.amount < bid.suggestedPrice):
+                                    #elseif(bid.bidAmount < bid.suggestedPrice):
                                         <div style="font-size: 0.75rem; color: #10b981; margin-top: 0.5rem; font-weight: 600;">
-                                            -$#(bid.suggestedPrice - bid.amount) below
+                                            -$#(bid.suggestedPrice - bid.bidAmount) below
                                         </div>
                                     #else:
                                         <div style="font-size: 0.75rem; color: #667eea; margin-top: 0.5rem; font-weight: 600;">

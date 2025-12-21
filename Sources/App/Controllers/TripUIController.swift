@@ -1,4 +1,5 @@
 import Vapor
+import PaymentDTO
 import TripDTO
 import Leaf
 import DriversDTO
@@ -51,7 +52,7 @@ struct TripUIController: RouteCollection {
             pageType: "trips",
             trip: trip,
             driver: driver,
-            canBid: trip.status == "driversAccepting",
+            canBid: trip.status == "pending",
             existingBid: existingBid
         )
         return try await req.view.render("drivers/trips/trip-details", context)
@@ -63,24 +64,28 @@ struct TripUIController: RouteCollection {
         }
 
         let bidData = try req.content.decode(BidFormData.self)
+        guard let tripUUID = UUID(uuidString: tripId) else {
+            return req.redirect(to: "/products/gofloradriver/trips")
+        }
 
-        let jsonData = try JSONEncoder().encode(bidData)
+        let bidContentData = SubmitDriverBidRequest(tripId: tripUUID, bidAmount: bidData.bidAmount)
+
+        let jsonData = try JSONEncoder().encode(bidContentData)
 
         let buffer = req.application.allocator.buffer(data: jsonData)
-        let driverId = req.session.data["driverID"] ?? ""
 
         do {
 
             let response = try await makeAPIRequest(
                 req: req,
                 method: .POST,
-                endpoint: APIConfig.endpoints["drivers"]! + "/trips/\(tripId)/bid",
+                endpoint: APIConfig.endpoints["drivers"]! + "/trip/\(tripId)/bid",
                 body: buffer,
                 requiresAuth: true
             )
 
             if response.status == .created || response.status == .ok {
-                return req.redirect(to: "/products/gofloradriver/trips/\(tripId)?success=Bid submitted successfully")
+                return req.redirect(to: "/products/gofloradriver/bids?success=Bid submitted successfully")
             } else {
                 let errorData = try? response.content.decode([String: String].self)
                 let error = errorData?["message"] ?? "Failed to submit bid"
@@ -97,12 +102,16 @@ struct TripUIController: RouteCollection {
     @Sendable func renderMyBids(_ req: Request) async throws -> View {
         let driver = try await fetchDriverProfile(req)
         let bids = try await fetchMyBids(req)
+        let pendingBidsCount = bids.filter { $0.status == "pending" }.count
+        let approvedBidsCount = bids.filter { $0.status == "approved" }.count
 
         let context = MyBidsPageContext(
             title: "My Bids",
             pageType: "trips",
             bids: bids,
-            driver: driver
+            driver: driver,
+            pendingBidsCount: pendingBidsCount,
+            acceptedBidsCount: approvedBidsCount
         )
         return try await req.view.render("drivers/trips/my-bids", context)
     }
@@ -198,10 +207,25 @@ struct TripUIController: RouteCollection {
     // MARK: - Helper Methods
 
     private func fetchDriverProfile(_ req: Request) async throws -> DriverProfileDTO {
-        // Mock data - in real implementation, call API with session token
+        // Try to fetch existing bid from API
+        do {
+            let response = try await makeAPIRequest(
+                req: req,
+                method: .GET,
+                endpoint: APIConfig.endpoints["gofloradriver-profiles"]! + "/me",
+                requiresAuth: true
+            )
 
+            if response.status == .ok {
+                if let driverProfile = try? response.content.decode(DriverProfileDTO.self) {
+                return driverProfile
+                }
+            }
+        } catch {
+            throw Abort(.internalServerError, reason: "Failed to fetch driver profile from API.")
+        }
+        throw Abort(.internalServerError, reason: "Failed to fetch driver profile from API.")
 
-        return DriverProfileDTO(driverID:  req.session.data["driverID"] ?? "unknown", driverName: req.session.data["name"] ?? "Unknown Driver", driverPhone: "+263778463020", driverEmail: "waltack@example.com", driverAddress: "Victoria Falls City", registrationDate: Date(), driverLicense: "AQW5363783", vehicle_id: UUID())
     }
 
     private func fetchAvailableTrips(_ req: Request) async throws -> [TripSummaryContext] {
@@ -240,45 +264,7 @@ struct TripUIController: RouteCollection {
             req.logger.warning("Failed to fetch available trips from API: \(error)")
         }
 
-        // Fallback to mock data if API call fails or returns nil
-        return [
-            TripSummaryContext(
-                id: "mock-trip-1",
-                pickup: "Downtown Mall, Harare",
-                destination: "Robert Gabriel Mugabe International Airport",
-                distance: "15.2 km",
-                suggestedPrice: 45.00,
-                status: "driversAccepting",
-                bidAmount: nil,
-                scheduledTime: ISO8601DateFormatter().string(from: Date().addingTimeInterval(3600)),
-                date: Date().formatted(date: .abbreviated, time: .omitted),
-                amount: nil
-            ),
-            TripSummaryContext(
-                id: "mock-trip-2",
-                pickup: "Avondale Shopping Centre",
-                destination: "University of Zimbabwe",
-                distance: "8.7 km",
-                suggestedPrice: 25.00,
-                status: "driversAccepting",
-                bidAmount: nil,
-                scheduledTime: ISO8601DateFormatter().string(from: Date().addingTimeInterval(7200)),
-                date: Date().formatted(date: .abbreviated, time: .omitted),
-                amount: nil
-            ),
-            TripSummaryContext(
-                id: "mock-trip-3",
-                pickup: "Borrowdale Village",
-                destination: "CBD, First Street",
-                distance: "12.1 km",
-                suggestedPrice: 35.00,
-                status: "driversAccepting",
-                bidAmount: nil,
-                scheduledTime: ISO8601DateFormatter().string(from: Date().addingTimeInterval(10800)),
-                date: Date().formatted(date: .abbreviated, time: .omitted),
-                amount: nil
-            )
-        ]
+        return []
     }
 
     private func fetchTripDetails(_ req: Request, tripId: String) async throws -> DetailedTripContext {
@@ -287,7 +273,7 @@ struct TripUIController: RouteCollection {
             let response = try await makeAPIRequest(
                 req: req,
                 method: .GET,
-                endpoint: APIConfig.endpoints["drivers"]! + "/trips/\(tripId)",
+                endpoint: APIConfig.endpoints["drivers"]! + "/trip/\(tripId)",
                 requiresAuth: true
             )
 
@@ -310,20 +296,7 @@ struct TripUIController: RouteCollection {
         } catch {
             req.logger.warning("Failed to fetch trip details from API for trip \(tripId): \(error)")
         }
-
-        // Fallback to mock data if API call fails or returns nil
-        return DetailedTripContext(
-            id: tripId,
-            pickup: "Mock Pickup Location - Harare CBD",
-            destination: "Mock Destination - Avondale",
-            distance: "12.5 km",
-            suggestedPrice: 35.00,
-            status: "driversAccepting",
-            clientName: "Mock Client",
-            scheduledTime: ISO8601DateFormatter().string(from: Date().addingTimeInterval(3600)),
-            numberOfPassengers: 2,
-            specialInstructions: "Mock instructions: Please call client upon arrival at pickup location."
-        )
+        return DetailedTripContext(id: tripId, pickup: "", destination: "", distance: "0 km", suggestedPrice: 0.0, status: "", clientName: "No Client", scheduledTime: "--:--", numberOfPassengers: 0, specialInstructions: nil)
     }
 
     private func fetchExistingBid(_ req: Request, tripId: String, driverId: String) async throws -> BidContext? {
@@ -363,19 +336,13 @@ struct TripUIController: RouteCollection {
             let response = try await makeAPIRequest(
                 req: req,
                 method: .GET,
-                endpoint: APIConfig.endpoints["drivers"]! + "/drivers/\(driverId)/bids",
+                endpoint: APIConfig.endpoints["drivers"]! + "/\(driverId)/bids",
                 requiresAuth: true
             )
 
             if response.status == .ok {
                 if let bidsData = try? response.content.decode([BidSummaryContext].self) {
                     return bidsData.compactMap { bidData in
-                        /*guard let tripID = bidData["tripId"] as? String,
-                              let bidAmount = bidData["bidAmount"] as? Double,
-                              let status = bidData["status"] as? String,
-                              let submittedAt = bidData["submittedAt"] as? String else {
-                            return nil
-                        }*/
 
                         return BidSummaryContext(
                             tripID: bidData.tripID,
@@ -394,26 +361,7 @@ struct TripUIController: RouteCollection {
         }
 
         // Fallback to mock data if API call fails or returns nil
-        return [
-            BidSummaryContext(
-                tripID: "mock-trip-1",
-                pickup: "Mock Downtown Mall",
-                destination: "Mock Airport",
-                bidAmount: 42.00,
-                status: "pending",
-                submittedAt: "2025-01-28 12:00",
-                isApproved: false
-            ),
-            BidSummaryContext(
-                tripID: "mock-trip-2",
-                pickup: "Mock Business Center",
-                destination: "Mock University",
-                bidAmount: 28.50,
-                status: "approved",
-                submittedAt: "2025-01-27 15:30",
-                isApproved: true
-            )
-        ]
+        return []
     }
 
     private func fetchAssignedTrips(_ req: Request) async throws -> [AssignedTripContext] {
@@ -448,31 +396,8 @@ struct TripUIController: RouteCollection {
             req.logger.warning("Failed to fetch assigned trips from API: \(error)")
         }
 
-        // Fallback to mock data if API call fails or returns nil
-        return [
-            AssignedTripContext(
-                id: "mock-assigned-trip-1",
-                pickup: "Mock Business Center",
-                destination: "Mock Airport",
-                status: "paymentComplete",
-                scheduledTime: "2025-01-28 18:00",
-                clientName: "Mock Jane Client",
-                clientPhone: "+263771234567",
-                canStart: true,
-                canComplete: false
-            ),
-            AssignedTripContext(
-                id: "mock-assigned-trip-2",
-                pickup: "Mock Hotel",
-                destination: "Mock Mall",
-                status: "inProgress",
-                scheduledTime: "2025-01-28 20:00",
-                clientName: "Mock John Client",
-                clientPhone: "+263779876543",
-                canStart: false,
-                canComplete: true
-            )
-        ]
+
+        return []
     }
 
     private func fetchTripHistory(_ req: Request) async throws -> [TripSummaryContext] {
@@ -508,33 +433,8 @@ struct TripUIController: RouteCollection {
             req.logger.warning("Failed to fetch trip history from API: \(error)")
         }
 
-        // Fallback to mock data if API call fails or returns nil
-        return [
-            TripSummaryContext(
-                id: "mock-history-1",
-                pickup: "Mock City Center",
-                destination: "Mock Suburbs",
-                distance: "12 km",
-                suggestedPrice: 30.00,
-                status: "completed",
-                bidAmount: 28.00,
-                scheduledTime: "2025-01-27 10:00",
-                date: "Jan 27, 2025",
-                amount: 28.00
-            ),
-            TripSummaryContext(
-                id: "mock-history-2",
-                pickup: "Mock Airport",
-                destination: "Mock Hotel",
-                distance: "18 km",
-                suggestedPrice: 40.00,
-                status: "completed",
-                bidAmount: 38.00,
-                scheduledTime: "2025-01-26 15:30",
-                date: "Jan 26, 2025",
-                amount: 38.00
-            )
-        ]
+
+        return []
     }
 
     private func makeAPIRequest(req: Request, method: HTTPMethod, endpoint: String, body: ByteBuffer? = nil, requiresAuth: Bool = false) async throws -> ClientResponse {

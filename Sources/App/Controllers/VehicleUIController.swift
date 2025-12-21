@@ -15,7 +15,7 @@ struct VehicleUIController: RouteCollection {
         protectedRoutes.post("service-type", use: handleServiceTypeSelection)
         protectedRoutes.get("register", use: renderVehicleRegistration)
         protectedRoutes.post("register", use: handleVehicleRegistration)
-        protectedRoutes.get("confirm", use: renderVehicleConfirmation)
+     //   protectedRoutes.get("confirm", use: renderVehicleConfirmation)
         // New: List and Delete vehicles
         protectedRoutes.get("list", use: renderVehicleList)
         protectedRoutes.get(":vehicleID", "delete", use: renderDeleteConfirmation)
@@ -89,43 +89,37 @@ struct VehicleUIController: RouteCollection {
     }
 
     @Sendable func handleVehicleRegistration(_ req: Request) async throws -> Response {
-        guard let driverToken = req.session.data["driverToken"] else {
-            return req.redirect(to: "/products/gofloradriver/register")
-        }
-
-        guard let driverID = req.session.data["driverID"] else {
+        guard let driverToken = req.session.data["driverToken"],
+              let driverID = req.session.data["driverID"] else {
             return req.redirect(to: "/products/gofloradriver/register")
         }
 
         let vehicleData = try req.content.decode(VehicleRegistrationFormData.self)
 
-
-let vehicleDetails : VehicleDTO = VehicleDTO(
-    id: nil, 
-    registrationNumber: "remove this field" + UUID().uuidString,
-     licensePlateNumber: vehicleData.licensePlate,
-      make: vehicleData.make,
-       model: vehicleData.model,
-       yearOfManufacture: "\(vehicleData.year)", 
-       bodyType: "remove this field", 
-       color: vehicleData.color, 
-       engineSize: "remove this field", 
-       fuelType: "remove this field", 
-       transmissionType: "remove this field", 
-       seatingCapacity: "remove this field",
-        ownerName: "remove this field",
-         ownerAddress: "remove this field",
-          contactInformation: "remove this field",
-           insuranceDetails: "remove this field",
+        let vehicleDetails = VehicleDTO(
+            id: nil,
+            registrationNumber: "remove this field" + UUID().uuidString,
+            licensePlateNumber: vehicleData.licensePlate,
+            make: vehicleData.make,
+            model: vehicleData.model,
+            yearOfManufacture: "\(vehicleData.year)",
+            bodyType: "remove this field",
+            color: vehicleData.color,
+            engineSize: "remove this field",
+            fuelType: "remove this field",
+            transmissionType: "remove this field",
+            seatingCapacity: "remove this field",
+            ownerName: "remove this field",
+            ownerAddress: "remove this field",
+            contactInformation: "remove this field",
+            insuranceDetails: "remove this field",
             vehicleHistory: "remove this field",
-             emissionsStandards: "remove this field",
-              servicetypeId: UUID(uuidString: vehicleData.serviceTypeID)!
+            emissionsStandards: "remove this field",
+            servicetypeId: UUID(uuidString: vehicleData.serviceTypeID)!
+        )
 
-)
-let jsonData = try JSONEncoder().encode(vehicleDetails)
-let buffer = req.application.allocator.buffer(data: jsonData)
-
-        // Prepare data for VehicleController API
+        let jsonData = try JSONEncoder().encode(vehicleDetails)
+        let buffer = req.application.allocator.buffer(data: jsonData)
 
         do {
             let response = try await makeAPIRequest(
@@ -136,26 +130,21 @@ let buffer = req.application.allocator.buffer(data: jsonData)
                 driverToken: driverToken
             )
 
-            let savedVehicle: VehicleDTO = try response.content.decode(VehicleDTO.self)
-
-            if savedVehicle.id != nil {
-                // Store vehicle data in session
-                req.session.data["vehicleMake"] = savedVehicle.make
-                req.session.data["vehicleModel"] = savedVehicle.model
-                req.session.data["vehicleYear"] = savedVehicle.yearOfManufacture
-                req.session.data["vehicleLicensePlate"] = savedVehicle.licensePlateNumber
-                req.session.data["vehicleColor"] = savedVehicle.color
-                req.session.data["hasVehicle"] = "true"
-                // Mark vehicle completion flags
-                req.session.data["vehicleComplete"] = "true"
-                req.session.data["vehicleIncomplete"] = nil
-
-                return req.redirect(to: "/products/gofloradriver/vehicle/confirm")
-            } else {
-                let errorData = try response.content.decode([String: String].self)
+            // Check status code instead of decoded ID
+            guard response.status == .ok || response.status == .created else {
+                let errorData = (try? response.content.decode([String: String].self)) ?? [:]
                 let error = errorData["message"] ?? "Vehicle registration failed"
                 return req.redirect(to: "/products/gofloradriver/vehicle/register?error=\(error)")
             }
+
+            // Update session flags
+            req.session.data["hasVehicle"] = "true"
+            req.session.data["vehicleComplete"] = "true"
+            req.session.data["vehicleIncomplete"] = nil
+
+            // Redirect to vehicle list with success message
+            return req.redirect(to: "/products/gofloradriver/vehicle/list?success=Vehicle registered successfully")
+
         } catch {
             return req.redirect(to: "/products/gofloradriver/vehicle/register?error=Network error. Please try again.")
         }
@@ -207,7 +196,7 @@ let buffer = req.application.allocator.buffer(data: jsonData)
             return req.redirect(to: "/products/gofloradriver/login")
         }
 
-        let endpoint = (APIConfig.endpoints["vehicles"] ?? "urlfailed") + "/by-driver/\(driverID)"
+        let endpoint = (APIConfig.endpoints["vehicles"] ?? "urlfailed")
         do {
             let resp = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: driverToken)
             var vehicles: [VehicleDTO] = []
@@ -225,7 +214,7 @@ let buffer = req.application.allocator.buffer(data: jsonData)
             )
             return try await req.view.render("drivers/vehicle/my-vehicles", context).encodeResponse(for: req)
         } catch {
-            return req.redirect(to: "/products/gofloradriver/vehicle/list?error=Failed to load vehicles")
+            return req.redirect(to: "/products/gofloradriver/dashboard?error=Failed to load vehicles + \(error.localizedDescription)")
         }
     }
 
