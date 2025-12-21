@@ -1,49 +1,44 @@
 #extend("drivers/driversbase"):
-    #export("contentDetail"):
-        <div class="auth-container">
-            <div class="auth-header">
-                <h1>Vehicle Registration</h1>
-                <p>Welcome #(driverName)! Would you like to register your vehicle now?</p>
+    #export("content"):
+        <div style="max-width: 960px; margin: 0 auto; padding: 28px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px;">
+                <h1 style="font-size: 24px; font-weight: 700;">Vehicle Setup</h1>
+                <span style="color:#6b7280; font-size:14px;">Driver: #(driverName)</span>
             </div>
-            
-            <div class="choice-container">
-                <div class="choice-explanation">
-                    <h3>Why Register Your Vehicle?</h3>
-                    <ul class="benefits-list">
-                        <li>Start accepting trip requests immediately</li>
-                        <li>Set your service type and pricing</li>
-                        <li>Access all driver features</li>
-                        <li>Begin earning money today</li>
-                    </ul>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
+                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                        <div style="width:36px; height:36px; border-radius:10px; background:#eff6ff; display:flex; align-items:center; justify-content:center; color:#2563eb;">🚗</div>
+                        <div>
+                            <div style="font-weight:600;">Register Now</div>
+                            <div style="color:#6b7280; font-size:13px;">Quick setup to start taking trips immediately.</div>
+                        </div>
+                    </div>
+                    <form method="POST" action="/products/gofloradriver/vehicle-choice">
+                        <input type="hidden" name="registerVehicleNow" value="true">
+                        <button type="submit" style="padding:10px 14px; background:#2563eb; color:#fff; border:none; border-radius:8px; cursor:pointer;">Continue to Service Types</button>
+                    </form>
                 </div>
-                
-                <div class="choice-options">
-                    <div class="choice-card">
-                        <h4>Register Vehicle Now</h4>
-                        <p>Complete your setup and start driving today</p>
-                        <form method="POST" action="/products/gofloradriver/vehicle-choice">
-                            <input type="hidden" name="registerVehicleNow" value="true">
-                            <button type="submit" class="btn btn-primary btn-full">
-                                Yes, Register My Vehicle
-                            </button>
-                        </form>
+
+                <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
+                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                        <div style="width:36px; height:36px; border-radius:10px; background:#f5f3ff; display:flex; align-items:center; justify-content:center; color:#7c3aed;">⏳</div>
+                        <div>
+                            <div style="font-weight:600;">Do It Later</div>
+                            <div style="color:#6b7280; font-size:13px;">Skip for now; we’ll remind you on the dashboard.</div>
+                        </div>
                     </div>
-                    
-                    <div class="choice-card">
-                        <h4>Register Later</h4>
-                        <p>Complete vehicle registration when you're ready to start driving</p>
-                        <form method="POST" action="/products/gofloradriver/vehicle-choice">
-                            <input type="hidden" name="registerVehicleNow" value="false">
-                            <button type="submit" class="btn btn-secondary btn-full">
-                                I'll Register Later
-                            </button>
-                        </form>
-                    </div>
+                    <form method="POST" action="/products/gofloradriver/vehicle-choice">
+                        <input type="hidden" name="registerVehicleNow" value="false">
+                        <button type="submit" style="padding:10px 14px; background:#f3f4f6; color:#111827; border:1px solid #e5e7eb; border-radius:8px; cursor:pointer;">Skip and Continue</button>
+                    </form>
                 </div>
             </div>
-            
-            <div class="auth-footer">
-                <p><small>You can always add your vehicle later from your driver dashboard</small></p>
+
+            <div style="margin-top:20px; background:#f8fafc; border:1px solid #e5e7eb; border-radius:12px; padding:16px;">
+                <div style="font-weight:600; margin-bottom:6px;">Why vehicle setup matters</div>
+                <div style="color:#6b7280; font-size:13px;">Registering a vehicle unlocks trip bidding, instant assignments, and visibility in rider searches.</div>
             </div>
         </div>
     #endexport

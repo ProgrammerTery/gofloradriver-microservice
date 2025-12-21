@@ -1,176 +1,120 @@
 #extend("drivers/driversbase"):
-    #export("contentDetail"):
-        <div class="vehicle-container">
-            <div class="vehicle-header">
-                <h1>Vehicle Registration</h1>
-                <p>Tell us about your vehicle, #(driverName)</p>
-                #if(selectedServiceType):
-                <div class="selected-service-badge">
-                    Selected: #(selectedServiceType.name) Service
+    #export("content"):
+        <style>
+            .vr-wrap { max-width: 900px; margin: 0 auto; padding: 24px; }
+            .vr-header { display:flex; justify-content: space-between; align-items:flex-start; margin-bottom: 16px; }
+            .vr-title { font-size: 2rem; font-weight: 800; color:#111827; }
+            .vr-sub { color:#6b7280; }
+            .vr-selected { background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; box-shadow:0 6px 24px rgba(17,24,39,.06); padding:16px; margin-top:12px; }
+            .vr-selected h3 { margin:0; font-size:1.125rem; font-weight:700; color:#111827; }
+            .vr-badge { font-size:12px; color:#0f766e; background:#ccfbf1; border:1px solid #99f6e4; padding:4px 8px; border-radius:999px; }
+            .vr-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+            .vr-card { background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; box-shadow:0 6px 24px rgba(17,24,39,.06); padding:16px; }
+            .vr-group { display:flex; flex-direction:column; gap:8px; }
+            .vr-label { font-size:13px; color:#6b7280; }
+            .vr-input { padding:12px; border:1px solid #e5e7eb; border-radius:10px; font-size:14px; }
+            .vr-checklist { display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px; }
+            .vr-check { display:flex; align-items:center; gap:8px; }
+            .vr-actions { display:flex; gap:10px; margin-top:18px; }
+            .btn-primary-modern { padding:12px 14px; border-radius:10px; border:1px solid #111827; background:#111827; color:#fff; }
+            .btn-secondary-modern { padding:12px 14px; border-radius:10px; border:1px solid #e5e7eb; background:#ffffff; color:#111827; text-decoration:none; }
+            @media (max-width: 768px) { .vr-grid { grid-template-columns: 1fr; } .vr-wrap { padding: 12px; } }
+        </style>
+
+        <div class="vr-wrap">
+            <div class="vr-header">
+                <div>
+                    <div class="vr-title">Vehicle Registration</div>
+                    <div class="vr-sub">Tell us about your vehicle, #(driverName)</div>
+                    #if(selectedServiceType):
+                    <div class="vr-selected">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <h3>#(selectedServiceType.transportServiceType)</h3>
+                            <span class="vr-badge">Selected</span>
+                        </div>
+                        #if(selectedServiceType.description):
+                        <p style="color:#6b7280; margin-top:6px;">#(selectedServiceType.description)</p>
+                        #endif
+                        #if(selectedServiceType.baseFare):
+                        <div style="margin-top:6px; font-size:13px; color:#374151;">Base Fare: $#(selectedServiceType.baseFare)</div>
+                        #endif
+                    </div>
+                    #endif
                 </div>
-                #endif
             </div>
-            
+
             #if(errorMessage):
-            <div class="alert alert-error">
-                <span class="alert-icon">⚠️</span>
-                <span>#(errorMessage)</span>
-            </div>
+            <div style="padding:10px 12px; background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; border-radius:10px;">#(errorMessage)</div>
             #endif
-            
-            <form method="POST" action="/products/gofloradriver/vehicle/register" class="vehicle-form" id="vehicleForm">
-                <div class="form-section">
-                    <h3>Vehicle Information</h3>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="make">Make</label>
-                            <input type="text" 
-                                   id="make" 
-                                   name="make" 
-                                   required 
-                                   placeholder="Toyota, Honda, Ford, etc."
-                                   list="makes">
+
+            <form method="POST" action="/products/gofloradriver/vehicle/register" id="vehicleForm">
+                <div class="vr-grid">
+                    <div class="vr-card">
+                        <div class="vr-group">
+                            <label class="vr-label" for="make">Make</label>
+                            <input class="vr-input" type="text" id="make" name="make" required placeholder="Toyota, Honda, Ford, etc." list="makes">
                             <datalist id="makes">
-                                <option value="Toyota">
-                                <option value="Honda">
-                                <option value="Ford">
-                                <option value="Chevrolet">
-                                <option value="Nissan">
-                                <option value="BMW">
-                                <option value="Mercedes-Benz">
-                                <option value="Audi">
-                                <option value="Volkswagen">
-                                <option value="Hyundai">
+                                <option value="Toyota"><option value="Honda"><option value="Ford"><option value="Chevrolet"><option value="Nissan"><option value="BMW"><option value="Mercedes-Benz"><option value="Audi"><option value="Volkswagen"><option value="Hyundai">
                             </datalist>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="model">Model</label>
-                            <input type="text" 
-                                   id="model" 
-                                   name="model" 
-                                   required 
-                                   placeholder="Camry, Civic, F-150, etc.">
+                        <div class="vr-group">
+                            <label class="vr-label" for="model">Model</label>
+                            <input class="vr-input" type="text" id="model" name="model" required placeholder="Camry, Civic, F-150, etc.">
+                        </div>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div class="vr-group">
+                                <label class="vr-label" for="year">Year</label>
+                                <input class="vr-input" type="number" id="year" name="year" required min="2010" max="2025" placeholder="2020">
+                            </div>
+                            <div class="vr-group">
+                                <label class="vr-label" for="color">Color</label>
+                                <input class="vr-input" type="text" id="color" name="color" required placeholder="White, Black, Silver, etc." list="colors">
+                                <datalist id="colors">
+                                    <option value="White"><option value="Black"><option value="Silver"><option value="Gray"><option value="Blue"><option value="Red"><option value="Green"><option value="Brown">
+                                </datalist>
+                            </div>
+                        </div>
+                        <div class="vr-group">
+                            <label class="vr-label" for="licensePlate">License Plate Number</label>
+                            <input class="vr-input" type="text" id="licensePlate" name="licensePlate" required placeholder="ABC-1234" style="text-transform: uppercase;">
                         </div>
                     </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="year">Year</label>
-                            <input type="number" 
-                                   id="year" 
-                                   name="year" 
-                                   required 
-                                   min="2010" 
-                                   max="2025"
-                                   placeholder="2020">
+                    <div class="vr-card">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <i class="fas fa-clipboard-check" style="color:#16a34a;"></i>
+                            <h4 style="margin:0;">Vehicle Requirements</h4>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="color">Color</label>
-                            <input type="text" 
-                                   id="color" 
-                                   name="color" 
-                                   required 
-                                   placeholder="White, Black, Silver, etc."
-                                   list="colors">
-                            <datalist id="colors">
-                                <option value="White">
-                                <option value="Black">
-                                <option value="Silver">
-                                <option value="Gray">
-                                <option value="Blue">
-                                <option value="Red">
-                                <option value="Green">
-                                <option value="Brown">
-                            </datalist>
+                        <div class="vr-checklist">
+                            <label class="vr-check"><input type="checkbox" required><span>Vehicle is 2015 or newer</span></label>
+                            <label class="vr-check"><input type="checkbox" required><span>Vehicle has valid registration</span></label>
+                            <label class="vr-check"><input type="checkbox" required><span>Vehicle has current insurance</span></label>
+                            <label class="vr-check"><input type="checkbox" required><span>Vehicle passes safety inspection</span></label>
                         </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="licensePlate">License Plate Number</label>
-                        <input type="text" 
-                               id="licensePlate" 
-                               name="licensePlate" 
-                               required 
-                               placeholder="ABC-1234"
-                               style="text-transform: uppercase;">
                     </div>
                 </div>
-                
+
                 #if(selectedServiceType):
                 <input type="hidden" name="serviceTypeID" value="#(selectedServiceType.id)">
                 #endif
-                
-                <div class="vehicle-requirements">
-                    <h4>Vehicle Requirements</h4>
-                    <div class="requirements-checklist">
-                        <label class="checkbox-label">
-                            <input type="checkbox" required>
-                            <span class="checkmark"></span>
-                            Vehicle is 2015 or newer
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" required>
-                            <span class="checkmark"></span>
-                            Vehicle has valid registration
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" required>
-                            <span class="checkmark"></span>
-                            Vehicle has current insurance
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" required>
-                            <span class="checkmark"></span>
-                            Vehicle passes safety inspection
-                        </label>
-                    </div>
+
+                <div class="vr-actions">
+                    <button type="submit" class="btn-primary-modern">Register Vehicle</button>
+                    <a href="/products/gofloradriver/vehicle/service-type" class="btn-secondary-modern">Back to service type</a>
                 </div>
-                
-                <button type="submit" class="btn btn-primary btn-full">
-                    Register Vehicle
-                </button>
             </form>
-            
-            <div class="vehicle-footer">
-                <p><a href="/products/gofloradriver/vehicle/service-type">← Back to service type</a></p>
-            </div>
         </div>
-        
+
         <script>
             document.getElementById('vehicleForm').addEventListener('submit', function(e) {
                 const year = parseInt(document.getElementById('year').value);
                 const currentYear = new Date().getFullYear();
-                
-                if (year < 2015) {
-                    e.preventDefault();
-                    alert('Vehicle must be 2015 or newer to register for GoFlora driver service.');
-                    return false;
-                }
-                
-                if (year > currentYear + 1) {
-                    e.preventDefault();
-                    alert('Please enter a valid vehicle year.');
-                    return false;
-                }
-                
-                // Check if all requirements are checked
-                const requirements = document.querySelectorAll('.requirements-checklist input[type="checkbox"]');
-                const allChecked = Array.from(requirements).every(checkbox => checkbox.checked);
-                
-                if (!allChecked) {
-                    e.preventDefault();
-                    alert('Please confirm all vehicle requirements before proceeding.');
-                    return false;
-                }
+                if (year < 2015) { e.preventDefault(); alert('Vehicle must be 2015 or newer to register.'); return false; }
+                if (year > currentYear + 1) { e.preventDefault(); alert('Please enter a valid vehicle year.'); return false; }
+                const requirements = document.querySelectorAll('.vr-checklist input[type="checkbox"]');
+                const allChecked = Array.from(requirements).every(cb => cb.checked);
+                if (!allChecked) { e.preventDefault(); alert('Please confirm all vehicle requirements before proceeding.'); return false; }
             });
-            
-            // Auto-uppercase license plate
-            document.getElementById('licensePlate').addEventListener('input', function() {
-                this.value = this.value.toUpperCase();
-            });
+            document.getElementById('licensePlate').addEventListener('input', function() { this.value = this.value.toUpperCase(); });
         </script>
     #endexport
 #endextend

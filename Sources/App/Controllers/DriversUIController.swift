@@ -164,6 +164,9 @@ struct DriversUIController: RouteCollection {
                     req.session.data["rememberMe"] = "true"
                 }
 
+                // Post-login status sync: query API to set completeness flags
+                await postLoginSyncCompleteness(req, token: driverResponse.token, driverID: driverResponse.driverID.uuidString)
+
                 // Check if user has completed registration
                 if  !driverResponse.email.isEmpty {
                     // User has completed driver registration, go to dashboard
@@ -210,8 +213,9 @@ struct DriversUIController: RouteCollection {
     @Sendable func handleDriverRegistration(_ req: Request) async throws -> Response {
         let registrationData = try req.content.decode(DriverProfileDTO.self)
 
-
-        let jsonData = try JSONEncoder().encode(registrationData)
+        let jsonEncoder = JSONEncoder()
+        jsonEncoder.dateEncodingStrategy = .iso8601
+        let jsonData = try jsonEncoder.encode(registrationData)
         let driverData = req.application.allocator.buffer(data: jsonData)
         // Call the DriverProfilesController API for registration
         let driverToken = req.session.data["driverToken"]
@@ -220,7 +224,7 @@ struct DriversUIController: RouteCollection {
             let response = try await makeAPIRequest(
                 req: req,
                 method: .POST,
-                endpoint: APIConfig.endpoints["driver-profiles"]! + "/register",
+                endpoint: APIConfig.endpoints["gofloradriver-profiles"]! + "/create",
                 body: driverData,
                 driverToken: driverToken
             )
@@ -230,6 +234,9 @@ struct DriversUIController: RouteCollection {
                 req.session.data["driverID"] = registrationData.driverID
                 req.session.data["name"] = registrationData.driverName
                 req.session.data["email"] = registrationData.driverEmail
+                // Mark profile as complete
+                req.session.data["profileComplete"] = "true"
+                req.session.data["profileIncomplete"] = nil
 
                 return req.redirect(to: "/products/gofloradriver/vehicle-choice")
             } else {
@@ -265,6 +272,9 @@ struct DriversUIController: RouteCollection {
         if choiceData.registerVehicleNow {
             return req.redirect(to: "/products/gofloradriver/vehicle/service-type")
         } else {
+            // Mark vehicle as incomplete for reminders
+            req.session.data["vehicleIncomplete"] = "true"
+            req.session.data["vehicleComplete"] = nil
             return req.redirect(to: "/products/gofloradriver/success")
         }
     }
@@ -299,12 +309,12 @@ struct DriversUIController: RouteCollection {
         // Store minimal driver info if not already present
         if req.session.data["driverID"] == nil {
             req.session.data["driverID"] = UUID().uuidString
-            req.session.data["name"] = "Driver \(Int.random(in: 1000...9999))"
+            req.session.data["name"] = req.session.data["name"] ?? "Temp Driver"
             req.session.data["email"] = req.session.data["email"] ?? "temp@example.com"
         }
 
         // Redirect to dashboard with incomplete profile flag
-        return req.redirect(to: "/products/gofloradriver/dashboard")
+        return req.redirect(to: "/products/gofloradriver/dashboard?reminder=complete-profile")
     }
 
     // MARK: - Protected Routes
@@ -315,7 +325,8 @@ struct DriversUIController: RouteCollection {
         let recentTrips = try await fetchRecentTrips(req)
 
         // Check if profile is incomplete (from skip registration)
-        let profileIncomplete = req.session.data["profileIncomplete"] == "true"
+        let profileIncomplete = req.session.data["profileIncomplete"] == "true" || req.session.data["profileComplete"] != "true"
+        let vehicleIncomplete = req.session.data["vehicleIncomplete"] == "true" || req.session.data["vehicleComplete"] != "true"
 
         let context = DriversDashboardPageContext(
             title: "Driver Dashboard",
@@ -323,7 +334,8 @@ struct DriversUIController: RouteCollection {
             driver: driverProfile,
             stats: stats,
             recentTrips: recentTrips,
-            profileIncomplete: profileIncomplete
+            profileIncomplete: profileIncomplete,
+            vehicleIncomplete: vehicleIncomplete
         )
         return try await req.view.render("drivers/dashboard/dashboard", context)
     }
@@ -381,6 +393,9 @@ struct DriversUIController: RouteCollection {
                 // Update session data with new values
                 req.session.data["name"] = updateData.driverName
                 req.session.data["email"] = updateData.driverEmail
+                // Mark profile completion flags so dashboard reminders disappear
+                req.session.data["profileComplete"] = "true"
+                req.session.data["profileIncomplete"] = nil
 
                 return req.redirect(to: "/products/gofloradriver/profile?success=Profile updated successfully")
             } else {
@@ -417,78 +432,124 @@ struct DriversUIController: RouteCollection {
         return try await req.client.send(clientRequest)
     }
 
-    private func fetchDriverProfile(_ req: Request) async throws -> DriverProfileDTO {
-        // Mock data - in real implementation, call API with session token
-        return DriverProfileDTO(driverID:  req.session.data["driverID"] ?? "unknown", driverName: req.session.data["name"] ?? "Unknown Driver", driverPhone: "+263778463020", driverEmail: "waltack@example.com", driverAddress: "Victoria Falls City", registrationDate: Date(), driverLicense: "AQW5363783", vehicle_id: UUID())
+    // After login, query profile & vehicle APIs to set completeness flags
+    private func postLoginSyncCompleteness(_ req: Request, token: String, driverID: String) async {
+        // Profile completeness
+        if let isProfileComplete = await fetchProfileCompleteness(req, token: token) {
+            if isProfileComplete {
+                req.session.data["profileComplete"] = "true"
+                req.session.data["profileIncomplete"] = nil
+            } else {
+                req.session.data["profileIncomplete"] = "true"
+                req.session.data["profileComplete"] = nil
+            }
+        }
+
+        // Vehicle completeness
+        if let hasVehicle = await fetchVehicleExists(req, driverID: driverID, token: token) {
+            if hasVehicle {
+                req.session.data["vehicleComplete"] = "true"
+                req.session.data["vehicleIncomplete"] = nil
+                req.session.data["hasVehicle"] = "true"
+            } else {
+                req.session.data["vehicleIncomplete"] = "true"
+                req.session.data["vehicleComplete"] = nil
+                req.session.data["hasVehicle"] = nil
+            }
+        }
     }
 
-    private func fetchDriverStats(_ req: Request) async throws -> DriversDriverStatsContext {
-        // In a real implementation, these would come from API calls
-        return DriversDriverStatsContext(
-            totalEarnings: "4250.00",
-            totalTrips: "125",
-            averageRating: "4.9",
-            thisWeekTrips: "8",
-            activeBids: "3",
-            assignedTrips: "2",
-            earningsToday: "145.50",
-            completedTrips: "123",
-            successRate: "98",
-            weeklyTrips: "8",
-            weeklyEarnings: "580.00",
-            weeklyHours: "24",
-            availableTrips: "12",
-            // Revenue Trajectory Properties
-            monthlyEarnings: "3450.00",
-            monthlyGrowth: "18",
-            monthlyGoal: "3000.00",
-            goalProgress: "115",
-            goalExceeded: "25",
-            avgTripEarnings: "32",
-            daysLeft: "6"
+    // Returns true if profile appears complete, false if incomplete, nil on error
+    private func fetchProfileCompleteness(_ req: Request, token: String) async -> Bool? {
+        let base = APIConfig.endpoints["gofloradriver-profiles"] ?? "urlfailed"
+        let endpoint = base + "/me"
+        do {
+            let resp = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: token)
+            if resp.status == .ok {
+                let profile = try resp.content.decode(DriverProfileDTO.self)
+                let nameOk = !profile.driverName.isEmpty
+                let emailOk = !profile.driverEmail.isEmpty
+                // License can be optional during onboarding; rely on name+email
+                return nameOk && emailOk
+            } else if resp.status == .notFound {
+                return false
+            } else {
+                return nil
+            }
+        } catch {
+            return nil
+        }
+    }
+
+    // Returns true if a vehicle exists, false if none, nil on error
+    private func fetchVehicleExists(_ req: Request, driverID: String, token: String) async -> Bool? {
+        let base = APIConfig.endpoints["vehicles"] ?? "urlfailed"
+        let endpoint = base + "/\(driverID)" + "/checkvehiclestatus"
+        do {
+            let resp = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: token)
+            if resp.status == .ok {
+                return true
+            } else if resp.status == .notFound {
+                return false
+            } else {
+                return nil
+            }
+        } catch {
+            return nil
+        }
+    }
+
+    private func fetchDriverProfile(_ req: Request) async throws -> DriverProfileDTO {
+        let driverToken = req.session.data["driverToken"]
+        let response = try await makeAPIRequest(
+            req: req,
+            method: .GET,
+            endpoint: APIConfig.endpoints["gofloradriver-profiles"]! + "/me",
+            driverToken: driverToken
         )
+
+        if response.status == .ok {
+            let driverProfile = try response.content.decode(DriverProfileDTO.self)
+            return driverProfile
+        } else {
+            throw Abort(.unauthorized, reason: "Failed to fetch driver profile")
+        }
+    }
+        
+
+    private func fetchDriverStats(_ req: Request) async throws -> DriversDriverStatsContext {
+        // In a real implementation,
+        let driverToken = req.session.data["driverToken"]
+        let response = try await makeAPIRequest(
+            req: req,
+            method: .GET,
+            endpoint: APIConfig.endpoints["gofloradrivers"]! + "/stats",
+            driverToken: driverToken
+        )   
+        if response.status == .ok {
+            let stats = try response.content.decode(DriversDriverStatsContext.self)
+            return stats
+        } else {
+            throw Abort(.unauthorized, reason: "Failed to fetch driver stats")
+            /**/
+        }   
     }
 
     private func fetchRecentTrips(_ req: Request) async throws -> [DriversTripSummaryContext] {
         // In a real implementation, this would come from API calls
-        return [
-            DriversTripSummaryContext(
-                id: "trip-001",
-                pickup: "Downtown Mall",
-                destination: "Airport Terminal 1",
-                distance: "15.2 miles",
-                suggestedPrice: 45.00,
-                status: "completed",
-                bidAmount: 42.00,
-                scheduledTime: "2025-01-28 14:30",
-                date: "Jan 28, 2025",
-                amount: "42.00"
-            ),
-            DriversTripSummaryContext(
-                id: "trip-002",
-                pickup: "Business District",
-                destination: "Hotel Plaza",
-                distance: "8.5 miles",
-                suggestedPrice: 25.00,
-                status: "completed",
-                bidAmount: 28.00,
-                scheduledTime: "2025-01-28 16:00",
-                date: "Jan 28, 2025",
-                amount: "28.00"
-            ),
-            DriversTripSummaryContext(
-                id: "trip-003",
-                pickup: "Train Station",
-                destination: "University Campus",
-                distance: "12.1 miles",
-                suggestedPrice: 35.00,
-                status: "completed",
-                bidAmount: 35.00,
-                scheduledTime: "2025-01-27 09:15",
-                date: "Jan 27, 2025",
-                amount: "35.00"
-            )
-        ]
+        let driverToken = req.session.data["driverToken"]
+        let response = try await makeAPIRequest(
+            req: req,
+            method: .GET,
+            endpoint: APIConfig.endpoints["gofloradrivers"]! + "/recenttrips",
+            driverToken: driverToken
+        )
+        if response.status == .ok {
+            let trips = try response.content.decode([DriversTripSummaryContext].self)
+            return trips
+        } else {    
+            throw Abort(.unauthorized, reason: "Failed to fetch recent trips")
+        }       
     }
 }
 

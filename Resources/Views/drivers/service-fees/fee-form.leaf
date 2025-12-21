@@ -1,0 +1,46 @@
+#extend("drivers/driversbase"):
+    #export("content"):
+        <div class="trips-dashboard-section">
+            <h1>#if(isEdit):Edit Service Fee#else:Create Service Fee#endif</h1>
+            #if(errorMessage):<div class="alert alert-error">#(errorMessage)</div>#endif
+            <form method="post" action="#if(isEdit):/products/gofloradriver/service-fees/#if(fee.id):#(fee.id)#endif#else:/products/gofloradriver/service-fees/create#endif" class="trips-form">
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <select name="paymentMethodId" required>
+                        #for(method in paymentMethods):
+                            <option value="#if(method.id):#(method.id)#endif" #if(fee):#if(fee.paymentMethodId == method.id):selected#endif#endif>#(method.name)</option>
+                        #endfor
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Method Type</label>
+                    <input type="text" name="methodType" value="#if(fee):#(fee.methodType)#endif" required>
+                </div>
+                <div class="form-group">
+                    <label>Currency</label>
+                    <select name="currency" required>
+                        #for(curr in currencies):
+                            <option value="#(curr)" #if(fee):#if(fee.currency == curr):selected#endif#endif>#(curr)</option>
+                        #endfor
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fee Amount</label>
+                    <input type="number" name="feeAmount" min="0.01" step="0.01" value="#if(fee):#(fee.feeAmount)#endif" required>
+                </div>
+                <div class="form-group">
+                    <label>Priority <i class="fas fa-info-circle" title="Priority determines which service fee applies when multiple fees match. Higher numbers take precedence."></i></label>
+                    <input type="number" name="priority" min="1" value="#if(fee):#(fee.priority)#else:1#endif" required>
+                </div>
+                <div class="form-group">
+                    <label>Active</label>
+                    <input type="checkbox" name="isActive" #if(fee):#if(fee.isActive):checked#endif#else:checked#endif>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="trips-btn-primary">#if(isEdit):Update Fee#else:Create Fee#endif</button>
+                    <a href="/products/gofloradriver/service-fees/my-fees" class="trips-btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    #endexport
+#endextend

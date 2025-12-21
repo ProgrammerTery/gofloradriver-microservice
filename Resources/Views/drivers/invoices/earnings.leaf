@@ -1,0 +1,70 @@
+#extend("drivers/driversbase"):
+    #export("content"):
+        <div class="trips-dashboard-section">
+            <h1>Earnings Report</h1>
+            <form method="get" action="/products/gofloradriver/invoices/earnings" class="trips-form" style="margin-bottom:2rem;">
+                <label for="periodSelect">Period:</label>
+                <select id="periodSelect" name="period">
+                    #for(option in periodOptions):
+                        <option value="#(option.value)" #if(option.value == selectedPeriod):selected#endif>#(option.label)</option>
+                    #endfor
+                </select>
+                #if(selectedPeriod == "custom"):
+                    <input type="date" name="from" value="#if(report):#(report.period.from)#endif">
+                    <input type="date" name="to" value="#if(report):#(report.period.to)#endif">
+                #endif
+                <button type="submit" class="trips-btn-primary">Apply</button>
+            </form>
+            #if(report):
+                <div class="trips-stats-grid">
+                    <div class="trips-stat-card">
+                        <div class="trips-stat-label">Total Earnings</div>
+                        <div class="trips-stat-value">$#(report.summary.totalEarnings)</div>
+                    </div>
+                    <div class="trips-stat-card">
+                        <div class="trips-stat-label">Driver Fees</div>
+                        <div class="trips-stat-value">$#(report.summary.totalDriverFees)</div>
+                    </div>
+                    <div class="trips-stat-card">
+                        <div class="trips-stat-label">Platform Fees</div>
+                        <div class="trips-stat-value">$#(report.summary.totalPlatformFees)</div>
+                    </div>
+                    <div class="trips-stat-card">
+                        <div class="trips-stat-label">Base Fares</div>
+                        <div class="trips-stat-value">$#(report.summary.totalBaseFares)</div>
+                    </div>
+                    <div class="trips-stat-card">
+                        <div class="trips-stat-label">Invoices</div>
+                        <div class="trips-stat-value">#(report.summary.invoiceCount)</div>
+                    </div>
+                </div>
+                <h2>Currency Breakdown</h2>
+                <table class="trips-table">
+                    <thead>
+                        <tr>
+                            <th>Currency</th>
+                            <th>Count</th>
+                            <th>Driver Fees</th>
+                            <th>Total Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        #for(curr in currencyEarnings):
+                            <tr>
+                                <td>#(curr.currency)</td>
+                                <td>#(curr.earnings.count)</td>
+                                <td>$#(curr.earnings.driverFees)</td>
+                                <td>$#(curr.earnings.totalAmount)</td>
+                            </tr>
+                        #endfor
+                    </tbody>
+                </table>
+                <div style="margin-top:2rem;">
+                    <button type="button" class="trips-btn-secondary">Export CSV</button>
+                </div>
+            #else:
+                <div class="empty-state">No earnings data for selected period.</div>
+            #endif
+        </div>
+    #endexport
+#endextend

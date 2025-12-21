@@ -1,10 +1,16 @@
 #extend("drivers/driversbase"):
-    #export("contentDetail"):
+    #export("title", "Driver Registration")
+    #export("pageType", "auth")
+    #export("content"):
         <div class="auth-container">
-            <div class="auth-header">
-                <h1>Driver Registration</h1>
-                <p>Complete your driver profile to start earning</p>
-            </div>
+            <div class="auth-card">
+                <div class="auth-header">
+                    <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25);">
+                        <i class="fas fa-id-card" style="font-size: 2rem; color: white;"></i>
+                    </div>
+                    <h1>Complete Driver Profile</h1>
+                    <p>Provide license and contact details to activate</p>
+                </div>
             
             #if(errorMessage):
             <div class="alert alert-error">
@@ -12,6 +18,7 @@
                 <span>#(errorMessage)</span>
             </div>
             #endif
+           
             
             <form method="POST" action="/products/gofloradriver/register" class="auth-form" id="driverRegistrationForm">
                 <div class="form-section">
@@ -30,29 +37,33 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="driverName">Full Name</label>
+                            <label class="form-label" for="driverName">Full Name</label>
                             <input type="text" 
+                                   class="form-control"
                                    id="driverName" 
                                    name="driverName" 
                                    required
                                    #if(prefillData):
                                    value="#(prefillData.driverName)"
                                    #endif
-                                   placeholder="Walter Vector">
+                                   placeholder="Walter Vector" readonly>
+                            <small style="display:block;margin-top:6px;color:var(--text-muted);font-size:.8125rem;">Managed by your account</small>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="driverEmail">Email Address</label>
+                            <label class="form-label" for="driverEmail">Email Address</label>
                             <input type="email" 
+                                   class="form-control"
                                    id="driverEmail" 
                                    name="driverEmail" 
                                    required 
                                    #if(prefillData):
                                    value="#(prefillData.driverEmail)"
                                    #endif
-                                   placeholder="your@email.com">
+                                   placeholder="your@email.com" readonly>
+                            <small style="display:block;margin-top:6px;color:var(--text-muted);font-size:.8125rem;">Managed by your account</small>
                         </div>
                         
                         <div class="form-group">
@@ -99,31 +110,51 @@
 </div>
                 </div>
                 
-                <button type="submit" class="btn btn-primary btn-full">
-                    Complete Registration
-                </button>
+                <div class="form-actions" style="display:flex; gap:12px; flex-wrap:wrap; margin-top: 1rem;">
+                    <button type="submit" class="btn btn-primary btn-full" style="flex:1; min-width:240px;">
+                        <i class="fas fa-check-circle"></i>
+                        Complete Registration
+                    </button>
+                    <button type="submit" formaction="/products/gofloradriver/register/skip" formnovalidate class="btn btn-outline btn-full" style="flex:1; min-width:240px;">
+                        <i class="fas fa-forward"></i>
+                        Skip for now
+                    </button>
+                </div>
+                <p class="muted" style="margin-top:.5rem; font-size:.875rem; color: var(--text-muted);">You can complete the registration later from your dashboard.</p>
             </form>
             
             <div class="auth-footer">
-                <p><a href="/products/gofloradriver/signup">← Back to signup</a></p>
+                <p style="margin-bottom: 0.5rem;">Need to change account details? <a href="/products/gofloradriver/login" style="color: var(--primary); font-weight: 600; text-decoration: none;">Go to Account</a></p>
+                <a href="/products/gofloradriver/landing" class="btn btn-outline btn-full" style="margin-top: 1rem;">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Home
+                </a>
             </div>
         </div>
         
         <script>
-            document.getElementById('driverRegistrationForm').addEventListener('submit', function(e) {
+            const formEl = document.getElementById('driverRegistrationForm');
+            formEl.addEventListener('submit', function(e) {
+                const submitter = e.submitter; // the button used to submit
+                const isSkip = submitter && submitter.getAttribute('formaction') === '/products/gofloradriver/register/skip';
+                if (isSkip) {
+                    // Bypass custom validation entirely for skip
+                    return true;
+                }
+
                 const driverID = document.getElementById('driverID').value;
                 const driverName = document.getElementById('driverName').value;
                 const driverEmail = document.getElementById('driverEmail').value;
                 const driverPhone = document.getElementById('driverPhone').value;
                 const driverLicense = document.getElementById('driverLicense').value;
-                
+
                 // Basic validation
                 if (!driverID || !driverName || !driverEmail || !driverPhone || !driverLicense) {
                     e.preventDefault();
                     alert('Please fill in all required fields.');
                     return false;
                 }
-                
+
                 // Driver ID validation
                 if (!/^[A-Za-z0-9_-]+$/.test(driverID)) {
                     e.preventDefault();
@@ -132,5 +163,19 @@
                 }
             });
         </script>
+        <style>
+            input[readonly], textarea[readonly] {
+                background-color: #f3f4f6; /* gray-100 */
+                color: #6b7280; /* gray-500 */
+                cursor: not-allowed;
+                border-color: #d1d5db; /* gray-300 */
+            }
+            .form-group input[readonly] + .hint,
+            .field input[readonly] + .hint {
+                color: #6b7280;
+                font-size: 12px;
+                margin-top: 4px;
+            }
+        </style>
     #endexport
 #endextend

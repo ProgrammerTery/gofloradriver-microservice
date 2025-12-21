@@ -460,37 +460,67 @@
                         <i class="fas fa-home"></i>
                         <span>Dashboard</span>
                     </a>
-                    <a href="/products/gofloradriver/assigned" class="nav-link #if(pageType == "trips"):active#endif">
-                        <i class="fas fa-clipboard-list"></i>
-                        <span>Accepted Trips</span>
-                    </a>
                     <a href="/products/gofloradriver/trips" class="nav-link">
                         <i class="fas fa-route"></i>
                         <span>Trips</span>
                     </a>
-                    <a href="/products/gofloradriver/bids" class="nav-link">
-                        <i class="fas fa-gavel"></i>
-                        <span>Bids</span>
-                    </a>
-                    <a href="/products/gofloradriver/history" class="nav-link">
-                        <i class="fas fa-history"></i>
-                        <span>History</span>
-                    </a>
+                    <div class="nav-link" id="tripMgmtMenu" style="position: relative;">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Trip Management</span>
+                        <i class="fas fa-chevron-down" style="margin-left: 6px; font-size: 0.8rem;"></i>
+                        <div id="tripMgmtDropdown" style="display:none; position: absolute; top: 44px; left: 0; background: #ffffff; border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-md); min-width: 220px; padding: 8px 0; z-index: 1001;">
+                            <a href="/products/gofloradriver/assigned" class="nav-link" style="display:block; padding: 10px 12px;">
+                                <i class="fas fa-clipboard-list"></i>
+                                <span>Accepted Trips</span>
+                            </a>
+                            <a href="/products/gofloradriver/bids" class="nav-link" style="display:block; padding: 10px 12px;">
+                                <i class="fas fa-gavel"></i>
+                                <span>Bids</span>
+                            </a>
+                            <a href="/products/gofloradriver/history" class="nav-link" style="display:block; padding: 10px 12px;">
+                                <i class="fas fa-history"></i>
+                                <span>History</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Billing & Cost Dropdown (cash icon) -->
+                    <div class="nav-link" id="billingMenu" style="position: relative;">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Billing &amp; Cost</span>
+                        <i class="fas fa-chevron-down" style="margin-left: 6px; font-size: 0.8rem;"></i>
+                        <div id="billingDropdown" style="display:none; position: absolute; top: 44px; left: 0; background: #ffffff; border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-md); min-width: 220px; padding: 8px 0; z-index: 1001;">
+                            <a href="/products/gofloradriver/invoices" class="nav-link" style="display:block; padding: 10px 12px;">
+                                <i class="fas fa-file-invoice"></i>
+                                <span>View Invoices</span>
+                            </a>
+                            <a href="/products/gofloradriver/service-fees/my-fees" class="nav-link" style="display:block; padding: 10px 12px;">
+                                <i class="fas fa-percent"></i>
+                                <span>Manage Service Fees</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Settings Dropdown (profile + logout) -->
+                    <div class="nav-link" id="settingsMenu" style="position: relative;">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                        <i class="fas fa-chevron-down" style="margin-left: 6px; font-size: 0.8rem;"></i>
+                        <div id="settingsDropdown" style="display:none; position: absolute; top: 44px; left: 0; background: #ffffff; border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-md); min-width: 220px; padding: 8px 0; z-index: 1001;">
+                            <a href="/products/gofloradriver/profile" class="nav-link" style="display:block; padding: 10px 12px;">
+                                <i class="fas fa-user"></i>
+                                <span>Profile</span>
+                            </a>
+                            <a href="/products/gofloradriver/logout" class="nav-link" style="display:block; padding: 10px 12px;">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
 
                 </nav>
                 
-                <div class="header-actions">
-                    <a href="/products/gofloradriver/profile" class="nav-link">
-                    <div class="user-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <span>Profile</span>
-                    </a>
-                    <a href="/products/gofloradriver/logout" class="nav-link">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
-                    </a>
-                </div>
+              
             </div>
         </header>
         #endif
@@ -526,6 +556,19 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+                        // Trip Management dropdown toggle
+                        const tripMenu = document.getElementById('tripMgmtMenu');
+                        const tripDropdown = document.getElementById('tripMgmtDropdown');
+                        if (tripMenu && tripDropdown) {
+                            tripMenu.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                const isOpen = tripDropdown.style.display === 'block';
+                                tripDropdown.style.display = isOpen ? 'none' : 'block';
+                            });
+                            document.addEventListener('click', function() {
+                                tripDropdown.style.display = 'none';
+                            });
+                        }
             // Auto-hide alerts
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach(alert => {
@@ -534,6 +577,34 @@
                     setTimeout(() => alert.remove(), 300);
                 }, 5000);
             });
+
+            // Billing dropdown toggle
+            const billingMenu = document.getElementById('billingMenu');
+            const billingDropdown = document.getElementById('billingDropdown');
+            if (billingMenu && billingDropdown) {
+                billingMenu.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isOpen = billingDropdown.style.display === 'block';
+                    billingDropdown.style.display = isOpen ? 'none' : 'block';
+                });
+                document.addEventListener('click', function() {
+                    billingDropdown.style.display = 'none';
+                });
+            }
+
+            // Settings dropdown toggle
+            const settingsMenu = document.getElementById('settingsMenu');
+            const settingsDropdown = document.getElementById('settingsDropdown');
+            if (settingsMenu && settingsDropdown) {
+                settingsMenu.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isOpen = settingsDropdown.style.display === 'block';
+                    settingsDropdown.style.display = isOpen ? 'none' : 'block';
+                });
+                document.addEventListener('click', function() {
+                    settingsDropdown.style.display = 'none';
+                });
+            }
         });
         
         #import("scripts")

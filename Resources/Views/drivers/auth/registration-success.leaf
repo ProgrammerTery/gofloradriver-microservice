@@ -1,90 +1,63 @@
 #extend("drivers/driversbase"):
-    #export("contentDetail"):
-        <div class="auth-container">
-            <div class="auth-header">
-                <h1>Registration Successful!</h1>
-                <p>Welcome to GoFlora, #(driverName)!</p>
-            </div>
-            
-            <div class="success-content">
-                <div class="success-icon">
-                    <span>✅</span>
+    #export("content"):
+        <div style="max-width: 960px; margin: 0 auto; padding: 28px;">
+            <div style="background:linear-gradient(135deg,#ecfdf5,#eff6ff); border:1px solid #e5e7eb; border-radius:16px; padding:24px; display:flex; align-items:center; gap:16px; margin-bottom:20px;">
+                <div style="width:48px; height:48px; border-radius:12px; background:#10b981; color:white; display:flex; align-items:center; justify-content:center; font-size:24px;">✓</div>
+                <div>
+                    <div style="font-size:22px; font-weight:700;">Registration Successful</div>
+                    <div style="color:#374151;">Welcome to GoFlora, #(driverName)!</div>
                 </div>
-                
-                <div class="success-message">
+            </div>
+
+            <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
+                #if(hasVehicle):
+                    <h3 style="margin:0 0 8px 0;">You're all set!</h3>
+                    <p style="color:#6b7280;">Your driver account and vehicle are ready. Start browsing trips and earning.</p>
+                #else:
+                    <h3 style="margin:0 0 8px 0;">Almost there</h3>
+                    <p style="color:#6b7280;">To accept trips, register your vehicle and choose a service type.</p>
+                #endif
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top:16px;">
                     #if(hasVehicle):
-                        <h3>Your driver account and vehicle have been successfully registered!</h3>
-                        <p>You're all set to start accepting trip requests and earning money with GoFlora.</p>
+                        <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:12px;">
+                            <span style="color:#10b981; font-weight:600;">✓</span> Driver account created
+                        </div>
+                        <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:12px;">
+                            <span style="color:#10b981; font-weight:600;">✓</span> Vehicle registered
+                        </div>
+                        <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:12px;">
+                            <span style="color:#2563eb; font-weight:600;">→</span> Browse available trips
+                        </div>
                     #else:
-                        <h3>Your driver account has been successfully created!</h3>
-                        <p>To start accepting trips, you'll need to register your vehicle and choose a service type.</p>
+                        <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:12px;">
+                            <span style="color:#10b981; font-weight:600;">✓</span> Driver account created
+                        </div>
+                        <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:12px;">
+                            <span style="color:#111827; font-weight:600;">1</span> Register your vehicle
+                        </div>
+                        <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:12px;">
+                            <span style="color:#111827; font-weight:600;">2</span> Choose service type
+                        </div>
                     #endif
                 </div>
-                
-                <div class="next-steps">
-                    <h4>What's Next?</h4>
-                    <div class="steps-list">
-                        #if(hasVehicle):
-                            <div class="step completed">
-                                <span class="step-icon">✓</span>
-                                <span>Driver account created</span>
-                            </div>
-                            <div class="step completed">
-                                <span class="step-icon">✓</span>
-                                <span>Vehicle registered</span>
-                            </div>
-                            <div class="step">
-                                <span class="step-icon">→</span>
-                                <span>Start browsing available trips</span>
-                            </div>
-                        #else:
-                            <div class="step completed">
-                                <span class="step-icon">✓</span>
-                                <span>Driver account created</span>
-                            </div>
-                            <div class="step">
-                                <span class="step-icon">1</span>
-                                <span>Register your vehicle</span>
-                            </div>
-                            <div class="step">
-                                <span class="step-icon">2</span>
-                                <span>Choose service type</span>
-                            </div>
-                            <div class="step">
-                                <span class="step-icon">3</span>
-                                <span>Start earning</span>
-                            </div>
-                        #endif
-                    </div>
-                </div>
-                
-                <div class="success-actions">
-                    <a href="#(nextStepURL)" class="btn btn-primary btn-large">
-                        #if(hasVehicle):
-                            Go to Dashboard
-                        #else:
-                            Register Vehicle
-                        #endif
-                    </a>
-                    
+
+                <div style="display:flex; gap:12px; margin-top:16px;">
+                    <a href="#(nextStepURL)" style="padding:10px 14px; background:#2563eb; color:#fff; border:none; border-radius:8px; text-decoration:none;">#if(hasVehicle): Go to Dashboard #else: Register Vehicle #endif</a>
                     #if(hasVehicle):
-                        <a href="/products/gofloradriver/trips" class="btn btn-secondary">
-                            Browse Available Trips
-                        </a>
+                        <a href="/products/gofloradriver/trips" style="padding:10px 14px; background:#f3f4f6; color:#111827; border:1px solid #e5e7eb; border-radius:8px; text-decoration:none;">Browse Trips</a>
                     #else:
-                        <a href="/products/gofloradriver/dashboard" class="btn btn-secondary">
-                            Explore Dashboard
-                        </a>
+                        <a href="/products/gofloradriver/dashboard" style="padding:10px 14px; background:#f3f4f6; color:#111827; border:1px solid #e5e7eb; border-radius:8px; text-decoration:none;">Explore Dashboard</a>
                     #endif
                 </div>
             </div>
-            
-            <div class="welcome-info">
-                <h4>Getting Started Tips</h4>
-                <ul class="tips-list">
+
+            <div style="margin-top:20px; background:#f8fafc; border:1px solid #e5e7eb; border-radius:12px; padding:16px;">
+                <div style="font-weight:600; margin-bottom:6px;">Getting Started Tips</div>
+                <ul style="color:#6b7280; font-size:13px; margin:0; padding-left:18px;">
                     <li>Complete your profile for better trip opportunities</li>
                     <li>Check available trips in your area</li>
-                    <li>Set competitive bid prices to win more trips</li>
+                    <li>Set competitive prices to win more trips</li>
                     <li>Maintain high ratings for consistent bookings</li>
                 </ul>
             </div>

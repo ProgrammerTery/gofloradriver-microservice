@@ -1,0 +1,89 @@
+#extend("drivers/driversbase"):
+    #export("content"):
+        <div class="trips-dashboard-section" style="max-width: 900px; margin: 0 auto;">
+            <h1 style="text-align:center;">My Invoices</h1>
+            <div style="margin-bottom:8px;">
+                <a href="/products/gofloradriver/invoices/stats" class="trips-btn-secondary">View Invoices Stats →</a>
+            </div>
+            <!-- Tabs -->
+            <div class="tabs">
+                <a href="?filter=all&page=1" #if(filter == "all"):class="active"#endif>All</a>
+
+                <a href="?filter=pending&page=1" #if(filter == "pending"):class="active"#endif>Pending</a>
+                
+                <a href="?filter=paid&page=1" #if(filter == "paid"):class="active"#endif>Paid</a>
+            </div>
+            <!-- Stats Cards -->
+            <div class="trips-stats-grid">
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Total Amount</div>
+                    <div class="trips-stat-value">$#if(totalAmount):#(totalAmount)#else:0.00#endif</div>
+                </div>
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Paid Amount</div>
+                    <div class="trips-stat-value">$#if(paidAmount):#(paidAmount)#else:0.00#endif</div>
+                </div>
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Pending Amount</div>
+                    <div class="trips-stat-value">$#if(pendingAmount):#(pendingAmount)#else:0.00#endif</div>
+                </div>
+            </div>
+            <!-- Alerts -->
+            #if(successMessage):<div class="alert alert-success">#(successMessage)</div>#endif
+            #if(errorMessage):<div class="alert alert-error">#(errorMessage)</div>#endif
+            <!-- Table -->
+            #if(count(invoices) > 0):
+                <div style="display:flex; flex-direction:column; gap:12px; align-items:center;">
+                    #for(invoice in invoices):
+                        <div style="width: 680px; background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:16px; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
+                            <div style="text-align:center; margin-bottom:10px;">
+                                <div style="font-weight:700; font-size:16px; letter-spacing:1px;">GoFlora Transport</div>
+                                <div style="color:#6b7280; font-size:12px;">Invoice Receipt</div>
+                            </div>
+                            <div style="border-top:1px dashed #d1d5db; margin:8px 0;"></div>
+                            <div style="display:flex; justify-content:space-between; font-size:13px;">
+                                <div><strong>ID:</strong> #if(invoice.id):#(invoice.id)#else:N/A#endif</div>
+                                <div><strong>Date:</strong> #if(invoice.createdAt):#(invoice.createdAt)#else:N/A#endif</div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:13px; margin-top:6px;">
+                                <div><strong>From:</strong> #if(invoice.tripPickupLocation):#(invoice.tripPickupLocation)#else:N/A#endif</div>
+                                <div><strong>To:</strong> #if(invoice.tripDropoffLocation):#(invoice.tripDropoffLocation)#else:N/A#endif</div>
+                            </div>
+                            <div style="border-top:1px dashed #d1d5db; margin:8px 0;"></div>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; font-size:13px;">
+                                <div><strong>Base Fare:</strong> $#if(invoice.baseFare):#(invoice.baseFare)#else:0.00#endif</div>
+                                <div><strong>Driver Fee:</strong> $#if(invoice.driverServiceFee):#(invoice.driverServiceFee)#else:0.00#endif</div>
+                                <div><strong>Platform Fee:</strong> $#if(invoice.platformFee):#(invoice.platformFee)#else:0.00#endif</div>
+                                <div><strong>Payment Method:</strong> #if(invoice.method):#(invoice.method)#else:N/A#endif</div>
+                            </div>
+                            <div style="border-top:1px dashed #d1d5db; margin:8px 0;"></div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div><strong>Status:</strong> <span class="trips-badge #if(invoice.status == "paid"):completed#else:pending#endif">#(invoice.status)</span></div>
+                                <div style="font-weight:700;">Total: $#if(invoice.amount):#(invoice.amount)#else:0.00#endif</div>
+                            </div>
+                            <div style="text-align:center; color:#9ca3af; font-size:12px; margin-top:8px;">Thank you for driving with GoFlora</div>
+                            <div style="text-align:center; margin-top:10px;">
+                                <a href="/products/gofloradriver/invoices/#if(invoice.id):#(invoice.id)#endif" class="trips-btn-secondary">View Details</a>
+                            </div>
+                        </div>
+                    #endfor
+                </div>
+            #else:
+                <div style="background:#f8fafc; border:1px dashed #cbd5e1; border-radius:12px; padding:24px; text-align:center;">
+                    <div style="font-size:18px; font-weight:600; margin-bottom:6px;">No invoices yet</div>
+                    <div style="color:#64748b; margin-bottom:12px;">Create invoices from completed trips or explore stats.</div>
+                    <div style="display:flex; gap:10px; justify-content:center;">
+                        <a href="/products/gofloradriver/invoices/stats" class="trips-btn-secondary">View Stats</a>
+                        <a href="/products/gofloradriver/dashboard" class="trips-btn-secondary">Go to Dashboard</a>
+                    </div>
+                </div>
+            #endif
+            <!-- Pagination -->
+            <div class="trips-pagination">
+                #if(hasPrevPage):<a href="?filter=#(filter)&page=#(page-1)" class="trips-btn-secondary">Previous</a>#endif
+                <span>Page #(page) of #(totalPages)</span>
+                #if(hasNextPage):<a href="?filter=#(filter)&page=#(page+1)" class="trips-btn-secondary">Next</a>#endif
+            </div>
+        </div>
+    #endexport
+#endextend

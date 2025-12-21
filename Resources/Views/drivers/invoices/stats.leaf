@@ -1,0 +1,50 @@
+#extend("drivers/driversbase"):
+    #export("content"):
+        <div class="trips-dashboard-section" style="max-width: 900px; margin: 0 auto;">
+            <h1 style="text-align:center;">Invoice Statistics</h1>
+            <div style="margin-bottom:8px;">
+                <a href="/products/gofloradriver/invoices?filter=all&page=1" class="trips-btn-secondary">Back to Invoices →</a>
+            </div>
+            <div class="trips-stats-grid">
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Total Invoices</div>
+                    <div class="trips-stat-value">#if(stats):#(stats.totalInvoices)#else:0#endif</div>
+                </div>
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Paid Invoices</div>
+                    <div class="trips-stat-value">#if(stats):#(stats.paidInvoices)#else:0#endif</div>
+                </div>
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Pending Invoices</div>
+                    <div class="trips-stat-value">#if(stats):#(stats.pendingInvoices)#else:0#endif</div>
+                </div>
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Total Amount</div>
+                    <div class="trips-stat-value">$#if(stats):#(stats.totalAmount)#else:0.00#endif</div>
+                </div>
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Paid Amount</div>
+                    <div class="trips-stat-value">$#if(stats):#(stats.paidAmount)#else:0.00#endif</div>
+                </div>
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Pending Amount</div>
+                    <div class="trips-stat-value">$#if(stats):#(stats.pendingAmount)#else:0.00#endif</div>
+                </div>
+                <div class="trips-stat-card">
+                    <div class="trips-stat-label">Average Invoice</div>
+                    <div class="trips-stat-value">$#if(stats):#(stats.averageInvoiceAmount)#else:0.00#endif</div>
+                </div>
+            </div>
+            #if(!stats):
+                <div style="background:#f8fafc; border:1px dashed #cbd5e1; border-radius:12px; padding:24px; text-align:center; margin-top:16px;">
+                    <div style="font-size:18px; font-weight:600; margin-bottom:6px;">No stats available</div>
+                    <div style="color:#64748b; margin-bottom:12px;">Stats appear after invoices are created or updated.</div>
+                    <div style="display:flex; gap:10px; justify-content:center;">
+                        <a href="/products/gofloradriver/invoices?filter=all&page=1" class="trips-btn-secondary">View Invoices</a>
+                        <a href="/products/gofloradriver/dashboard" class="trips-btn-secondary">Go to Dashboard</a>
+                    </div>
+                </div>
+            #endif
+        </div>
+    #endexport
+#endextend
