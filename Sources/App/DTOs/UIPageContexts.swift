@@ -6,9 +6,7 @@ import DriversDTO
 struct ServiceFeesListPageContext: Content {
     let title: String
     let pageType: String
-    let driver: DriverProfileDTO
     let serviceFees: [DriverCustomServiceFeesDTO]
-    let stats: DriverServiceFeesStatsDTO?
     let total: Int
     let page: Int
     let perPage: Int
@@ -20,39 +18,35 @@ struct ServiceFeesListPageContext: Content {
     let hasPrevPage: Bool
 }
 
-struct ServiceFeeFormPageContext: Content {
+// Deprecated legacy form context removed in favor of PayNow-driven contexts
+
+// New context for Create Service Fee view using PayNowPaymentMethodResponseDTO
+struct ServiceFeeCreatePageContext: Content {
     let title: String
     let pageType: String
-    let driver: DriverProfileDTO
-    let fee: DriverCustomServiceFeesDTO?
     let paymentMethods: [PayNowPaymentMethodResponseDTO]
-    let currencies: [String]
-    let isEdit: Bool
+    let errorMessage: String?
+}
+
+// New context for Edit Service Fee view
+struct ServiceFeeEditPageContext: Content {
+    let title: String
+    let pageType: String
+    let paymentMethods: [PayNowPaymentMethodResponseDTO]
+    let fee: DriverCustomServiceFeesDTO
     let errorMessage: String?
 }
 
 struct ServiceFeeDetailsPageContext: Content {
     let title: String
     let pageType: String
-    let driver: DriverProfileDTO
     let fee: DriverCustomServiceFeesDTO
-    let paymentMethod: PayNowPaymentMethodResponseDTO?
+    let paymentMethods: [PayNowPaymentMethodResponseDTO]
     let successMessage: String?
     let errorMessage: String?
 }
 
-struct CurrencyStatItem: Content {
-    let currency: String
-    let stats: CurrencyStatsDTO
-}
-
-struct ServiceFeesStatsPageContext: Content {
-    let title: String
-    let pageType: String
-    let driver: DriverProfileDTO
-    let stats: DriverServiceFeesStatsDTO?
-    let currencyStats: [CurrencyStatItem]
-}
+// Stats contexts removed per new workflow
 
 // Invoices Contexts
 struct InvoicesListPageContext: Content {

@@ -1,0 +1,130 @@
+#extend("drivers/driversbase"):
+    #export("content"):
+        <div class="trips-dashboard-section" style="max-width: 860px; margin: 0 auto;">
+            <h1 style="text-align:center;">Create GoFloraPaymentMethod</h1>
+            #if(errorMessage):<div class="alert alert-error">#(errorMessage)</div>#endif
+            <form id="createFeeForm" method="post" action="/products/gofloradriver/service-fees/create" class="trips-form" style="margin: 0 auto;">
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <select id="paymentMethodSelect" name="paymentMethodId" required style="width:100%; padding: 0.9rem 1rem; font-size: 1.1rem; min-height: 48px;">
+                        <option value="" disabled selected>Select a payment method</option>
+                        #for(method in paymentMethods):
+                            <option value="#if(method.id):#(method.id)#endif">#(method.name)</option>
+                        #endfor
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Service Fee Sharing <i class="fas fa-info-circle" title="If enabled, both driver and client share the service fee."></i></label>
+                    <div id="serviceFeesSharingStatus" class="readonly-chip">—</div>
+                </div>
+
+                <div class="form-group">
+                    <label>USD Methods</label>
+                    <div id="usMethodsContainer" class="methods-container">
+                        <em class="muted">Select one or more (if available)</em>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>ZWL Methods</label>
+                    <div id="zwMethodsContainer" class="methods-container">
+                        <em class="muted">Select one or more (if available)</em>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Priority <i class="fas fa-info-circle" title="Priority determines which service fee applies when multiple fees match. Higher numbers take precedence."></i></label>
+                    <input type="number" name="priority" min="1" value="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Active</label>
+                    <input type="checkbox" name="isActive" checked>
+                </div>
+
+                <div class="form-actions" style="text-align:center;">
+                    <button type="submit" class="trips-btn-primary" style="padding: 0.9rem 1.6rem; font-size: 1.05rem;">Create GoFloraPaymentMethod</button>
+                    <a href="/products/gofloradriver/service-fees/my-fees" class="trips-btn-secondary" style="margin-left:0.5rem;">Cancel</a>
+                </div>
+            </form>
+        </div>
+
+        <script>
+            const selectEl = document.getElementById('paymentMethodSelect');
+            const sharingEl = document.getElementById('serviceFeesSharingStatus');
+            const usContainer = document.getElementById('usMethodsContainer');
+            const zwContainer = document.getElementById('zwMethodsContainer');
+            const formEl = document.getElementById('createFeeForm');
+
+            function clearMethods() {
+                usContainer.innerHTML = '<em class="muted">Select one or more (if available)</em>';
+                zwContainer.innerHTML = '<em class="muted">Select one or more (if available)</em>';
+            }
+
+            function renderMethodCheckboxes(container, methods, group) {
+                if (!methods || methods.length === 0) {
+                    container.innerHTML = '<em class="muted">No methods available</em>';
+                    return;
+                }
+                const list = document.createElement('div');
+                list.className = 'radio-list';
+                methods.forEach((m) => {
+                    const id = group + '-' + m.replace(/\s+/g, '-').toLowerCase();
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'checkbox-item';
+                    const input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.name = group + '[]';
+                    input.value = m;
+                    input.id = id;
+                    const label = document.createElement('label');
+                    label.setAttribute('for', id);
+                    label.textContent = m;
+                    wrapper.appendChild(input);
+                    wrapper.appendChild(label);
+                    list.appendChild(wrapper);
+                });
+                container.innerHTML = '';
+                container.appendChild(list);
+            }
+
+            selectEl.addEventListener('change', () => {
+                const selectedId = selectEl.value;
+                if (!selectedId) {
+                    clearMethods();
+                    sharingEl.textContent = '—';
+                    return;
+                }
+                // Find selected method data inline
+                let selected = null;
+                #for(method in paymentMethods):
+                    if ("#if(method.id):#(method.id)#endif" === selectedId) {
+                        selected = {
+                            usMethods: [#for(m in method.usMethods):"#(m)",#endfor],
+                            zwMethods: [#for(m in method.zwMethods):"#(m)",#endfor],
+                            serviceFeesSharing: #if(method.serviceFeesSharing):true#else:false#endif
+                        };
+                    }
+                #endfor
+                if (!selected) {
+                    clearMethods();
+                    sharingEl.textContent = '—';
+                    return;
+                }
+                sharingEl.textContent = selected.serviceFeesSharing ? 'Enabled (driver and client share)' : 'Disabled';
+                renderMethodCheckboxes(usContainer, selected.usMethods, 'usMethods');
+                renderMethodCheckboxes(zwContainer, selected.zwMethods, 'zwMethods');
+            });
+
+            formEl.addEventListener('submit', (e) => {
+                // Ensure a payment method is selected
+                if (!selectEl.value) {
+                    e.preventDefault();
+                    alert('Please select a payment method.');
+                    return;
+                }
+            });
+        </script>
+    #endexport
+#endextend

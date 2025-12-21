@@ -13,7 +13,6 @@ struct ServiceFeesUIController: RouteCollection {
         feesRoute.get(":serviceFeeID", "edit", use: renderEditFee)
         feesRoute.put(":serviceFeeID", use: handleEditFee)
         feesRoute.post(":serviceFeeID", "toggle-active", use: handleToggleActive)
-        feesRoute.get("stats", use: renderStats)
     }
 
     // GET /my-fees
@@ -22,17 +21,13 @@ struct ServiceFeesUIController: RouteCollection {
             let driverToken = req.session.data["driverToken"] ?? ""
             let page = Int(req.query["page"] ?? "1") ?? 1
             let perPage = Int(req.query["perPage"] ?? "25") ?? 25
-            let driverProfile = try await fetchDriverProfile(req)
             let paymentMethods = try await fetchPaymentMethods(req, driverToken: driverToken)
             let feesResponse = try await fetchServiceFees(req, driverToken: driverToken, page: page, perPage: perPage)
-            let stats = try await fetchServiceFeeStats(req, driverToken: driverToken)
             let totalPages = Int(ceil(Double(feesResponse.total) / Double(perPage)))
             let context = ServiceFeesListPageContext(
                 title: "My Service Fees",
                 pageType: "service-fees-list",
-                driver: driverProfile,
                 serviceFees: feesResponse.serviceFees,
-                stats: stats,
                 total: feesResponse.total,
                 page: page,
                 perPage: perPage,
@@ -45,14 +40,10 @@ struct ServiceFeesUIController: RouteCollection {
             )
             return try await req.view.render("drivers/service-fees/my-fees", context).encodeResponse(for: req)
         } catch {
-          // return req.redirect(to: "/products/gofloradriver/dashboard?error=An unexpected error occurred. Please try again later.")
-            let driverProfile = try await fetchDriverProfile(req)
             let context = ServiceFeesListPageContext(
                 title: "My Service Fees",
                 pageType: "service-fees-list",
-                driver: driverProfile ,
                 serviceFees: [],
-                stats: nil,
                 total: 0,
                 page: 1,
                 perPage: 25,
@@ -70,26 +61,27 @@ struct ServiceFeesUIController: RouteCollection {
     // GET /create
     @Sendable func renderCreateFee(_ req: Request) async throws -> View {
         let driverToken = req.session.data["driverToken"] ?? ""
-        let driverProfile = try await fetchDriverProfile(req)
-        let paymentMethods = try await fetchPaymentMethods(req, driverToken: driverToken)
-        let currencies = ["USD", "ZWL", "ZAR", "EUR", "GBP"]
-        let context = ServiceFeeFormPageContext(
+        let paymentMethods: [PayNowPaymentMethodResponseDTO] = try await fetchPaymentMethods(req, driverToken: driverToken)
+        let context = ServiceFeeCreatePageContext(
             title: "Create Service Fee",
-            pageType: "service-fee-form",
-            driver: driverProfile,
-            fee: nil,
+            pageType: "service-fee-create",
             paymentMethods: paymentMethods,
-            currencies: currencies,
-            isEdit: false,
             errorMessage: req.query["error"]
         )
-        return try await req.view.render("drivers/service-fees/fee-form", context)
+        return try await req.view.render("drivers/service-fees/fee-form-create", context)
     }
 
     // POST /create
     @Sendable func handleCreateFee(_ req: Request) async throws -> Response {
         let driverToken = req.session.data["driverToken"] ?? ""
-        let form = try req.content.decode(CreateDriverCustomServiceFeesRequest.self)
+        struct CreateServiceFeeViaPayNowRequest: Content {
+            let paymentMethodId: UUID
+            let usMethods: [String]
+            let zwMethods: [String]
+            let priority: Int
+            let isActive: Bool
+        }
+        let form = try req.content.decode(CreateServiceFeeViaPayNowRequest.self)
         let jsonData = try JSONEncoder().encode(form)
         let buffer = req.application.allocator.buffer(data: jsonData)
         let endpoint = APIConfig.endpoints["service-fees"] ?? "urlfailed"
@@ -106,16 +98,14 @@ struct ServiceFeesUIController: RouteCollection {
     // GET /:serviceFeeID
     @Sendable func renderFeeDetails(_ req: Request) async throws -> View {
         let driverToken = req.session.data["driverToken"] ?? ""
-        let driverProfile = try await fetchDriverProfile(req)
         let feeID = req.parameters.get("serviceFeeID") ?? ""
         let fee = try await fetchServiceFeeByID(req, driverToken: driverToken, feeID: feeID)
-        let paymentMethod = try await fetchPaymentMethodByID(req, driverToken: driverToken, paymentMethodID: fee.paymentMethodId.uuidString)
+        let paymentMethods = try await fetchPaymentMethods(req, driverToken: driverToken)
         let context = ServiceFeeDetailsPageContext(
             title: "Service Fee Details",
             pageType: "service-fee-details",
-            driver: driverProfile,
             fee: fee,
-            paymentMethod: paymentMethod,
+            paymentMethods: paymentMethods,
             successMessage: req.query["success"],
             errorMessage: req.query["error"]
         )
@@ -125,29 +115,31 @@ struct ServiceFeesUIController: RouteCollection {
     // GET /:serviceFeeID/edit
     @Sendable func renderEditFee(_ req: Request) async throws -> View {
         let driverToken = req.session.data["driverToken"] ?? ""
-        let driverProfile = try await fetchDriverProfile(req)
         let feeID = req.parameters.get("serviceFeeID") ?? ""
         let fee = try await fetchServiceFeeByID(req, driverToken: driverToken, feeID: feeID)
         let paymentMethods = try await fetchPaymentMethods(req, driverToken: driverToken)
-        let currencies = ["USD", "ZWL", "ZAR", "EUR", "GBP"]
-        let context = ServiceFeeFormPageContext(
+        let context = ServiceFeeEditPageContext(
             title: "Edit Service Fee",
-            pageType: "service-fee-form",
-            driver: driverProfile,
-            fee: fee,
+            pageType: "service-fee-edit",
             paymentMethods: paymentMethods,
-            currencies: currencies,
-            isEdit: true,
+            fee: fee,
             errorMessage: req.query["error"]
         )
-        return try await req.view.render("drivers/service-fees/fee-form", context)
+        return try await req.view.render("drivers/service-fees/fee-form-edit", context)
     }
 
     // PUT /:serviceFeeID
     @Sendable func handleEditFee(_ req: Request) async throws -> Response {
         let driverToken = req.session.data["driverToken"] ?? ""
         let feeID = req.parameters.get("serviceFeeID") ?? ""
-        let form = try req.content.decode(UpdateDriverCustomServiceFeesRequest.self)
+        struct UpdateServiceFeeViaPayNowRequest: Content {
+            let paymentMethodId: UUID
+            let usMethods: [String]
+            let zwMethods: [String]
+            let priority: Int
+            let isActive: Bool
+        }
+        let form = try req.content.decode(UpdateServiceFeeViaPayNowRequest.self)
         let jsonData = try JSONEncoder().encode(form)
         let buffer = req.application.allocator.buffer(data: jsonData)
         let endpoint = (APIConfig.endpoints["service-fees"] ?? "urlfailed") + "/\(feeID)"
@@ -174,31 +166,10 @@ struct ServiceFeesUIController: RouteCollection {
         }
     }
 
-    // GET /stats
-    @Sendable func renderStats(_ req: Request) async throws -> View {
-        let driverToken = req.session.data["driverToken"] ?? ""
-        let driverProfile = try await fetchDriverProfile(req)
-        let stats = try await fetchServiceFeeStats(req, driverToken: driverToken)
-        let currencyStats: [CurrencyStatItem] = stats?.currencyBreakdown.map { (key, value) in CurrencyStatItem(currency: key, stats: value) } ?? []
-        let context = ServiceFeesStatsPageContext(
-            title: "Service Fees Stats",
-            pageType: "service-fees-stats",
-            driver: driverProfile,
-            stats: stats,
-            currencyStats: currencyStats
-        )
-        return try await req.view.render("drivers/service-fees/stats", context)
-    }
+    // Stats removed per new workflow
 
     // Helper methods (stubs, to be implemented)
-    private func fetchDriverProfile(_ req: Request) async throws -> DriverProfileDTO {
-        guard let driverToken = req.session.data["driverToken"], !driverToken.isEmpty else {
-            throw Abort.redirect(to: "/products/gofloradriver/login")
-        }
-        let endpoint = APIConfig.endpoints["gofloradriver-profiles"] ?? "urlfailed"
-        let response = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint + "/me", driverToken: driverToken)
-        return try response.content.decode(DriverProfileDTO.self)
-    }
+    // Driver profile fetch removed for service-fee pages
 
     private func fetchPaymentMethods(_ req: Request, driverToken: String) async throws -> [PayNowPaymentMethodResponseDTO] {
         let baseURL = APIConfig.mainAppBaseURL
@@ -217,18 +188,14 @@ struct ServiceFeesUIController: RouteCollection {
     }
 
     private func fetchServiceFees(_ req: Request, driverToken: String, page: Int, perPage: Int) async throws -> DriverCustomServiceFeesListResponse {
-        var queryItems = [URLQueryItem(name: "page", value: "\(page)"),
-                          URLQueryItem(name: "per", value: "\(perPage)")]
+        let queryItems = [URLQueryItem(name: "page", value: "\(page)"),
+                  URLQueryItem(name: "per", value: "\(perPage)")]
         let endpoint = (APIConfig.endpoints["service-fees"] ?? "urlfailed") + "/my-fees?" + queryItems.map { "\($0.name)=\($0.value ?? "")" }.joined(separator: "&")
         let response = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: driverToken)
         return try response.content.decode(DriverCustomServiceFeesListResponse.self)
     }
 
-    private func fetchServiceFeeStats(_ req: Request, driverToken: String) async throws -> DriverServiceFeesStatsDTO? {
-        let endpoint = (APIConfig.endpoints["service-fees"] ?? "urlfailed") + "/stats"
-        let response = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: driverToken)
-        return try? response.content.decode(DriverServiceFeesStatsDTO.self)
-    }
+    // Stats fetch removed
 
     private func fetchServiceFeeByID(_ req: Request, driverToken: String, feeID: String) async throws -> DriverCustomServiceFeesDTO {
         let endpoint = (APIConfig.endpoints["service-fees"] ?? "urlfailed") + "/\(feeID)"
