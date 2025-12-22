@@ -91,8 +91,6 @@ struct TripUIController: RouteCollection {
             return req.redirect(to: "/products/gofloradriver/trips")
         }
 
-        let bidContentData = SubmitDriverBidRequest(tripId: tripUUID, bidAmount: bidData.bidAmount)
-
         //Now lets redirect to page where driver selects what custom fees they want to use, method ,and we pass some data as prefillData, bidAmount
         struct bidCustomFeesContext {
             let driverId : UUID
@@ -102,32 +100,6 @@ struct TripUIController: RouteCollection {
         // pass the bidAmount in the query
         // redirect to invoice handler,
         return req.redirect(to: "/products/gofloradriver/invoices/generate-for-trip/\(tripId)?bidAmount=\(bidData.bidAmount)", redirectType: .permanent)
-
-      /*  let jsonData = try JSONEncoder().encode(bidContentData)
-
-        let buffer = req.application.allocator.buffer(data: jsonData)
-
-        do {
-
-            let response = try await makeAPIRequest(
-                req: req,
-                method: .POST,
-                endpoint: APIConfig.endpoints["drivers"]! + "/trip/\(tripId)/bid",
-                body: buffer,
-                requiresAuth: true
-            )
-
-            if response.status == .created || response.status == .ok {
-                return req.redirect(to: "/products/gofloradriver/bids?success=Bid submitted successfully")
-            } else {
-                let errorData = try? response.content.decode([String: String].self)
-                let error = errorData?["message"] ?? "Failed to submit bid"
-                return req.redirect(to: "/products/gofloradriver/trips/\(tripId)?error=\(error)")
-            }
-        } catch {
-            req.logger.error("Failed to submit bid: \(error)")
-            return req.redirect(to: "/products/gofloradriver/trips/\(tripId)?error=Network error. Please try again.")
-        }*/
     }
 
     // MARK: - My Bids

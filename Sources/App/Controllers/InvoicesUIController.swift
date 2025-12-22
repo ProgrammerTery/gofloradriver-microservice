@@ -2,6 +2,7 @@ import Vapor
 import Leaf
 import DriversDTO
 import Foundation
+import PaymentDTO
 
 // Use canonical contexts from UIPageContexts.swift
 
@@ -193,11 +194,11 @@ struct InvoicesUIController: RouteCollection {
     @Sendable private func handleGenerateForTrip(_ req: Request) async throws -> Response {
         let driverToken = req.session.data["driverToken"] ?? ""
         let tripID = req.parameters.get("tripID") ?? ""
+        guard let tripIDUUID = UUID(uuidString: tripID) else {
+           throw Abort(.badRequest, reason: "Invalid trip ID")
+        }
         // Decode form data and map to CreateDriverInvoiceRequest
         let form = try req.content.decode(InvoiceFormData.self)
-        guard let feesUUID = UUID(uuidString: form.driverCustomFeesId), let tripUUID = UUID(uuidString: form.tripId) else {
-            return req.redirect(to: "/products/gofloradriver/invoices/generate-for-trip/\(tripID)?error=Invalid IDs")
-        }
         /*let payload = CreateDriverInvoiceRequest(
             driverCustomFeesId: feesUUID,
             tripId: tripUUID,
@@ -212,8 +213,20 @@ struct InvoicesUIController: RouteCollection {
         ) */
         let jsonData = try JSONEncoder().encode(form)
         let buffer = req.application.allocator.buffer(data: jsonData)
-        let endpoint = (APIConfig.endpoints["invoices"] ?? "urlfailed")
+        let endpoint = (APIConfig.endpoints["invoices"] ?? "urlfailed") + "/generate-for-trip/\(tripID)"
         let response = try await makeAPIRequest(req: req, method: .POST, endpoint: endpoint, body: buffer, driverToken: driverToken)
+        let bidContentData = SubmitDriverBidRequest(tripId: tripIDUUID, bidAmount: form.bidAmount)
+        let jsonBidData = try JSONEncoder().encode(bidContentData)
+
+        let bufferBidData = req.application.allocator.buffer(data: jsonBidData)
+
+            let responseBidData = try await makeAPIRequest(
+                req: req,
+                method: .POST,
+                endpoint: APIConfig.endpoints["drivers"]! + "/trip/\(tripID)/bid",
+                body: bufferBidData,
+                driverToken: driverToken
+            )
         if response.status == .created || response.status == .ok {
             // decode created invoice to get id
             if let created = try? response.content.decode(DriverInvoiceDTO.self), let id = created.id?.uuidString {
