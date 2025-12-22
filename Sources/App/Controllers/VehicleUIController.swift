@@ -9,8 +9,11 @@ struct VehicleUIController: RouteCollection {
         let vehicleRoute = routes.grouped("products", "gofloradriver", "vehicle")
 
         // All vehicle routes require driver session
-        let protectedRoutes = vehicleRoute.grouped(DriverAuthMiddleware())
+        let protectedRoutes = vehicleRoute.grouped(DriverAuthenticatedMiddleware())
+        protectedRoutes.get("") { req in
+            return req.redirect(to: "/products/gofloradriver/vehicle/service-type")
 
+        }
         protectedRoutes.get("service-type", use: renderServiceTypeSelection)
         protectedRoutes.post("service-type", use: handleServiceTypeSelection)
         protectedRoutes.get("register", use: renderVehicleRegistration)

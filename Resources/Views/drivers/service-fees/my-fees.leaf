@@ -1,26 +1,8 @@
 #extend("drivers/driversbase"):
     #export("content"):
-        <div class="trips-dashboard-section">
-            <h1>My Service Fees</h1>
-            <!-- Stats Cards -->
-            <div class="trips-stats-grid">
-                <div class="trips-stat-card">
-                    <div class="trips-stat-label">Total Fees</div>
-                    <div class="trips-stat-value">#if(stats):#(stats.totalFees)#else:0#endif</div>
-                </div>
-                <div class="trips-stat-card">
-                    <div class="trips-stat-label">Active Fees</div>
-                    <div class="trips-stat-value">#if(stats):#(stats.activeFees)#else:0#endif</div>
-                </div>
-                <div class="trips-stat-card">
-                    <div class="trips-stat-label">Inactive Fees</div>
-                    <div class="trips-stat-value">#if(stats):#(stats.inactiveFees)#else:0#endif</div>
-                </div>
-                <div class="trips-stat-card">
-                    <div class="trips-stat-label">Total Amount</div>
-                    <div class="trips-stat-value">$#if(stats):#(stats.totalFeeAmount)#else:0.00#endif</div>
-                </div>
-            </div>
+        <div class="trips-dashboard-section" style="max-width: 1080px; margin: 0 auto;">
+            <h1 style="text-align:center;">My Service Fees</h1>
+            <!-- Stats removed per new workflow -->
             <!-- Alerts -->
             #if(successMessage):<div class="alert alert-success">#(successMessage)</div>#endif
             #if(errorMessage):<div class="alert alert-error">#(errorMessage)</div>#endif
@@ -30,9 +12,7 @@
                     <thead>
                         <tr>
                             <th>Payment Method</th>
-                            <th>Type</th>
-                            <th>Currency</th>
-                            <th>Amount</th>
+                            <th>Selected Methods</th>
                             <th>Priority</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -44,8 +24,6 @@
                                 <tr>
                                     <td>#if(fee.paymentMethodName):#(fee.paymentMethodName)#else:N/A#endif</td>
                                     <td>#if(fee.methodType):#(fee.methodType)#else:N/A#endif</td>
-                                    <td>#if(fee.currency):#(fee.currency)#else:N/A#endif</td>
-                                    <td>$#if(fee.feeAmount):#(fee.feeAmount)#else:0.00#endif</td>
                                     <td>#if(fee.priority):#(fee.priority)#else:N/A#endif</td>
                                     <td>
                                         <label class="toggle-switch">
@@ -60,7 +38,7 @@
                                 </tr>
                             #endfor
                         #else:
-                            <tr><td colspan="7" style="text-align:center;">No service fees yet.</td></tr>
+                            <tr><td colspan="5" style="text-align:center;">No service fees yet.</td></tr>
                         #endif
                     </tbody>
                 </table>
@@ -71,7 +49,9 @@
                 <span>Page #(page) of #(totalPages)</span>
                 #if(hasNextPage):<a href="?page=#(page+1)&perPage=#(perPage)" class="trips-btn-secondary">Next</a>#endif
             </div>
-            <a href="/products/gofloradriver/service-fees/create" class="trips-btn-primary" style="margin-top:2rem;">Create New Fee</a>
+            <div style="text-align:center;">
+                <a href="/products/gofloradriver/service-fees/create" class="trips-btn-primary" style="margin-top:2rem; padding: 0.9rem 1.6rem; font-size: 1.05rem;">Create GoFloraPaymentMethod</a>
+            </div>
         </div>
     #endexport
 #endextend

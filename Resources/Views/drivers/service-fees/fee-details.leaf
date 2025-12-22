@@ -1,20 +1,24 @@
 #extend("drivers/driversbase"):
     #export("content"):
-        <div class="trips-dashboard-section">
-            <h1>Service Fee Details</h1>
+        <div class="trips-dashboard-section" style="max-width: 860px; margin: 0 auto;">
+            <h1 style="text-align:center;">GoFloraPaymentMethod Details</h1>
             #if(successMessage):<div class="alert alert-success">#(successMessage)</div>#endif
             #if(errorMessage):<div class="alert alert-error">#(errorMessage)</div>#endif
             <div class="trips-card">
                 <h2>Payment Method</h2>
-                <p>#if(paymentMethod):#(paymentMethod.name)#else:#if(fee.paymentMethodName):#(fee.paymentMethodName)#else:N/A#endif#endif</p>
-                <p>#if(paymentMethod):#(paymentMethod.description)#else:#if(fee.paymentMethodDescription):#(fee.paymentMethodDescription)#else:N/A#endif#endif</p>
+                #for(pm in paymentMethods):
+                    #if(fee.paymentMethodId == pm.id):
+                        <p>#(pm.name)</p>
+                        <p>#if(pm.description):#(pm.description)#else:N/A#endif</p>
+                        <p>Sharing: #if(pm.serviceFeesSharing):Enabled#else:Disabled#endif</p>
+                    #endif
+                #endfor
             </div>
             <div class="trips-card">
                 <h2>Fee Details</h2>
                 <ul>
                     <li>Type: #if(fee.methodType):#(fee.methodType)#else:N/A#endif</li>
-                    <li>Currency: #if(fee.currency):#(fee.currency)#else:N/A#endif</li>
-                    <li>Amount: $#if(fee.feeAmount):#(fee.feeAmount)#else:0.00#endif</li>
+                    <li>Selected Methods: #if(fee.methodType):#(fee.methodType)#else:N/A#endif</li>
                     <li>Priority: #if(fee.priority):#(fee.priority)#else:N/A#endif</li>
                     <li>Status: #if(fee.isActive):Active#else:Inactive#endif</li>
                     <li>Created: #if(fee.createdAt):#(fee.createdAt)#else:N/A#endif</li>

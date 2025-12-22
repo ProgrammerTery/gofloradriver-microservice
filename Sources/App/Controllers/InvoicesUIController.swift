@@ -2,6 +2,7 @@ import Vapor
 import Leaf
 import DriversDTO
 import Foundation
+import PaymentDTO
 
 // Use canonical contexts from UIPageContexts.swift
 
@@ -171,18 +172,18 @@ struct InvoicesUIController: RouteCollection {
         let driverToken = req.session.data["driverToken"] ?? ""
         let tripID = req.parameters.get("tripID") ?? ""
         let driverProfile = try await fetchDriverProfile(req)
+        //fetch the bidAmount from URL query component
+        let bidAmount = Double(req.query["bidAmount"] ?? "") ?? 0.0
+
+
         // Fetch driver service fees to select one
         let serviceFees = try await fetchServiceFeesForDriver(req, driverToken: driverToken)
-        // Basic currencies
-        let currencies = ["USD", "ZWL", "ZAR", "EUR", "GBP"]
         // Prefill form context
         let context = InvoiceFormPageContext(
             title: "Generate Invoice",
             pageType: "invoice-generate",
-            driver: driverProfile,
-            invoice: nil,
             serviceFees: serviceFees,
-            currencies: currencies,
+            bidAmount: bidAmount,
             isEdit: false,
             tripId: tripID,
             errorMessage: req.query["error"]
@@ -193,12 +194,12 @@ struct InvoicesUIController: RouteCollection {
     @Sendable private func handleGenerateForTrip(_ req: Request) async throws -> Response {
         let driverToken = req.session.data["driverToken"] ?? ""
         let tripID = req.parameters.get("tripID") ?? ""
+        guard let tripIDUUID = UUID(uuidString: tripID) else {
+           throw Abort(.badRequest, reason: "Invalid trip ID")
+        }
         // Decode form data and map to CreateDriverInvoiceRequest
         let form = try req.content.decode(InvoiceFormData.self)
-        guard let feesUUID = UUID(uuidString: form.driverCustomFeesId), let tripUUID = UUID(uuidString: form.tripId) else {
-            return req.redirect(to: "/products/gofloradriver/invoices/generate-for-trip/\(tripID)?error=Invalid IDs")
-        }
-        let payload = CreateDriverInvoiceRequest(
+        /*let payload = CreateDriverInvoiceRequest(
             driverCustomFeesId: feesUUID,
             tripId: tripUUID,
             method: form.method,
@@ -209,11 +210,23 @@ struct InvoicesUIController: RouteCollection {
             amount: form.baseFare + form.driverServiceFee + form.platformFee,
             status: form.status,
             paidAt: nil
-        )
-        let jsonData = try JSONEncoder().encode(payload)
+        ) */
+        let jsonData = try JSONEncoder().encode(form)
         let buffer = req.application.allocator.buffer(data: jsonData)
-        let endpoint = (APIConfig.endpoints["invoices"] ?? "urlfailed")
+        let endpoint = (APIConfig.endpoints["invoices"] ?? "urlfailed") + "/generate-for-trip/\(tripID)"
         let response = try await makeAPIRequest(req: req, method: .POST, endpoint: endpoint, body: buffer, driverToken: driverToken)
+        let bidContentData = SubmitDriverBidRequest(tripId: tripIDUUID, bidAmount: form.bidAmount)
+        let jsonBidData = try JSONEncoder().encode(bidContentData)
+
+        let bufferBidData = req.application.allocator.buffer(data: jsonBidData)
+
+            let responseBidData = try await makeAPIRequest(
+                req: req,
+                method: .POST,
+                endpoint: APIConfig.endpoints["drivers"]! + "/trip/\(tripID)/bid",
+                body: bufferBidData,
+                driverToken: driverToken
+            )
         if response.status == .created || response.status == .ok {
             // decode created invoice to get id
             if let created = try? response.content.decode(DriverInvoiceDTO.self), let id = created.id?.uuidString {
@@ -228,11 +241,9 @@ struct InvoicesUIController: RouteCollection {
     }
 
     private func fetchServiceFeesForDriver(_ req: Request, driverToken: String) async throws -> [DriverCustomServiceFeesDTO] {
-        let queryItems = [URLQueryItem(name: "page", value: "1"), URLQueryItem(name: "per", value: "100")]
-        let endpoint = (APIConfig.endpoints["service-fees"] ?? "urlfailed") + "/my-fees?" + queryItems.map { "\($0.name)=\($0.value ?? "")" }.joined(separator: "&")
+        let endpoint = (APIConfig.endpoints["service-fees"] ?? "urlfailed") + "/my-fees"
         let response = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: driverToken)
-        let list = try response.content.decode(DriverCustomServiceFeesListResponse.self)
-        return list.serviceFees
+        return try response.content.decode([DriverCustomServiceFeesDTO].self)
     }
     private func buildPeriodOptions() -> [PeriodOption] {
         return [

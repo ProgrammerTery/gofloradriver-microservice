@@ -31,7 +31,7 @@ struct DriversUIController: RouteCollection {
         driversUIRoute.get("success", use: renderRegistrationSuccess)
 
         // Protected Routes (require driver session)
-        let protectedRoutes = driversUIRoute.grouped(DriverAuthMiddleware())
+        let protectedRoutes = driversUIRoute.grouped(DriverAuthenticatedMiddleware())
         protectedRoutes.get("dashboard", use: renderDashboard)
         protectedRoutes.get("profile", use: renderProfile)
         protectedRoutes.get("profile", "edit", use: renderEditProfile)
@@ -558,9 +558,28 @@ struct DriversUIController: RouteCollection {
 struct DriverAuthMiddleware: AsyncMiddleware {
     func respond(to request: Request, chainingTo next: AsyncResponder) async throws -> Response {
         if request.session.data["driverToken"] != nil {
+            // Check if profile is incomplete (from skip registration)
+            let profileIncomplete = request.session.data["profileIncomplete"] == "true" || request.session.data["profileComplete"] != "true"
+            let vehicleIncomplete = request.session.data["vehicleIncomplete"] == "true" || request.session.data["vehicleComplete"] != "true"
+
+            if profileIncomplete {
+                return request.redirect(to: "/products/gofloradriver/profile")
+            }
+            if vehicleIncomplete {
+                return request.redirect(to: "/products/gofloradriver/vehicle")
+            }
             return try await next.respond(to: request)
         } else {
             return request.redirect(to: "/products/gofloradriver/login")
         }
+    }
+}
+
+struct DriverAuthenticatedMiddleware: AsyncMiddleware {
+    func respond(to request: Request, chainingTo next: AsyncResponder) async throws -> Response {
+        if request.session.data["driverToken"] == nil {
+            return request.redirect(to: "/products/gofloradriver/login")
+        }
+        return try await next.respond(to: request)
     }
 }

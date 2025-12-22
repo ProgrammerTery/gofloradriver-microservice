@@ -1,61 +1,54 @@
-#extend("drivers/driversbase")
-#export("title") { Generate Invoice Preview }
-#export("body") {
+#extend("drivers/driversbase"):
+    #export("content"):
     <section class="container">
         <h2>Generate Invoice</h2>
-        #if(errorMessage)
+        #if(errorMessage):
             <div class="alert alert-danger">#(errorMessage)</div>
         #endif
         <form method="post" action="/products/gofloradriver/invoices/generate-for-trip/#(tripId)">
             <div class="form-group">
                 <label for="driverCustomFeesId">Service Fee</label>
                 <select id="driverCustomFeesId" name="driverCustomFeesId" required>
-                    #if(serviceFees)
-                        #for(fee in serviceFees)
-                            <option value="#(fee.id)">#(fee.title) - #(fee.currency)</option>
+                    #if(serviceFees):
+                        #for(fee in serviceFees):
+                            <option value="#(fee.id)">#(fee.name) - #(fee.paymentMethodID)</option>
                         #endfor
-                    #else
+                    #else:
                         <option value="">No fees found</option>
                     #endif
                 </select>
             </div>
+
             <input type="hidden" name="tripId" value="#(tripId)">
-            <div class="form-group">
-                <label for="currency">Currency</label>
-                <select id="currency" name="currency" required>
-                    #if(currencies)
-                        #for(c in currencies)
-                            <option value="#(c)">#(c)</option>
+             <div class="form-group">
+                <label for="method">Choose Payment Method</label>
+                <select id="method" name="method" required>
+                    #if(serviceFees):
+                    #for(fee in serviceFees):
+                    #if(fee.usMethods):
+                        #for(usMethod in fee.usMethods):
+                            <option value="#(usMethod)">#(usMethod)</option>
                         #endfor
-                    #else
-                        <option value="USD">USD</option>
+                    #elseif(fee.zwMethods):
+                          #for(zwMethod in fee.zwMethods):
+                            <option value="#(zwMethod)">#(zwMethod)</option>
+                         #endfor
+                    #else:
+                        <option value="cash">Cash(not supported yet)</option>
+
+                    #endif
+                    #endfor
                     #endif
                 </select>
             </div>
             <div class="form-group">
-                <label for="method">Method</label>
-                <input id="method" name="method" type="text" value="card" required />
+                <label for="bidAmount">bidAmount</label>
+                <input id="bidAmount" name="bidAmount" type="number" step="0.50" value="#(bidAmount)" required />
             </div>
-            <div class="form-group">
-                <label for="baseFare">Base Fare</label>
-                <input id="baseFare" name="baseFare" type="number" step="0.01" required />
-            </div>
-            <div class="form-group">
-                <label for="driverServiceFee">Driver Service Fee</label>
-                <input id="driverServiceFee" name="driverServiceFee" type="number" step="0.01" required />
-            </div>
-            <div class="form-group">
-                <label for="platformFee">Platform Fee</label>
-                <input id="platformFee" name="platformFee" type="number" step="0.01" required />
-            </div>
-            <div class="form-group">
-                <label for="status">Status</label>
-                <select id="status" name="status" required>
-                    <option value="pending">pending</option>
-                    <option value="paid">paid</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Create Invoice</button>
+
+            <button type="submit" class="btn btn-primary">Submit Bid Invoice</button>
         </form>
     </section>
-}
+#endexport
+
+#endextend

@@ -1,0 +1,82 @@
+#extend("drivers/driversbase"):
+    #export("content"):
+        <div class="trips-dashboard-section" style="max-width: 860px; margin: 0 auto;">
+            <h1 style="text-align:center;">Edit GoFloraPaymentMethod</h1>
+            #if(errorMessage):<div class="alert alert-error">#(errorMessage)</div>#endif
+            <form id="editFeeForm" method="post" action="/products/gofloradriver/service-fees/#if(fee.id):#(fee.id)#endif?_method=PUT" class="trips-form">
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <select name="paymentMethodId" required style="width:100%; padding: 0.9rem 1rem; font-size: 1.1rem; min-height: 48px;">
+                        #for(method in paymentMethods):
+                            <option value="#if(method.id):#(method.id)#endif" #if(fee.paymentMethodId == method.id):selected#endif>#(method.name)</option>
+                        #endfor
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Service Fee Sharing <i class="fas fa-info-circle" title="If enabled, both driver and client share the service fee."></i></label>
+                    #for(method in paymentMethods):
+                        #if(fee.paymentMethodId == method.id):
+                            <div class="readonly-chip">#if(method.serviceFeesSharing):Enabled#else:Disabled#endif</div>
+                        #endif
+                    #endfor
+                </div>
+
+                <div class="form-group">
+                    <label>USD Methods</label>
+                    <div class="methods-container">
+                        #for(method in paymentMethods):
+                            #if(fee.paymentMethodId == method.id):
+                                #if(count(method.usMethods) > 0):
+                                    #for(m in method.usMethods):
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" name="usMethods[]" value="#(m)" #if(fee.methodType == m):checked#endif id="us-#(m)">
+                                            <label for="us-#(m)">#(m)</label>
+                                        </div>
+                                    #endfor
+                                #else:
+                                    <em class="muted">No USD methods available</em>
+                                #endif
+                            #endif
+                        #endfor
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>ZWL Methods</label>
+                    <div class="methods-container">
+                        #for(method in paymentMethods):
+                            #if(fee.paymentMethodId == method.id):
+                                #if(count(method.zwMethods) > 0):
+                                    #for(m in method.zwMethods):
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" name="zwMethods[]" value="#(m)" #if(fee.methodType == m):checked#endif id="zw-#(m)">
+                                            <label for="zw-#(m)">#(m)</label>
+                                        </div>
+                                    #endfor
+                                #else:
+                                    <em class="muted">No ZWL methods available</em>
+                                #endif
+                            #endif
+                        #endfor
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Priority</label>
+                    <input type="number" name="priority" min="1" value="#if(fee.priority):#(fee.priority)#else:1#endif" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Active</label>
+                    <input type="checkbox" name="isActive" #if(fee.isActive):checked#endif>
+                </div>
+
+                <div class="form-actions" style="text-align:center;">
+                    <button type="submit" class="trips-btn-primary" style="padding: 0.9rem 1.6rem; font-size: 1.05rem;">Update GoFloraPaymentMethod</button>
+                    <a href="/products/gofloradriver/service-fees/my-fees" class="trips-btn-secondary" style="margin-left:0.5rem;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    #endexport
+#endextend
