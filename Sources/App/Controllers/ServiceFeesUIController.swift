@@ -22,13 +22,13 @@ struct ServiceFeesUIController: RouteCollection {
             let page = Int(req.query["page"] ?? "1") ?? 1
             let perPage = Int(req.query["perPage"] ?? "25") ?? 25
             let paymentMethods = try await fetchPaymentMethods(req, driverToken: driverToken)
-            let feesResponse = try await fetchServiceFees(req, driverToken: driverToken, page: page, perPage: perPage)
-            let totalPages = Int(ceil(Double(feesResponse.total) / Double(perPage)))
+            let servicefeesResponse = try await fetchServiceFees(req, driverToken: driverToken)
+            let totalPages = 1
             let context = ServiceFeesListPageContext(
                 title: "My Service Fees",
                 pageType: "service-fees-list",
-                serviceFees: feesResponse.serviceFees,
-                total: feesResponse.total,
+                serviceFees: servicefeesResponse,
+                total: 1,
                 page: page,
                 perPage: perPage,
                 paymentMethods: paymentMethods,
@@ -40,21 +40,7 @@ struct ServiceFeesUIController: RouteCollection {
             )
             return try await req.view.render("drivers/service-fees/my-fees", context).encodeResponse(for: req)
         } catch {
-            let context = ServiceFeesListPageContext(
-                title: "My Service Fees",
-                pageType: "service-fees-list",
-                serviceFees: [],
-                total: 0,
-                page: 1,
-                perPage: 25,
-                paymentMethods: [],
-                successMessage: nil,
-                errorMessage: nil,
-                totalPages: 0,
-                hasNextPage: false,
-                hasPrevPage: false
-            )
-            return try await req.view.render("drivers/service-fees/my-fees", context).encodeResponse(for: req)
+            throw Abort(.internalServerError, reason: "An unexpected error occurred while fetching service fees: \(error)")
         }
     }
 
@@ -187,12 +173,10 @@ struct ServiceFeesUIController: RouteCollection {
         return try decoder.decode([PayNowPaymentMethodResponseDTO].self, from: responseData)
     }
 
-    private func fetchServiceFees(_ req: Request, driverToken: String, page: Int, perPage: Int) async throws -> DriverCustomServiceFeesListResponse {
-        let queryItems = [URLQueryItem(name: "page", value: "\(page)"),
-                  URLQueryItem(name: "per", value: "\(perPage)")]
-        let endpoint = (APIConfig.endpoints["service-fees"] ?? "urlfailed") + "/my-fees?" + queryItems.map { "\($0.name)=\($0.value ?? "")" }.joined(separator: "&")
+    private func fetchServiceFees(_ req: Request, driverToken: String) async throws -> [DriverCustomServiceFeesDTO] {
+        let endpoint = (APIConfig.endpoints["service-fees"] ?? "urlfailed") + "/my-fees"
         let response = try await makeAPIRequest(req: req, method: .GET, endpoint: endpoint, driverToken: driverToken)
-        return try response.content.decode(DriverCustomServiceFeesListResponse.self)
+        return try response.content.decode([DriverCustomServiceFeesDTO].self)
     }
 
     // Stats fetch removed

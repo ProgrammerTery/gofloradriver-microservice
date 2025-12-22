@@ -111,10 +111,8 @@ struct EarningsReportPageContext: Content {
 struct InvoiceFormPageContext: Content {
     let title: String
     let pageType: String
-    let driver: DriverProfileDTO?
-    let invoice: DriverInvoiceDTO?
     let serviceFees: [DriverCustomServiceFeesDTO]
-    let currencies: [String]
+    let bidAmount: Double
     let isEdit: Bool
     let tripId: String?
     let errorMessage: String?
@@ -124,11 +122,7 @@ struct InvoiceFormData: Content {
     let driverCustomFeesId: String
     let tripId: String
     let method: String
-    let currency: String
-    let baseFare: Double
-    let driverServiceFee: Double
-    let platformFee: Double
-    let status: String
+    let bidAmount: Double
 }
 
 // Vehicles Page Contexts

@@ -59,9 +59,32 @@ struct TripUIController: RouteCollection {
     }
 
     @Sendable func handleSubmitBid(_ req: Request) async throws -> Response {
+        guard let driverId =  req.session.data["driverID"]  else {
+            return req.redirect(to: "/products/gofloradriver/login")
+        }
         guard let tripId = req.parameters.get("tripId") else {
             return req.redirect(to: "/products/gofloradriver/trips")
         }
+        // we want to ensure the driver has set up their custom fees information for invoice generation,
+        do {
+            let response = try await makeAPIRequest(
+                req: req,
+                method: .GET,
+                endpoint: APIConfig.endpoints["service-fees"]! + "/check-availability",
+                body: nil,
+                requiresAuth: true
+            )
+            if response.status == .notFound {
+            // redirect to creating the custom fees page
+                return req.redirect(to: "/products/gofloradriver/service-fees/create", redirectType: .permanent)
+            }
+
+        } catch {
+           throw Abort(.internalServerError, reason: "An error occurred while checking custom fees availability + \(error)")
+        }
+
+        // lets get the custom fees data here
+     //   let customFees = try await  getCustomFees(req)
 
         let bidData = try req.content.decode(BidFormData.self)
         guard let tripUUID = UUID(uuidString: tripId) else {
@@ -70,7 +93,17 @@ struct TripUIController: RouteCollection {
 
         let bidContentData = SubmitDriverBidRequest(tripId: tripUUID, bidAmount: bidData.bidAmount)
 
-        let jsonData = try JSONEncoder().encode(bidContentData)
+        //Now lets redirect to page where driver selects what custom fees they want to use, method ,and we pass some data as prefillData, bidAmount
+        struct bidCustomFeesContext {
+            let driverId : UUID
+            let customFees: DriverCustomServiceFeesListResponse
+            let bidContentData: SubmitDriverBidRequest
+        }
+        // pass the bidAmount in the query
+        // redirect to invoice handler,
+        return req.redirect(to: "/products/gofloradriver/invoices/generate-for-trip/\(tripId)?bidAmount=\(bidData.bidAmount)", redirectType: .permanent)
+
+      /*  let jsonData = try JSONEncoder().encode(bidContentData)
 
         let buffer = req.application.allocator.buffer(data: jsonData)
 
@@ -94,7 +127,7 @@ struct TripUIController: RouteCollection {
         } catch {
             req.logger.error("Failed to submit bid: \(error)")
             return req.redirect(to: "/products/gofloradriver/trips/\(tripId)?error=Network error. Please try again.")
-        }
+        }*/
     }
 
     // MARK: - My Bids
@@ -226,6 +259,21 @@ struct TripUIController: RouteCollection {
         }
         throw Abort(.internalServerError, reason: "Failed to fetch driver profile from API.")
 
+    }
+    private func getCustomFees(_ req: Request) async throws -> DriverCustomServiceFeesListResponse {
+     let response = try await makeAPIRequest(
+            req: req,
+            method: .GET,
+            endpoint: APIConfig.endpoints["drivers"]! + "/customservices/fees",
+            requiresAuth: true
+        )
+        
+        if response.status == .ok {
+            if let customFeesData = try? response.content.decode(DriverCustomServiceFeesListResponse.self) {
+                return customFeesData
+            }
+        }
+        return .init(serviceFees: [], total: 0, page: 0, perPage: 0)
     }
 
     private func fetchAvailableTrips(_ req: Request) async throws -> [TripSummaryContext] {
