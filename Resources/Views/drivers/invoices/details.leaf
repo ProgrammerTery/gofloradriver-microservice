@@ -1,40 +1,73 @@
 #extend("drivers/driversbase"):
     #export("content"):
-        <div class="trips-dashboard-section">
-            <h1>Invoice Details</h1>
-            #if(successMessage):<div class="alert alert-success">#(successMessage)</div>#endif
-            #if(errorMessage):<div class="alert alert-error">#(errorMessage)</div>#endif
-            <div class="trips-card">
-                <h2>Trip</h2>
-                <p>#if(invoice.tripPickupLocation):#(invoice.tripPickupLocation)#else:N/A#endif → #if(invoice.tripDropoffLocation):#(invoice.tripDropoffLocation)#else:N/A#endif</p>
-                <p>Status: #if(invoice.tripStatus):#(invoice.tripStatus)#else:N/A#endif</p>
-            </div>
-            <div class="trips-card">
-                <h2>Fee Breakdown</h2>
-                <ul>
-                    <li>Base Fare: $#if(invoice.baseFare):#(invoice.baseFare)#else:0.00#endif</li>
-                    <li>Driver Service Fee: $#if(invoice.driverServiceFee):#(invoice.driverServiceFee)#else:0.00#endif</li>
-                    <li>Platform Fee: $#if(invoice.platformFee):#(invoice.platformFee)#else:0.00#endif</li>
-                    <li>Total Amount: $#if(invoice.amount):#(invoice.amount)#else:0.00#endif</li>
-                </ul>
-            </div>
-            <div class="trips-card">
-                <h2>Payment Info</h2>
-                <ul>
-                    <li>Method: #if(invoice.method):#(invoice.method)#else:N/A#endif</li>
-                    <li>Status: <span class="trips-badge #if(invoice.status == "paid"):completed#else:pending#endif">#(invoice.status)</span></li>
-                    <li>Paid At: #if(invoice.paidAt):#(invoice.paidAt)#else:Not paid yet#endif</li>
-                    <li>Created: #if(invoice.createdAt):#(invoice.createdAt)#else:N/A#endif</li>
-                </ul>
-            </div>
-            <div class="trips-actions">
-                #if(canMarkPaid):
-                    <form method="post" action="/products/gofloradriver/invoices/#if(invoice.id):#(invoice.id)#endif/mark-paid" style="display:inline;">
-                        <button type="submit" class="trips-btn-primary">Mark as Paid</button>
-                    </form>
-                #endif
-                <a href="/products/gofloradriver/invoices" class="trips-btn-secondary">Back to List</a>
-            </div>
-        </div>
+                <div style="display:flex; flex-direction:column; gap:12px; align-items:center;">
+                        <div style="width: 680px; background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:16px; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
+                            <div style="text-align:center; margin-bottom:10px;">
+                                <div style="font-weight:700; font-size:16px; letter-spacing:1px;">GoFlora Transport</div>
+                                <div style="color:#6b7280; font-size:12px;">Invoice Receipt</div>
+                            </div>
+                            <div style="border-top:1px dashed #d1d5db; margin:8px 0;"></div>
+                            <div style="display:flex; justify-content:space-between; font-size:13px;">
+                                <div><strong>ID:</strong> #if(invoice.id):#(invoice.id)#else:N/A#endif</div>
+                                <div><strong>Date:</strong> #if(invoice.createdAt):#(invoice.createdAt)#else:N/A#endif</div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:13px; margin-top:6px;">
+                                <div><strong>From:</strong> #if(invoice.tripPickupLocation):#(invoice.tripPickupLocation)#else:N/A#endif</div>
+                                <div><strong>To:</strong> #if(invoice.tripDropoffLocation):#(invoice.tripDropoffLocation)#else:N/A#endif</div>
+                            </div>
+                            <div style="border-top:1px dashed #d1d5db; margin:8px 0;"></div>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; font-size:13px;">
+                                <div><strong>Base Fare:</strong> $#if(invoice.baseFare):#(invoice.baseFare)#else:0.00#endif</div>
+                                <div><strong>Driver Fee:</strong> $#if(invoice.driverServiceFee):#(invoice.driverServiceFee)#else:0.00#endif</div>
+                                <div><strong>Platform Fee:</strong> $#if(invoice.platformFee):#(invoice.platformFee)#else:0.00#endif</div>
+                                <div><strong>Payment Method:</strong> #if(invoice.method):#(invoice.method)#else:N/A#endif</div>
+                            </div>
+                            <div style="border-top:1px dashed #d1d5db; margin:8px 0;"></div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div><strong>Status:</strong> <span class="trips-badge #if(invoice.status == "paid"):completed#else:pending#endif">#(invoice.status)</span></div>
+                                <div style="font-weight:700;">Total: $#if(invoice.amount):#(invoice.amount)#else:0.00#endif</div>
+                            </div>
+                            <div style="text-align:center; color:#9ca3af; font-size:12px; margin-top:8px;">Thank you for driving with GoFlora</div>
+                               <div class="trips-actions">
+
+                  <form method="post" action="/products/gofloradriver/invoices/#if(invoice.id):#(invoice.id)#endif/mark-paid" style="display: block; width: 100%; margin-top: 16px;">
+    <button type="submit" 
+        style="
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2), 0 2px 4px -2px rgba(16, 185, 129, 0.1);
+            transition: all 0.2s ease;
+            outline: none;
+        "
+        onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 10px 15px -3px rgba(16, 185, 129, 0.3)';"
+        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px -1px rgba(16, 185, 129, 0.2)';"
+    >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        Confirm Payment Received
+    </button>
+</form>
+               </div>
+                            <div style="text-align:center; margin-top:10px;">
+                            <a href="/products/gofloradriver/invoices" class="trips-btn-secondary">Back to List</a>
+                            </div>
+                        </div>
+                </div>
+
     #endexport
 #endextend

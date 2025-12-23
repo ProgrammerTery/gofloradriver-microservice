@@ -3,7 +3,19 @@ import Leaf
 
 // configures your application
 public func configure(_ app: Application) async throws {
-    
+
+    // 1. Create a custom JSON Decoder
+    let decoder = JSONDecoder()
+    decoder.dateDecodingStrategy = .iso8601
+
+    // 2. Create a custom JSON Encoder (usually you want both to match)
+    let encoder = JSONEncoder()
+    encoder.dateEncodingStrategy = .iso8601
+
+    // 3. Register them globally with ContentConfiguration
+    ContentConfiguration.global.use(decoder: decoder, for: .json)
+    ContentConfiguration.global.use(encoder: encoder, for: .json)
+
     // Configure server to run on port 8081
     app.http.server.configuration.port = 8081
     
